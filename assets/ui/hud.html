@@ -1,0 +1,894 @@
+<style>
+  .hud-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: linear-gradient(to bottom,
+        rgba(40, 40, 40, 0.92),
+        rgba(25, 25, 25, 0.92));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5),
+      inset 0 0 20px rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    width: 200px;
+    backdrop-filter: blur(4px);
+  }
+
+  .panel-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    padding: 6px 8px;
+    background: rgba(30, 30, 30, 0.6);
+    border: 1px solid rgba(200, 200, 200, 0.15);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .panel-row:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-3px);
+  }
+
+  .panel-row.red-team {
+    background: rgba(255, 68, 68, 0.2);
+    border: 1px solid rgba(255, 68, 68, 0.4);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+  }
+
+  .panel-name.red-team {
+    color: #ff4444;
+    font-weight: bold;
+  }
+
+  .panel-name.blue-team {
+    color: #4444ff;
+    font-weight: bold;
+  }
+
+  .panel-name {
+    flex: 1;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+  }
+
+  .panel-value {
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Georgia', serif;
+    padding: 0 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+
+  .time-value {
+    color: #e5ec1d;
+  }
+
+  .red-score {
+    color: #ff4444;
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+  }
+
+  .blue-score {
+    color: #4444ff;
+    text-shadow: 0 0 8px rgba(68, 68, 255, 0.4);
+  }
+
+  .team-indicator {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+  }
+
+  .your-team .team-indicator {
+    display: inline-block;
+  }
+
+  .team-button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    background: linear-gradient(to bottom, #14376c, #1c4d97);
+    border: 2px solid rgba(200, 200, 200, 0.2);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .team-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .team-button:active {
+    transform: translateY(0);
+  }
+
+  .restart-button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    background: linear-gradient(to bottom, #6c1414, #971c1c);
+    border: 2px solid rgba(200, 200, 200, 0.2);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .restart-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .restart-button:active {
+    transform: translateY(0);
+  }
+
+  .class-button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    background: linear-gradient(to bottom, #146c14, #1c971c);
+    border: 2px solid rgba(200, 200, 200, 0.2);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .class-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .class-button:active {
+    transform: translateY(0);
+  }
+
+  .game-over {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  .game-over-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .winner-text {
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 48px;
+    color: #00ffaa;
+    text-shadow: 0 0 20px rgba(0, 255, 170, 0.6),
+      0 0 40px rgba(0, 255, 170, 0.4);
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    to {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .class-select {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(to bottom,
+        rgba(40, 40, 40, 0.95),
+        rgba(25, 25, 25, 0.95));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 12px;
+    padding: 20px;
+    width: 700px;
+    display: none;
+    justify-content: space-around;
+    gap: 20px;
+    backdrop-filter: blur(8px);
+  }
+
+  .class-select#player-leaderboard {
+    padding: 24px;
+    gap: 32px;
+    width: 60%;
+    background: rgba(5, 27, 107, 0.6);
+  }
+
+  .leaderboard {
+    background: rgba(5, 27, 107, 0.6);
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 350px;
+  }
+
+  .leaderboard-title {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 16px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .leaderboard-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 8px 16px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    color: #aaaaaa;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .leaderboard-entry {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 12px 16px;
+    margin: 4px 0;
+    background: #ffffff;
+    color: black;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .leaderboard-entry:hover {
+    background: rgba(70, 70, 70, 0.4);
+    transform: translateX(4px);
+  }
+
+  #red-leaderboard .leaderboard-title {
+    color: #ff4444;
+  }
+
+  #blue-leaderboard .leaderboard-title {
+    color: #4444ff;
+  }
+
+  .class-card {
+    width: 180px;
+    background: rgba(60, 60, 60, 0.4);
+    border: 2px solid rgba(200, 200, 200, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: rgba(200, 200, 200, 0.4);
+  }
+
+  .class-card.selected {
+    border-color: #00ffaa;
+    box-shadow: 0 0 15px rgba(0, 255, 170, 0.3);
+  }
+
+  .class-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 10px;
+  }
+
+  .class-name {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .class-desc {
+    color: #cccccc;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.4;
+  }
+
+  .class-stats {
+    text-align: left;
+    margin-top: 10px;
+    padding: 0 10px;
+  }
+
+  .stat {
+    color: #aaaaaa;
+    font-size: 13px;
+    margin: 4px 0;
+  }
+
+  .stat.pro {
+    color: #00ff00;
+  }
+
+  .stat.con {
+    color: #ff4444;
+  }
+
+  .stamina-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .stamina-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    transition: width 0.3s ease;
+  }
+
+  .stamina-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 10px;
+    line-height: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+  }
+
+  .crosshair {
+    position: fixed;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .crosshair::before,
+  .crosshair::after {
+    content: '';
+    position: absolute;
+    background: rgba(50, 50, 50, 0.8);
+  }
+
+  .crosshair::before {
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+
+  .crosshair::after {
+    top: 50%;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    transform: translateY(-50%);
+  }
+
+  .respawn-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .respawn-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  .death-message {
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 32px;
+    color: #ff4444;
+    text-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+    margin-bottom: 20px;
+  }
+
+  .respawn-timer {
+    font-family: 'Georgia', serif;
+    font-size: 48px;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    animation: pulse 1s infinite;
+  }
+
+  .team-banner {
+    position: fixed;
+    top: 16px;
+    height: 40px;
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    color: white;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .team-banner.red {
+    left: 20%;
+    background: linear-gradient(to right,
+        rgba(200, 30, 30, 0.95),
+        rgba(120, 20, 20, 0.85));
+    border: 2px solid rgba(255, 68, 68, 0.6);
+  }
+
+  .team-banner.blue {
+    right: 20%;
+    background: linear-gradient(to left,
+        rgba(30, 30, 200, 0.95),
+        rgba(20, 20, 120, 0.85));
+    border: 2px solid rgba(68, 68, 255, 0.6);
+  }
+
+  .team-banner.your-team {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  }
+
+  .team-name {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .team-score {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .controls-panel {
+    position: fixed;
+    right: 20px;
+    top: 80px;
+    background: linear-gradient(to bottom,
+        rgba(40, 40, 40, 0.92),
+        rgba(25, 25, 25, 0.92));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    padding: 12px;
+    width: 200px;
+    backdrop-filter: blur(4px);
+  }
+
+  .player-stats {
+    position: fixed;
+    right: 20px;
+    top: 200px;
+    background: linear-gradient(to bottom,
+        rgba(40, 40, 40, 0.92),
+        rgba(25, 25, 25, 0.92));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    padding: 12px;
+    width: 160px;
+    backdrop-filter: blur(4px);
+  }
+
+  .stats-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .death-count {
+    color: #ff4444;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+  }
+
+  .points-count {
+    color: #44ff44;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+  }
+
+  .kills-count {
+    color: #44ff44;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+  }
+
+  .stat-label {
+    font-weight: bold;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    color: #ffffff;
+    font-family: 'Georgia', serif;
+  }
+
+  .time-display {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom,
+        rgba(40, 40, 40, 0.92),
+        rgba(25, 25, 25, 0.92));
+    border: 1px solid rgba(180, 180, 180, 0.4);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .time-label {
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+    margin-right: 8px;
+    font-weight: bold;
+  }
+</style>
+
+<div class="crosshair" id="crosshair"></div>
+
+<div class="stamina-container">
+  <div class="stamina-bar" id="stamina-bar"></div>
+  <div class="stamina-text" id="stamina-text">100/100</div>
+</div>
+
+<div class="time-display">
+  <span class="time-label">Time Left</span>
+  <span class="panel-value time-value" id="time-left">5:00</span>
+</div>
+
+<div class="hud-panel">
+  <!-- <button class="team-button" id="switch-team">Switch Team</button> -->
+  <button class="restart-button" id="restart-game">Restart Game</button>
+  <button class="class-button" id="change-class">Change Class (e)</button>
+</div>
+
+<div class="game-over">
+  <div class="game-over-content">
+    <div class="winner-text" id="winner-text">Red Team Wins!</div>
+  </div>
+</div>
+
+<div class="class-select" id="class-select">
+  <div class="class-card" id="runner-class">
+    <div class="class-name">Runner</div>
+    <div class="class-desc">
+      Fast-moving scout that leaves a trail of color behind them
+    </div>
+    <div class="class-stats">
+      <div class="stat pro">+ More stamina</div>
+      <div class="stat pro">+ Punch players off the map</div>
+      <div class="stat con">- No projectiles</div>
+      <div class="stat con">- Less knockback on hit</div>
+    </div>
+  </div>
+
+  <div class="class-card" id="sniper-class">
+    <div class="class-name">Sniper</div>
+    <div class="class-desc">Long-range specialist with precise shots</div>
+    <div class="class-stats">
+      <div class="stat pro">+ Easiest to aim</div>
+      <div class="stat pro">+ Shooting takes less stamina</div>
+      <div class="stat con">- Small splash radius</div>
+      <div class="stat con">- No splash on hit</div>
+    </div>
+  </div>
+
+  <div class="class-card" id="grenader-class">
+    <div class="class-name">Grenader</div>
+    <div class="class-desc">Area control expert with explosive projectiles</div>
+    <div class="class-stats">
+      <div class="stat pro">+ Large Splash</div>
+      <div class="stat pro">+ Bounce off players</div>
+      <div class="stat con">- Hard to aim</div>
+      <div class="stat con">- Less stamina</div>
+    </div>
+  </div>
+</div>
+
+<div class="class-select" id="player-leaderboard">
+  <div class="leaderboard-title">Leaderboard</div>
+  <div id="red-leaderboard" class="leaderboard">
+    <!-- <div>Red Raiders</div> -->
+  </div>
+  <div id="blue-leaderboard" class="leaderboard">
+    <!-- <div>Blue Bandits</div> -->
+  </div>
+</div>
+
+<div class="respawn-screen" id="respawn-screen">
+  <div class="respawn-content">
+    <div class="death-message" id="death-message">You fell off the map!</div>
+    <div class="respawn-timer" id="respawn-timer">5</div>
+  </div>
+</div>
+
+<div class="team-banner red" id="red-banner">
+  <div class="team-name">Red Raiders</div>
+  <div class="team-score" id="red-score">0</div>
+</div>
+
+<div class="team-banner blue" id="blue-banner">
+  <div class="team-name">Blue Bandits</div>
+  <div class="team-score" id="blue-score">0</div>
+</div>
+
+<div class="player-stats">
+  <div class="stats-row">
+    <div class="stat-counter death-count">
+      <span class="stat-label">Deaths</span>
+      <span class="stat-value" id="death-count">0</span>
+    </div>
+    <div class="stat-counter points-count">
+      <span class="stat-label">Points</span>
+      <span class="stat-value" id="points-count">0</span>
+    </div>
+    <div class="stat-counter kills-count">
+      <span class="stat-label">Kills</span>
+      <span class="stat-value" id="kills-count">0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  hytopia.onData((data) => {
+    if (data.type === 'game-ui') {
+      document.getElementById('time-left').textContent = data.time
+
+      // Update points counter
+      if (data.playerPoints !== undefined) {
+        document.getElementById('points-count').textContent = data.playerPoints
+      }
+
+      if (data.playerKills !== undefined) {
+        document.getElementById('kills-count').textContent = data.playerKills
+      }
+
+      // Update stamina bar
+      if (data.playerStamina !== undefined) {
+        const staminaBar = document.getElementById('stamina-bar')
+        const staminaText = document.getElementById('stamina-text')
+        const percentage = (data.playerStamina / data.maxStamina) * 100
+        staminaBar.style.width = `${percentage}%`
+        staminaText.textContent = `${Math.round(data.playerStamina)}/${data.maxStamina
+          }`
+
+        // Update stamina bar color based on stamina level
+        if (percentage < 30) {
+          staminaBar.style.background =
+            'linear-gradient(to right, #e74c3c, #c0392b)'
+        } else {
+          staminaBar.style.background =
+            'linear-gradient(to right, #2ecc71, #27ae60)'
+        }
+      }
+
+      // Show/hide crosshair based on player class
+      const crosshair = document.getElementById('crosshair')
+      // if (data.playerClass === 'sniper' || data.playerClass === 'grenader') {
+      //   crosshair.style.display = 'block';
+      // } else {
+      //   crosshair.style.display = 'none';
+      // }
+
+      // Parse the scores string and update the UI
+      const scores = data.scores.split(' | ')
+      scores.forEach((score) => {
+        if (score.includes('Blue')) {
+          document.getElementById('blue-score').textContent =
+            score.split(': ')[1]
+        } else if (score.includes('Red')) {
+          document.getElementById('red-score').textContent =
+            score.split(': ')[1]
+        }
+      })
+
+      // Update team indicator
+      document.getElementById('red-banner').classList.remove('your-team')
+      document.getElementById('blue-banner').classList.remove('your-team')
+
+      if (data.playerTeam === 'Red Raiders') {
+        document.getElementById('red-banner').classList.add('your-team')
+      } else if (data.playerTeam === 'Blue Bandits') {
+        document.getElementById('blue-banner').classList.add('your-team')
+      }
+    }
+
+    if (data.type === 'game-over') {
+      document.querySelector('.game-over').style.display = 'block'
+      document.getElementById(
+        'winner-text'
+      ).textContent = `${data.winner} Wins!`
+      // Hide game over message after 5 seconds
+      setTimeout(() => {
+        document.querySelector('.game-over').style.display = 'none'
+      }, 5000)
+    }
+
+    if (data.type === 'player-death') {
+      const respawnScreen = document.getElementById('respawn-screen')
+      const respawnTimer = document.getElementById('respawn-timer')
+      const deathMessage = document.getElementById('death-message')
+      const deathCount = document.getElementById('death-count')
+
+      // Increment death counter
+      deathCount.textContent = (parseInt(deathCount.textContent) + 1).toString()
+
+      deathMessage.textContent = data.message || 'You died!'
+      respawnScreen.style.display = 'block'
+
+      let timeLeft = 5
+      respawnTimer.textContent = timeLeft
+
+      const countdown = setInterval(() => {
+        timeLeft--
+        respawnTimer.textContent = timeLeft
+
+        if (timeLeft <= 0) {
+          clearInterval(countdown)
+          respawnScreen.style.display = 'none'
+        }
+      }, 1000)
+    }
+
+    if (data.type === 'show-class-select') {
+      const select = document.getElementById('class-select')
+      if (select.style.display === 'none') {
+        select.style.display = 'flex'
+      } else {
+        select.style.display = 'none'
+      }
+    }
+
+    if (data.type === 'show-player-leaderboard') {
+      if (document.getElementById('player-leaderboard').style.display === 'none') {
+        document.getElementById('player-leaderboard').style.display = 'block'
+        const redLeaderboard = data.redLeaderboard
+        document.getElementById('red-leaderboard').innerHTML = ''
+        redLeaderboard.forEach(player => {
+          document.getElementById('red-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
+        })
+
+        const blueLeaderboard = data.blueLeaderboard
+        document.getElementById('blue-leaderboard').innerHTML = ''
+        blueLeaderboard.forEach(player => {
+          document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
+        })
+        // document.getElementById('red-leaderboard').innerHTML = 'Red Raiders'
+        // document.getElementById('blue-leaderboard').innerHTML = 'Blue Bandits'
+      } else {
+        document.getElementById('player-leaderboard').style.display = 'none'
+      }
+    }
+  })
+
+  // document.getElementById('switch-team').addEventListener('click', () => {
+  //   hytopia.sendData({ button: 'switch-team' })
+  // })
+
+  document.getElementById('restart-game').addEventListener('click', () => {
+    hytopia.sendData({ button: 'restart-game' })
+  })
+
+  let selectedClass = null
+
+  function selectClass(className) {
+    // Remove selected class from all cards
+    document.querySelectorAll('.class-card').forEach((card) => {
+      card.classList.remove('selected')
+    })
+
+    // Add selected class to clicked card
+    document.getElementById(`${className}-class`).classList.add('selected')
+
+    // Send selection to game
+    hytopia.sendData({ button: 'select-class', class: className })
+
+    // Hide class selection after choosing
+    document.getElementById('class-select').style.display = 'none'
+  }
+
+  // Add click handlers for class selection
+  document
+    .getElementById('runner-class')
+    .addEventListener('click', () => selectClass('runner'))
+  document
+    .getElementById('sniper-class')
+    .addEventListener('click', () => selectClass('sniper'))
+  document
+    .getElementById('grenader-class')
+    .addEventListener('click', () => selectClass('grenader'))
+
+  document.getElementById('change-class').addEventListener('click', () => {
+    document.getElementById('class-select').style.display = 'flex'
+  })
+</script>

@@ -1,0 +1,107 @@
+<script>
+  hytopia.registerSceneUITemplate('game-instructions', (id, onState) => {
+    const template = document.getElementById('game-instructions-template');
+    const clone = template.content.cloneNode(true);
+    const instructionsElement = clone.querySelector('.instructions');
+    
+    onState(state => {
+      instructionsElement.style.display = state.visible ? 'block' : 'none';
+    });
+    
+    return clone;
+  });
+</script>
+
+<template id="game-instructions-template">
+  <div class="instructions">
+    <div class="instructions-panel">
+      <h2>How to Play</h2>
+      <div class="instruction-section">
+        <h3>Movement</h3>
+        <ul>
+          <li>WASD - Move around</li>
+          <li>Space - Jump</li>
+          <li>Shift - Sprint</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Classes</h3>
+        <ul>
+          <li>Runner - Colors blocks by walking, can punch players</li>
+          <li>Sniper - Precise shots, low stamina cost</li>
+          <li>Grenader - Area control, bouncy projectiles</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Controls</h3>
+        <ul>
+          <li>Left Click - Shoot/Punch</li>
+          <li>H - Toggle Instructions</li>
+          <li>\ - Debug View</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Objective</h3>
+        <p>Color more blocks than the enemy team before time runs out!</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .instructions {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .instructions-panel {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .instructions h2 {
+    text-align: center;
+    color: #00ffaa;
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+  }
+
+  .instruction-section {
+    margin: 15px 0;
+  }
+
+  .instruction-section h3 {
+    color: #4488ff;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+  }
+
+  .instruction-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .instruction-section li {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #cccccc;
+  }
+
+  .instruction-section p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #cccccc;
+  }
+</style>
