@@ -628,6 +628,7 @@
 
 <div class="hud-panel">
   <!-- <button class="team-button" id="switch-team">Switch Team</button> -->
+  <!-- <button class="class-button" id="switch-map">Switch Map</button> -->
   <button class="restart-button" id="restart-game">Restart Game</button>
   <button class="class-button" id="change-class">Change Class (e)</button>
 </div>
@@ -856,6 +857,10 @@
 
   document.getElementById('restart-game').addEventListener('click', () => {
     hytopia.sendData({ button: 'restart-game' })
+  })
+
+  document.getElementById('switch-map').addEventListener('click', () => {
+    hytopia.sendData({ button: 'switch-map' })
   })
 
   let selectedClass = null

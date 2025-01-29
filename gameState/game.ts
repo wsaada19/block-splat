@@ -1,7 +1,7 @@
 import { World, Player, PlayerManager } from 'hytopia'
 import TeamManager from './team'
 import type { PlayerDataManager } from './player-data'
-import { BLOCK_STATE, clearBlockStates } from './block-utils'
+import { BLOCK_STATE, clearBlockStates } from '../utilities/block-utils'
 
 export type GameEventHandler = () => void
 
