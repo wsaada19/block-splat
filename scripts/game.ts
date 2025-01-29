@@ -46,6 +46,7 @@ export default class Game {
   startGame() {
     if (this.isGameRunning) return
     this.isGameRunning = true
+    this.timeRemaining = this.timeLimit
 
     clearBlockStates(this.blockStateMap, this.world)
 
@@ -59,8 +60,8 @@ export default class Game {
     }, 1000)
 
     this.uiTimer = setInterval(() => {
-      this.updateAllPlayersUI()
       this.playerDataManager.staminaRegen()
+      this.updateAllPlayersUI()
     }, 250)
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
@@ -73,14 +74,11 @@ export default class Game {
   }
 
   restartGame() {
-    this.timeRemaining = this.timeLimit
-    this.scores.forEach((_, teamId) => {
-      this.scores.set(teamId, 0)
-    })
-
+    this.isGameRunning = false
+    if (this.gameTimer) clearInterval(this.gameTimer)
+    if (this.uiTimer) clearInterval(this.uiTimer)
     // TODO randomize teams
     this.startGame()
-    this.updateAllPlayersUI()
   }
 
   changeScore(teamId: number, score: number) {
@@ -138,6 +136,7 @@ export default class Game {
     this.isGameRunning = false
 
     if (this.gameTimer) clearInterval(this.gameTimer)
+    if (this.uiTimer) clearInterval(this.uiTimer)
 
     // Find winning team
     let winningTeam = 1

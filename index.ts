@@ -23,7 +23,8 @@ import {
   coloredBlockData,
   blockIds,
   getStateFromTag,
-  setBlockState
+  setBlockState,
+  getBlockIdFromState
 } from './scripts/block-utils'
 
 import Game from './scripts/game'
@@ -39,6 +40,8 @@ import {
 const TIME_LIMIT = 60 * 5 // 5 minutes
 const DEFAULT_SPAWN = { x: -10, y: 15, z: -10 }
 const blockStateMap = new Map<string, BLOCK_STATE>()
+const SHOOTING_COOLDOWN = 250;
+const JUMP_COOLDOWN = 1000;
 
 startServer((world) => {
   const playerDataManager = new PlayerDataManager()
@@ -99,8 +102,14 @@ startServer((world) => {
 
   world.loadMap(worldMap)
 
-  world.chatManager.registerCommand('start-game', () => {
+  world.chatManager.registerCommand('/start-game', () => {
+    world.chatManager.sendBroadcastMessage('Starting game...')
     game.startGame()
+  })
+
+  world.chatManager.registerCommand('/set-name', (player, args) => {
+    playerDataManager.setPlayerName(player.id, args[0])
+    world.chatManager.sendPlayerMessage(player, `Name set to ${args[0]}`)
   })
 
   // Play some peaceful ambient music
@@ -236,14 +245,14 @@ function onPlayerJoin(
     }
   }
 
-  world.chatManager.sendPlayerMessage(player, 'Welcome to the game!', '00FF00')
-  world.chatManager.sendPlayerMessage(player, 'Use WASD to move around.')
+  world.chatManager.sendPlayerMessage(player, 'Welcome! Use WASD to move around.')
   world.chatManager.sendPlayerMessage(player, 'Press space to jump.')
   world.chatManager.sendPlayerMessage(player, 'Hold shift to sprint.')
-  world.chatManager.sendPlayerMessage(
-    player,
-    'Press \\ to enter or exit debug view.'
-  )
+  world.chatManager.sendPlayerMessage(player, 'Press left mouse button to shoot.')
+  world.chatManager.sendPlayerMessage(player, 'Press right mouse button to punch.')
+  world.chatManager.sendPlayerMessage(player, 'Press e to select your class.')
+  world.chatManager.sendPlayerMessage(player, 'Press r to view the leaderboard.')
+  world.chatManager.sendPlayerMessage(player, 'Type /set-name to set your name.')
 }
 
 function onBlockHit(
@@ -288,7 +297,7 @@ function onBlockHit(
         z: Math.round(contactPoint.z)
       }
 
-      const maxBlocks = entity.name === PROJECTILES.ARROW.NAME ? 2 : 9
+      const maxBlocks = entity.name === PROJECTILES.ARROW.NAME ? 2 : 14
       let blocksColored = 0
       const newState = getStateFromTag(color ?? 'WHITE')
       const blockId =
@@ -311,7 +320,9 @@ function onBlockHit(
         [1, 0, 1],
         [-1, 0, 1],
         [1, 0, -1],
-        [-1, 0, -1]
+        [-1, 0, -1],
+        [-1, -1, -1],
+        [1, 1, 1]
       ]
 
       for (const [dx, dy, dz] of checkOrder) {
@@ -329,8 +340,7 @@ function onBlockHit(
         }
 
         const blockState = world.chunkLattice.getBlockId(blockPos)
-
-        if (blockState === newState) continue
+        if (blockState === getBlockIdFromState(newState)) continue
 
         // Update scores in one pass
         if (blockState === BLOCK_STATE.BLUE) {
@@ -411,6 +421,7 @@ function onBlockHit(
 }
 
 let lastJumpMap = new Map<string, number>()
+let lastShotMap = new Map<string, number>()
 
 function onTickWithPlayerInput(
   this: PlayerEntityController,
@@ -427,6 +438,13 @@ function onTickWithPlayerInput(
     const playerClass = playerDataManager.getPlayerClass(entity.player.id)
 
     if (!playerClass || playerClass === PlayerClass.RUNNER) return
+    const lastShot = lastShotMap.get(entity.player.id)
+    if (lastShot && Date.now() - lastShot < SHOOTING_COOLDOWN) {
+      input.ml = false
+      return
+    } else {
+      lastShotMap.set(entity.player.id, Date.now())
+    }
 
     const world = entity.world
     const direction = Vector3.fromVector3Like(entity.directionFromRotation)
@@ -485,7 +503,7 @@ function onTickWithPlayerInput(
     }
   } else if (input.mr) {
     const direction = entity.player.camera.facingDirection
-    const length = 3
+    const length = 3.5
 
     const raycastResult = world.simulation.raycast(
       entity.position,
@@ -497,28 +515,31 @@ function onTickWithPlayerInput(
     )
     if (raycastResult?.hitEntity?.name === 'Player') {
       // knockback player
+      const verticalForce = Math.max(direction.y, 0.7) * 15;
+      entity.startModelOneshotAnimations(['simple_interact'])
+      // raycastResult.hitEntity.startModelOneshotAnimations(['jump'])
       raycastResult.hitEntity.applyImpulse({
-        x: direction.x * 5,
-        y: 15,
-        z: direction.z * 5
+        x: direction.x * 12,
+        y: verticalForce,
+        z: direction.z * 12
       })
-
+      playerDataManager.updateStamina(entity.player.id, -10)
       input.mr = false
-    }
-  } else if (input.sh) {
-    //decrease stamina
-    if (playerDataManager.getPlayerStamina(entity.player.id) > 5) {
-      playerDataManager.updateStamina(entity.player.id, -0.5)
-    } else {
-      input.sh = false
     }
   } else if (input.sp) {
     // don't let player spam jumping due to some weird behavior
     const lastJump = lastJumpMap.get(entity.player.id)
-    if (lastJump && Date.now() - lastJump < 1000) {
+    if (lastJump && Date.now() - lastJump < JUMP_COOLDOWN) {
       input.sp = false
     } else {
       lastJumpMap.set(entity.player.id, Date.now())
+    }
+  } else if (input.sh) {
+    //decrease stamina
+    if (playerDataManager.getPlayerStamina(entity.player.id) > 5) {
+      playerDataManager.updateStamina(entity.player.id, -1)
+    } else {
+      input.sh = false
     }
   } else if (input.e) {
     entity.player.ui.sendData({
@@ -526,7 +547,6 @@ function onTickWithPlayerInput(
     })
     input.e = false
   } else if (input.r) {
-    console.log('show-player-leaderboard')
     const redLeaderboard = teamManager.getTeamPlayerData(TEAM_COLORS.RED).sort((a, b) => b.playerPoints - a.playerPoints)
     const blueLeaderboard = teamManager.getTeamPlayerData(TEAM_COLORS.BLUE).sort((a, b) => b.playerPoints - a.playerPoints)
     entity.player.ui.sendData({

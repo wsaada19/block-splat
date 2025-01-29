@@ -9,7 +9,7 @@ export const PROJECTILES = {
         MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
         MODEL_SCALE: 1.5,
         SPEED: 30,
-        KNOCKBACK: 20,
+        KNOCKBACK: 30,
         ENERGY: -40,
     },
     ARROW: {
@@ -17,7 +17,7 @@ export const PROJECTILES = {
         MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
         MODEL_SCALE: 0.8,
         SPEED: 40,
-        KNOCKBACK: 20,
+        KNOCKBACK: 30,
         ENERGY: -15
     }
 }
@@ -47,9 +47,9 @@ export const knockBackCollisionHandler = (projectile: Entity, otherEntity: Entit
         const impactForce = projectile.name === PROJECTILES.BLOB.NAME
             ? PROJECTILES.BLOB.KNOCKBACK
             : PROJECTILES.ARROW.KNOCKBACK;
-        const verticalForce = Math.max(normalizedDy, 0.7) * impactForce;
+        const verticalForce = Math.max(normalizedDy, 0.7) * impactForce * 0.8;
         // Add some jitter to the knockback to make it more chaotic
-        const jitter = (1 + (Math.random() * 0.2 - 0.1));
+        const jitter = (0.5 + (Math.random() * 0.1 - 0.1));
 
         if (projectile.name === PROJECTILES.BLOB.NAME) {
             otherEntity.applyImpulse({
@@ -63,6 +63,7 @@ export const knockBackCollisionHandler = (projectile: Entity, otherEntity: Entit
                 y: verticalForce, // Increased vertical force
                 z: normalizedDz * impactForce * jitter
             });
+            projectile.despawn();
         }
 
         // Play hit sound

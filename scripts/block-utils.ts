@@ -11,6 +11,17 @@ export function getBlockKey(pos: Vector3Like): string {
   return `${Math.floor(pos.x)},${Math.floor(pos.y)},${Math.floor(pos.z)}`;
 }
 
+export function getBlockIdFromState(state: BLOCK_STATE): number {
+  switch(state) {
+    case BLOCK_STATE.BLUE:
+      return BLUE_BLOCK_ID;
+    case BLOCK_STATE.RED:
+      return RED_BLOCK_ID;
+    default:
+      return BLANK_BLOCK_ID;
+  }
+}
+
 export function getStateFromTag(tag: string): BLOCK_STATE {
   if(tag === 'RED') {
     return BLOCK_STATE.RED;

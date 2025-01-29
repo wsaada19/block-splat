@@ -118,7 +118,11 @@ export class PlayerDataManager {
 
   public staminaRegen() {
     for (const player of this.playerData.values()) {
-      player.stamina += 5
+      if (player.stamina + 5 > player.maxStamina) {
+        player.stamina = player.maxStamina
+      } else {
+        player.stamina += 5
+      }
     }
   }
 
@@ -133,11 +137,11 @@ export class PlayerDataManager {
   private getMaxStaminaForClass(playerClass: PlayerClass): number {
     switch (playerClass) {
       case PlayerClass.RUNNER:
-        return 120
+        return 200
       case PlayerClass.SNIPER:
         return 400
       case PlayerClass.GRENADER:
-        return 600
+        return 420
       default:
         return 100
     }
