@@ -54,7 +54,12 @@ export default class TeamManager {
       const team = this.getPlayerTeam(player.player.id);
       const spawn = team ? this.getTeamSpawn(team) : undefined;
       if (spawn) {
-        player.setPosition(spawn);
+        const randomPosition = {
+          x: spawn.x + (Math.random() * 2 - 1),
+          y: spawn.y,
+          z: spawn.z + (Math.random() * 2 - 1)
+        };
+        player.setPosition(randomPosition);
       }
     }
   }
@@ -147,7 +152,16 @@ export default class TeamManager {
   }
 
   getTeamSpawn(teamId: number): Vector3Like | undefined {
-    return this.teams.get(teamId)?.spawn;
+    // get random position in a 2 block radius of the spawn
+    const spawn = this.teams.get(teamId)?.spawn;
+    if (!spawn) {
+      return undefined;
+    }
+    return {
+      x: spawn.x + (Math.random() * 2 - 1),
+      y: spawn.y,
+      z: spawn.z + (Math.random() * 2 - 1)
+    };
   }
 
   setTeamName(teamId: number, name: string): boolean {

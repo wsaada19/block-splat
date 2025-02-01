@@ -736,35 +736,31 @@
       Fast-moving scout that leaves a trail of color behind them
     </div>
     <div class="class-stats">
-      <div class="stat pro">+ More stamina</div>
+      <div class="stat pro">+ Leave a trail of paint by walking</div>
       <div class="stat pro">+ Punch players off the map</div>
       <div class="stat con">- No projectiles</div>
-      <div class="stat con">- Less knockback on hit</div>
     </div>
   </div>
 
   <div class="class-card" id="sniper-class">
-    <div class="class-name">Sniper</div>
-    <div class="class-desc">Long-range specialist with precise shots</div>
+    <div class="class-name">Slingshot</div>
     <img src="{{CDN_ASSETS_URL}}/ui/icons/range-icon.png" alt="Sniper" class="class-icon">
+    <div class="class-desc">Spray damage, shoot 3 paint balls at once</div>
     <div class="class-stats">
-      <div class="stat pro">+ Easiest to aim</div>
+      <div class="stat pro">+ Shoot 3 paint balls at once</div>
       <div class="stat pro">+ Shooting takes less stamina</div>
-      <div class="stat con">- Small splash radius</div>
-      <div class="stat con">- No splash on hit</div>
+      <div class="stat con">- Smaller splash radius</div>
     </div>
   </div>
 
   <div class="class-card" id="grenader-class">
     <div class="class-name">Grenader</div>
-    <div class="class-desc">Area control expert with explosive projectiles</div>
     <img src="{{CDN_ASSETS_URL}}/ui/icons/splash-icon.png" alt="Grenader" class="class-icon">
-
+    <div class="class-desc">Area control expert with explosive projectiles</div>
     <div class="class-stats">
       <div class="stat pro">+ Large Splash</div>
-      <div class="stat pro">+ Bounce off players</div>
-      <div class="stat con">- Hard to aim</div>
-      <div class="stat con">- Less stamina</div>
+      <div class="stat pro">+ Bounces off players</div>
+      <div class="stat con">- Harder to aim</div>
     </div>
   </div>
 </div>
@@ -835,7 +831,7 @@
         <h3>Classes</h3>
         <ul>
           <li><strong></strong>Runner</strong> - Colors blocks by walking, can punch players</li>
-          <li><strong>Sniper</strong> - Precise shots, low stamina cost</li>
+          <li><strong>Slingshot</strong> - Spray shots, low stamina cost</li>
           <li><strong>Grenader</strong> - Area control, bouncy projectiles</li>
         </ul>
       </div>
@@ -843,14 +839,14 @@
         <h3>Controls</h3>
         <ul>
           <li></strong>Left Click</strong> - Shoot</li>
-          <li><strong>Right Click</strong> - Punch</li>
+          <li><strong>Q or Right Click</strong> - Punch</li>
           <li><strong>E</strong> - Change Class</li>
           <li><strong>R</strong> - View Leaderboard</li>
         </ul>
       </div>
       <div class="instruction-section">
         <h3>Objective</h3>
-        <p>Color more blocks than the enemy team before time runs out!</p>
+        <p>Color more blocks than the enemy team before time runs out! Shoot paint balls that color blocks and push players off the map, but be careful, because you can knock of your teammates as well! Paint balls will overwrite the existing paint on the block.</p>
       </div>
     </div>
   </div>
@@ -981,6 +977,10 @@
   
     if (data.type === 'player-id') {
       localStorage.setItem('playerId', data.playerId)
+      const playerName = localStorage.getItem('playerName')
+      if (playerName) {
+        hytopia.sendData({ type: 'set-name', name: playerName })
+      }
     }
 
     if (data.type === 'set-name') {

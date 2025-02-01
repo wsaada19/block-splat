@@ -12,7 +12,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 2,
     SPEED: 30,
-    KNOCKBACK: 30,
+    KNOCKBACK: 20,
     ENERGY: -40
   },
   ARROW: {
@@ -20,7 +20,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
-    KNOCKBACK: 30,
+    KNOCKBACK: 20,
     ENERGY: -30
   }
 }

@@ -136,10 +136,10 @@ export class PlayerDataManager {
 
   public staminaRegen() {
     for (const player of this.playerData.values()) {
-      if (player.stamina + 5 > player.maxStamina) {
+      if (player.stamina + 6 > player.maxStamina) {
         player.stamina = player.maxStamina
       } else {
-        player.stamina += 5
+        player.stamina += 6
       }
     }
   }

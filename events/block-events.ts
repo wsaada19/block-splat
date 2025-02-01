@@ -52,7 +52,7 @@ export function onBlockHit(
           z: Math.round(contactPoint.z)
         }
   
-        const maxBlocks = entity.name === PROJECTILES.ARROW.NAME ? 2 : 16
+        const maxBlocks = entity.name === PROJECTILES.ARROW.NAME ? 2 : 18
         let blocksColored = 0
         const newState = getStateFromTag(color ?? 'WHITE')
         const blockId =
@@ -83,6 +83,7 @@ export function onBlockHit(
           [-1, 1, 1],
           [1, 1, -1],
           [-1, 1, -1],
+          [0, -2, 0]
         ]
   
         for (const [dx, dy, dz] of checkOrder) {
