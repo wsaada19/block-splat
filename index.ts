@@ -3,10 +3,13 @@ import {
   Audio,
   Entity,
   BlockType,
+  SceneUI,
 } from 'hytopia'
 import {
   BLOCK_STATE,
+  BLUE_BLOCK_ID,
   coloredBlockData,
+  RED_BLOCK_ID,
 } from './utilities/block-utils'
 
 import Game from './gameState/game'
@@ -81,7 +84,58 @@ startServer((world) => {
       )
   })
 
-  world.loadMap(worldMap)
+  world.loadMap(worldMap);
+
+  // const boundaries = [50, -50]
+
+  // boundaries.forEach((x) => {
+  //   for(let y = -10; y < 50; y++) {
+  //     for(let z = -50; z < 50; z++) {
+  //       world.chunkLattice.setBlock({x, y, z}, 22);
+  //     }
+  //   }
+  // })
+
+  // boundaries.forEach((z) => {
+  //   for(let y = -10; y < 50; y++) {
+  //     for(let x = -50; x < 50; x++) {
+  //       world.chunkLattice.setBlock({x, y, z}, 23);
+  //     }
+  //   }
+  // })
+
+  // for(let x = -50; x < 50; x++) {
+  //   for(let z = -50; z < 50; z++) {
+  //     world.chunkLattice.setBlock({x, y: 50, z}, 24);
+  //   }
+  // }
+
+  // spawn a 20 by 20 by 20 glass box between y 60 and y 70
+  for(let x = -10; x < 10; x++) {
+    for(let z = -10; z < 10; z++) {
+      world.chunkLattice.setBlock({x, y: 60, z}, 21);
+    }
+  }
+
+  // add walls around the glass box
+  for(let y = 60; y < 70; y++) {
+    for(let z = -10; z < 10; z++) {
+      world.chunkLattice.setBlock({x: -10, y, z}, 21);
+      world.chunkLattice.setBlock({x: 10, y, z}, 21);
+    }
+    for(let x = -10; x < 10; x++) {
+      world.chunkLattice.setBlock({x, y, z: -10}, 21);
+      world.chunkLattice.setBlock({x, y, z: 10}, 21);
+    }
+  }
+
+  const instructionsSceneUI = new SceneUI({
+    templateId: 'game-instructions',
+    position: { x: 0, y: 65, z: 10 },
+    state: { visible: true },
+  });
+
+  instructionsSceneUI.load(world)
 
   world.chatManager.registerCommand('/start-game', () => {
     if (game.isGameRunning) {
@@ -95,6 +149,7 @@ startServer((world) => {
   world.chatManager.registerCommand('/set-name', (player, args) => {
     playerDataManager.setPlayerName(player.id, args[0])
     world.chatManager.sendPlayerMessage(player, `Name set to ${args[0]}`)
+    player.ui.sendData({ type: 'set-name', name: args[0] })
   })
 
   // Play some peaceful ambient music

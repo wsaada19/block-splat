@@ -1,4 +1,4 @@
-import { World, Player, PlayerManager } from 'hytopia'
+import { World, Player, PlayerManager, type Vector3Like, Entity, RigidBodyType } from 'hytopia'
 import TeamManager from './team'
 import type { PlayerDataManager } from './player-data'
 import { BLOCK_STATE, clearBlockStates } from '../utilities/block-utils'
@@ -17,6 +17,7 @@ export default class Game {
   private timeLimit: number
   private scores: Map<number, number> = new Map()
   public isGameRunning: boolean = false
+  private energySpawnLocations: Vector3Like[] = [{x: 5, y: 10, z: 5}]
 
   constructor(
     world: World,
@@ -62,12 +63,22 @@ export default class Game {
     this.uiTimer = setInterval(() => {
       this.playerDataManager.staminaRegen()
       this.updateAllPlayersUI()
-    }, 250)
+    }, 200)
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       this.playerDataManager.setToMaxStamina(player.id)
     }
     this.teamManager.spawnPlayers(this.world)
+    const entity = new Entity({
+      name: 'Energy',
+      modelUri: 'models/projectiles/fireball.gltf',
+      modelScale: 1,
+      tintColor: { r: 200, g: 200, b: 0},
+      rigidBodyOptions: {
+        type: RigidBodyType.KINEMATIC_POSITION
+      }
+    })
+    entity.spawn(this.world, this.energySpawnLocations[0])
 
     this.resetScores()
     this.updateAllPlayersUI()

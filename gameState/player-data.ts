@@ -13,6 +13,7 @@ export interface PlayerStats {
   lastHitBy: string
   kills: number
   name: string
+  respawning: boolean
 }
 
 export class PlayerDataManager {
@@ -29,12 +30,28 @@ export class PlayerDataManager {
       playerPoints: player?.playerPoints || 0,
       lastHitBy: player?.lastHitBy || '',
       kills: player?.kills || 0,
-      name: player?.name || ''
+      name: player?.name || '',
+      respawning: player?.respawning || false
     })
+  }
+
+  public setPlayerRespawning(playerId: string, respawning: boolean): void {
+    const player = this.playerData.get(playerId)
+    if (player) {
+      player.respawning = respawning
+    }
+  }
+
+  public getPlayerRespawning(playerId: string): boolean {
+    return this.playerData.get(playerId)?.respawning || false
   }
 
   public getPlayerData(): Map<string, PlayerStats> {
     return this.playerData
+  }
+
+  public getPlayerName(playerId: string): string {
+    return this.playerData.get(playerId)?.name || ''
   }
 
   // Get a player's current class
@@ -65,7 +82,8 @@ export class PlayerDataManager {
       playerPoints: 0,
       lastHitBy: '',
       kills: 0,
-      name: ''
+      name: '',
+      respawning: false
     };
   }
 

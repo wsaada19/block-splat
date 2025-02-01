@@ -256,14 +256,18 @@
     width: 60%;
   }
 
+
+
   .leaderboard {
     border-radius: 8px;
     padding: 16px;
     min-width: 350px;
   }
+
   .leaderboard#red-leaderboard {
     background: rgba(255, 68, 68, 0.6);
   }
+
   .leaderboard#blue-leaderboard {
     background: rgba(68, 68, 255, 0.6);
   }
@@ -293,8 +297,8 @@
     grid-template-columns: 2fr 1fr 1fr;
     padding: 6px 8px;
     margin: 2px 0;
-    background: #ffffff;
-    color: black;
+    color: white;
+    font-weight: bold;
     border-radius: 6px;
     transition: all 0.2s ease;
   }
@@ -612,6 +616,91 @@
     margin-right: 8px;
     font-weight: bold;
   }
+
+  .my-game-message {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: white;
+    text-align: center;
+    position: relative;
+    margin-bottom: 15px;
+  }
+
+  /* .my-game-message:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid rgba(11, 6, 117, 0.8);
+  } */
+
+  .my-game-message p {
+    font-family: Arial, sans-serif;
+    user-select: none;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .instructions {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .instructions-panel {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    width: 500px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .instructions h2 {
+    text-align: center;
+    color: #00ffaa;
+    margin: 0 0 15px 0;
+    font-size: 26px;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+  }
+
+  .instruction-section {
+    margin: 15px 0;
+  }
+
+  .instruction-section h3 {
+    color: #4488ff;
+    margin: 0 0 8px 0;
+    font-size: 20px;
+  }
+
+  .instruction-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .instruction-section li {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #cccccc;
+  }
+
+  .instruction-section p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #cccccc;
+  }
 </style>
 
 <div class="crosshair" id="crosshair"></div>
@@ -629,7 +718,7 @@
 <div class="hud-panel">
   <!-- <button class="team-button" id="switch-team">Switch Team</button> -->
   <!-- <button class="class-button" id="switch-map">Switch Map</button> -->
-  <button class="restart-button" id="restart-game">Restart Game</button>
+  <!-- <button class="restart-button" id="restart-game">Restart Game</button> -->
   <button class="class-button" id="change-class">Change Class (e)</button>
 </div>
 
@@ -642,6 +731,7 @@
 <div class="class-select" id="class-select">
   <div class="class-card" id="runner-class">
     <div class="class-name">Runner</div>
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/speed-icon.png" alt="Runner" class="class-icon">
     <div class="class-desc">
       Fast-moving scout that leaves a trail of color behind them
     </div>
@@ -656,6 +746,7 @@
   <div class="class-card" id="sniper-class">
     <div class="class-name">Sniper</div>
     <div class="class-desc">Long-range specialist with precise shots</div>
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/range-icon.png" alt="Sniper" class="class-icon">
     <div class="class-stats">
       <div class="stat pro">+ Easiest to aim</div>
       <div class="stat pro">+ Shooting takes less stamina</div>
@@ -667,6 +758,8 @@
   <div class="class-card" id="grenader-class">
     <div class="class-name">Grenader</div>
     <div class="class-desc">Area control expert with explosive projectiles</div>
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/splash-icon.png" alt="Grenader" class="class-icon">
+
     <div class="class-stats">
       <div class="stat pro">+ Large Splash</div>
       <div class="stat pro">+ Bounce off players</div>
@@ -678,6 +771,7 @@
 
 <div class="class-select" id="player-leaderboard">
   <div id="red-leaderboard" class="leaderboard">
+
     <!-- <div>Red Raiders</div> -->
   </div>
   <div id="blue-leaderboard" class="leaderboard">
@@ -719,6 +813,49 @@
   </div>
 </div>
 
+<template id="my-game-message-template">
+  <div class="my-game-message">
+    <p class="message"></p>
+  </div>
+</template>
+
+<template id="game-instructions-template">
+  <div class="instructions">
+    <div class="instructions-panel">
+      <h2>How to Play</h2>
+      <div class="instruction-section">
+        <h3>Movement</h3>
+        <ul>
+          <li><strong>WASD</strong> - Move around</li>
+          <li><strong>Space</strong> - Jump</li>
+          <li><strong>Shift</strong> - Sprint</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Classes</h3>
+        <ul>
+          <li><strong></strong>Runner</strong> - Colors blocks by walking, can punch players</li>
+          <li><strong>Sniper</strong> - Precise shots, low stamina cost</li>
+          <li><strong>Grenader</strong> - Area control, bouncy projectiles</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Controls</h3>
+        <ul>
+          <li></strong>Left Click</strong> - Shoot</li>
+          <li><strong>Right Click</strong> - Punch</li>
+          <li><strong>E</strong> - Change Class</li>
+          <li><strong>R</strong> - View Leaderboard</li>
+        </ul>
+      </div>
+      <div class="instruction-section">
+        <h3>Objective</h3>
+        <p>Color more blocks than the enemy team before time runs out!</p>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script>
   hytopia.onData((data) => {
     if (data.type === 'game-ui') {
@@ -751,14 +888,6 @@
             'linear-gradient(to right, #2ecc71, #27ae60)'
         }
       }
-
-      // Show/hide crosshair based on player class
-      const crosshair = document.getElementById('crosshair')
-      // if (data.playerClass === 'sniper' || data.playerClass === 'grenader') {
-      //   crosshair.style.display = 'block';
-      // } else {
-      //   crosshair.style.display = 'none';
-      // }
 
       // Parse the scores string and update the UI
       const scores = data.scores.split(' | ')
@@ -833,13 +962,13 @@
       if (document.getElementById('player-leaderboard').style.display === 'none') {
         document.getElementById('player-leaderboard').style.display = 'flex'
         const redLeaderboard = data.redLeaderboard
-        document.getElementById('red-leaderboard').innerHTML = ''
+        document.getElementById('red-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
         redLeaderboard.forEach(player => {
           document.getElementById('red-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
 
         const blueLeaderboard = data.blueLeaderboard
-        document.getElementById('blue-leaderboard').innerHTML = ''
+        document.getElementById('blue-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
         blueLeaderboard.forEach(player => {
           document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
@@ -849,19 +978,27 @@
         document.getElementById('player-leaderboard').style.display = 'none'
       }
     }
+  
+    if (data.type === 'player-id') {
+      localStorage.setItem('playerId', data.playerId)
+    }
+
+    if (data.type === 'set-name') {
+      localStorage.setItem('playerName', data.name)
+    }
   })
 
   // document.getElementById('switch-team').addEventListener('click', () => {
   //   hytopia.sendData({ button: 'switch-team' })
   // })
 
-  document.getElementById('restart-game').addEventListener('click', () => {
-    hytopia.sendData({ button: 'restart-game' })
-  })
+  // document.getElementById('restart-game').addEventListener('click', () => {
+  //   hytopia.sendData({ button: 'restart-game' })
+  // })
 
-  document.getElementById('switch-map').addEventListener('click', () => {
-    hytopia.sendData({ button: 'switch-map' })
-  })
+  // document.getElementById('switch-map').addEventListener('click', () => {
+  //   hytopia.sendData({ button: 'switch-map' })
+  // })
 
   let selectedClass = null
 
@@ -893,6 +1030,51 @@
     .addEventListener('click', () => selectClass('grenader'))
 
   document.getElementById('change-class').addEventListener('click', () => {
-    document.getElementById('class-select').style.display = 'flex'
+    const select = document.getElementById('class-select')
+    if (select.style.display === 'none') {
+      select.style.display = 'flex'
+    } else {
+      select.style.display = 'none'
+    }
   })
+
+  hytopia.registerSceneUITemplate('my-game-message', (id, onState) => {
+    const template = document.getElementById('my-game-message-template');
+    const clone = template.content.cloneNode(true);
+    
+    const messageElement = clone.querySelector('.message');
+    const backgroundElement = clone.querySelector('.my-game-message');
+
+
+    onState(state => {
+      const playerId = localStorage.getItem('playerId')
+
+      // hide player's own name bar
+      if (playerId === state.playerId) {
+        backgroundElement.style.display = 'none'
+        messageElement.style.display = 'none'
+      } else {
+        backgroundElement.style.display = 'block'
+        messageElement.style.display = 'block'
+      }
+
+      messageElement.textContent = state.message;
+      backgroundElement.style.backgroundColor = state.color;
+      backgroundElement.style.borderColor = state.color;
+    });
+    
+    return clone;
+  });
+
+  hytopia.registerSceneUITemplate('game-instructions', (id, onState) => {
+    const template = document.getElementById('game-instructions-template');
+    const clone = template.content.cloneNode(true);
+    const instructionsElement = clone.querySelector('.instructions');
+    
+    onState(state => {
+      instructionsElement.style.display = state.visible ? 'block' : 'none';
+    });
+    
+    return clone;
+  });
 </script>

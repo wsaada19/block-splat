@@ -1,11 +1,11 @@
 // This file contains the player join, death, and respawn events
-import { Player, World, PlayerEntity, Entity, PlayerEntityController, PlayerUI } from "hytopia"
+import { Player, World, PlayerEntity, Entity, PlayerEntityController, PlayerUI, SceneUI } from "hytopia"
 import { onTickWithPlayerInput } from "./player-input"
 import type Game from "../gameState/game"
 import { type PlayerDataManager, PlayerClass } from "../gameState/player-data"
 import type TeamManager from "../gameState/team"
 import type GameMap from "../gameState/map"
-export const DEFAULT_SPAWN = { x: -10, y: 15, z: -10 }
+export const LOBBY_SPAWN = { x: 0, y: 65, z: 0 }
 
 
 export function onPlayerJoin(
@@ -16,27 +16,32 @@ export function onPlayerJoin(
   playerDataManager: PlayerDataManager,
   map: GameMap
 ) {
+  teamManager.addPlayerToMinTeam(player.id)
+  
+  const team = teamManager.getPlayerTeam(player.id)
   const playerEntity = new PlayerEntity({
     player,
     name: 'Player',
-    modelUri: 'models/players/player.gltf',
+    modelUri: team === 1 ? 'models/players/player-blue.gltf' : 'models/players/player.gltf',
     modelLoopedAnimations: ['idle'],
     modelScale: 0.5
   })
 
-  playerEntity.spawn(world, DEFAULT_SPAWN)
+  if(game.isGameRunning) {
+    playerEntity.spawn(world, teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN)
+  } else {
+    playerEntity.spawn(world, LOBBY_SPAWN)
+  }
+
   playerDataManager.setPlayerClass(player.id, PlayerClass.SNIPER)
   playerDataManager.setPlayerName(player.id, player.username)
   player.camera.setFov(80)
   player.camera.setOffset({ x: 0, y: 1, z: 0 })
 
-  teamManager.addPlayerToMinTeam(player.id)
-
   playerEntity.onTick = (entity: Entity) => {
     if (entity instanceof PlayerEntity && entity.position.y < -8) {
       handlePlayerDeath(
         entity as PlayerEntity,
-        world,
         teamManager,
         playerDataManager
       )
@@ -85,6 +90,30 @@ export function onPlayerJoin(
     }
   }
 
+  // we store the player id in the local storage so we can use it to hide the player's own name bar
+  player.ui.sendData({
+    type: 'player-id',
+    playerId: player.id,
+  })
+
+  const messageSceneUI = new SceneUI({
+    templateId: 'my-game-message',
+    attachedToEntity: playerEntity, // It'll follow our entity
+    state: { message: player.username, playerId: player.id },
+    offset: { x: 0, y: 1.1, z: 0 }, // Offset it up slightly so it's above our head
+  });
+
+  setInterval(() => {
+    const playerName = playerDataManager.getPlayerName(player.id)
+    messageSceneUI.setState({
+      message: playerName,
+      color: teamManager.getPlayerColor(player.id),
+      playerId: player.id,
+    });
+  }, 1000);
+
+  messageSceneUI.load(world);
+
   world.chatManager.sendPlayerMessage(
     player,
     'Welcome! Use WASD to move around.'
@@ -109,9 +138,9 @@ export function onPlayerJoin(
     'Type /set-name to set your name.'
   )
 }
+
 export function handlePlayerDeath(
   entity: PlayerEntity,
-  world: World,
   teamManager: TeamManager,
   playerDataManager: PlayerDataManager
 ) {
@@ -131,32 +160,39 @@ export function handlePlayerDeath(
   }
 
   // Make player spectator during respawn
-  entity.setPosition({ x: 0, y: 50, z: 0 })
+  entity.setPosition({ x: 0, y: 45, z: 0 })
   if (entity.rawRigidBody) {
     entity.rawRigidBody.setEnabled(false)
   }
 
   setTimeout(() => {
-    respawnPlayer(entity as PlayerEntity, world, teamManager)
+    respawnPlayer(entity as PlayerEntity, teamManager, playerDataManager)
   }, 5000)
 }
 
 export function respawnPlayer(
   entity: PlayerEntity,
-  world: World,
-  teamManager: TeamManager
+  teamManager: TeamManager,
+  playerDataManager: PlayerDataManager
 ) {
   // Get team spawn point
-  const team = teamManager.getPlayerTeam(entity.player.id)
-  const spawn = teamManager.getTeamSpawn(team ?? 0) ?? DEFAULT_SPAWN
+  if(!entity.isSpawned) return;
 
+  const team = teamManager.getPlayerTeam(entity.player.id)
+  const spawn = teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN
   // Re-enable physics and move to spawn
   if (entity.rawRigidBody) {
     entity.rawRigidBody.setEnabled(true)
   }
-  entity.setOpacity(0.3)
-  setTimeout(() => {
-    entity.setOpacity(1)
-  }, 3000)
+  // currently a bug with opacity dont use it now
+  // entity.setOpacity(0.3)
+  // setTimeout(() => {
+  //   entity.setOpacity(1)
+  // }, 3000)
+  
   entity.setPosition(spawn)
+  playerDataManager.setPlayerRespawning(entity.player.id, true)
+  setTimeout(() => {
+    playerDataManager.setPlayerRespawning(entity.player.id, false)
+  }, 4000)
 }

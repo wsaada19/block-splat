@@ -10,7 +10,7 @@ export const PROJECTILES = {
   BLOB: {
     NAME: 'Blob',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
-    MODEL_SCALE: 1.5,
+    MODEL_SCALE: 2,
     SPEED: 30,
     KNOCKBACK: 30,
     ENERGY: -40
@@ -21,7 +21,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 40,
     KNOCKBACK: 30,
-    ENERGY: -15
+    ENERGY: -30
   }
 }
 
@@ -59,54 +59,50 @@ export function spawnProjectile(
   playerDataManager: PlayerDataManager
 ) {
   // Spawn a projectileEntity when the player shoots.
-  const color = teamManager.getPlayerColor(tag)
-  const projectile = PROJECTILES[type]
-  const projectileEntity = new Entity({
-    name: projectile.NAME,
-    modelUri: projectile.MODEL_URI,
-    modelScale: projectile.MODEL_SCALE,
-    tintColor:
-      color === TEAM_COLOR_STRINGS[TEAM_COLORS.RED]
-        ? { r: 255, g: 0, b: 0 }
-        : { r: 0, g: 0, b: 255 },
-    rigidBodyOptions: {
-      type: RigidBodyType.DYNAMIC, // Kinematic means entity's rigid body will not be affected by physics. KINEMATIC_VELOCITY means the entity is moved by setting velocity.
-      linearVelocity: {
-        x: direction.x * projectile.SPEED,
-        y: direction.y * projectile.SPEED,
-        z: direction.z * projectile.SPEED
-      },
-      rotation: getRotationFromDirection(direction) // Get the rotation from the direction vector so it's facing the right way we shot it
-    },
-    tag: tag
-  })
+  const projectileEntity = createProjectileEntity(direction, tag, teamManager, type)
 
-  projectileEntity.onEntityCollision = (
-    projectileEntity: Entity,
-    otherEntity: Entity,
-    started: boolean
+  let projectiles = [projectileEntity]
+  if(type === 'ARROW') {
+    // create two additional arrows to the left and right of the original arrow
+    const leftDirection = rotateDirectionVector(direction, -20)
+    const rightDirection = rotateDirectionVector(direction, 20)
+    const leftArrow = createProjectileEntity(leftDirection, tag, teamManager, 'ARROW', -5)
+    const rightArrow = createProjectileEntity(rightDirection, tag, teamManager, 'ARROW', -5)
+    projectiles.push(leftArrow, rightArrow)
+  }
+  
+  projectiles.forEach(projectile => {
+    projectile.onEntityCollision = (
+      projectileEntity: Entity,
+      otherEntity: Entity,
+        started: boolean
   ) => {
     knockBackCollisionHandler(
       projectileEntity,
       otherEntity,
-      started,
-      tag,
-      playerDataManager
-    )
-  }
-
-  projectileEntity.onBlockCollision = (
-    projectileEntity: Entity,
-    block: BlockType,
-    started: boolean
-  ) => {
-    // If the projectileEntity hits a block, despawn it
-    if (started && !blockIds.includes(block.id)) {
-      projectileEntity.despawn()
+        started,
+        tag,
+        playerDataManager
+      )
     }
-  }
+  })
 
-  projectileEntity.spawn(world, coordinate)
+  projectiles.forEach(projectile => {
+    projectile.onBlockCollision = (
+      projectileEntity: Entity,
+      block: BlockType,
+      started: boolean
+    ) => {
+      // If the projectileEntity hits a block, despawn it
+      if (started && !blockIds.includes(block.id)) {
+        projectileEntity.despawn()
+      }
+    }
+  })
+
+  projectiles.forEach(projectile => {
+    projectile.spawn(world, coordinate)
+  })
 
   // SWOOSH!
   const audio = new Audio({
@@ -123,4 +119,45 @@ export function spawnProjectile(
   }, 2000)
 
   return projectileEntity
+}
+
+const createProjectileEntity = (direction: Vector3Like, tag: string, teamManager: TeamManager, type: ProjectileType, speedOffset: number = 0) => {
+  const projectile = PROJECTILES[type]
+  const color = teamManager.getPlayerColor(tag)
+  
+  const projectileEntity = new Entity({
+    name: projectile.NAME,
+    modelUri: projectile.MODEL_URI,
+    modelScale: projectile.MODEL_SCALE,
+    tintColor:
+      color === TEAM_COLOR_STRINGS[TEAM_COLORS.RED]
+        ? { r: 255, g: 0, b: 0 }
+        : { r: 0, g: 0, b: 255 },
+    rigidBodyOptions: {
+      type: RigidBodyType.DYNAMIC, // Kinematic means entity's rigid body will not be affected by physics. KINEMATIC_VELOCITY means the entity is moved by setting velocity.
+      linearVelocity: {
+        x: direction.x * (projectile.SPEED + speedOffset),
+        y: direction.y * (projectile.SPEED + speedOffset),
+        z: direction.z * (projectile.SPEED + speedOffset)
+      },
+      rotation: getRotationFromDirection(direction) // Get the rotation from the direction vector so it's facing the right way we shot it
+    },
+    tag: tag
+  })
+  return projectileEntity
+}
+
+function rotateDirectionVector(direction: Vector3Like, angleInDegrees: number): Vector3Like {
+  // Convert angle to radians
+  const angle = (angleInDegrees * Math.PI) / 180
+
+  // Rotate around Y axis
+  const cosAngle = Math.cos(angle)
+  const sinAngle = Math.sin(angle)
+
+  return {
+    x: direction.x * cosAngle - direction.z * sinAngle,
+    y: direction.y,
+    z: direction.x * sinAngle + direction.z * cosAngle
+  }
 }

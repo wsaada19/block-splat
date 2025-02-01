@@ -13,10 +13,9 @@ export const knockBackCollisionHandler = (
   // ALLOW FRIENDLY FIRE because it's funnier
   if (
     !(otherEntity instanceof PlayerEntity) ||
-    otherEntity.player.id === tag ||
-    otherEntity.opacity != 1
-  )
-    return
+    otherEntity.player.id === tag || playerDataManager.getPlayerRespawning(otherEntity.player.id)
+  ) return;
+
   if (started && projectile.isSpawned) {
     // tag player so we can reward kills
     const playerStats = playerDataManager.getPlayer(otherEntity.player.id)

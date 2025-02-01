@@ -4,7 +4,7 @@ import { PlayerDataManager, PlayerClass } from "../gameState/player-data"
 import TeamManager, { TEAM_COLORS } from "../gameState/team"
 
 const SHOOTING_COOLDOWN = 250
-const JUMP_COOLDOWN = 1000
+const JUMP_COOLDOWN = 500
 const UI_EVENT_TYPES = {
   SHOW_CLASS_SELECT: 'show-class-select',
   SHOW_PLAYER_LEADERBOARD: 'show-player-leaderboard'
@@ -27,7 +27,7 @@ export function onTickWithPlayerInput(
   if (input.ml) {
     const playerClass = playerDataManager.getPlayerClass(entity.player.id)
 
-    if (!playerClass || playerClass === PlayerClass.RUNNER) return
+    if (!playerClass || playerClass === PlayerClass.RUNNER || isPlayerRespawning(entity)) return
     const lastShot = lastShotMap.get(entity.player.id)
     if (lastShot && Date.now() - lastShot < SHOOTING_COOLDOWN) {
       input.ml = false
@@ -49,7 +49,7 @@ export function onTickWithPlayerInput(
     // Normalize the direction vector to unit length
     direction.normalize()
 
-    entity.startModelOneshotAnimations(['simple_interact'])
+    entity.startModelOneshotAnimations(['throw'])
 
     // Adjust bullet origin roughly for camera offset so crosshair is accurate
     const bulletOrigin = entity.position
@@ -103,10 +103,10 @@ export function onTickWithPlayerInput(
         filterExcludeRigidBody: entity.rawRigidBody
       }
     )
+    entity.startModelOneshotAnimations(['simple_interact'])
     if (raycastResult?.hitEntity?.name === 'Player') {
       // knockback player
       const verticalForce = Math.max(direction.y, 0.7) * 15
-      entity.startModelOneshotAnimations(['simple_interact'])
       // raycastResult.hitEntity.startModelOneshotAnimations(['jump'])
       raycastResult.hitEntity.applyImpulse({
         x: direction.x * 12,
@@ -150,4 +150,8 @@ export function onTickWithPlayerInput(
     })
     input.r = false
   }
+}
+
+const isPlayerRespawning = (entity: PlayerEntity) => {
+  return entity.position.y == 45;
 }
