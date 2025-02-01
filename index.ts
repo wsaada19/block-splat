@@ -150,9 +150,8 @@ startServer((world) => {
     world.chatManager.sendPlayerMessage(player, "Team changed!");
   });
 
-  // Play some peaceful ambient music
   new Audio({
-    uri: "audio/music/hytopia-main.mp3",
+    uri: "audio/music/to-the-death.mp3",
     loop: true,
     volume: 0.1,
   }).play(world);

@@ -13,7 +13,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 2,
     SPEED: 30,
     KNOCKBACK: 20,
-    ENERGY: -40
+    ENERGY: -35
   },
   ARROW: {
     NAME: 'Arrow',
@@ -21,7 +21,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 40,
     KNOCKBACK: 20,
-    ENERGY: -30
+    ENERGY: -35
   }
 }
 
@@ -110,13 +110,11 @@ export function spawnProjectile(
     playbackRate: 2,
     volume: 0.5,
     referenceDistance: 20,
-    position: coordinate
+    position: coordinate,
+    loop: false
   })
 
   audio.play(world)
-  setTimeout(() => {
-    world.audioManager.unregisterAudio(audio)
-  }, 2000)
 
   return projectileEntity
 }

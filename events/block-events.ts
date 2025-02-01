@@ -125,18 +125,15 @@ export function onBlockHit(
           playerDataManager.updatePlayerPoints(tag, blocksColored)
         }
   
-        const audio = new Audio({
+        new Audio({
           uri: 'audio/sfx/liquid/splash-01.mp3',
           playbackRate: 2,
           volume: 1,
           referenceDistance: 20,
-          position: position
-        })
-  
-        audio.play(world)
-        setTimeout(() => {
-          world.audioManager.unregisterAudio(audio)
-        }, 2000)
+          position: position,
+          loop: false
+        }).play(world)
+        
         entity.despawn()
       }
     }

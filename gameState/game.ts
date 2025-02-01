@@ -24,7 +24,10 @@ export default class Game {
   private timeLimit: number;
   private scores: Map<number, number> = new Map();
   public isGameRunning: boolean = false;
-  private energySpawnLocations: Vector3Like[] = [{ x: 5, y: 10, z: 5 }];
+  private energySpawnLocations: Vector3Like[] = [
+    { x: 5, y: 7, z: 1 },
+    { x: -5, y: 7, z: 1 },
+  ];
 
   constructor(
     world: World,
@@ -76,16 +79,16 @@ export default class Game {
       this.playerDataManager.setToMaxStamina(player.id);
     }
     this.teamManager.spawnPlayers(this.world);
-    const entity = new Entity({
-      name: "Energy",
-      modelUri: "models/projectiles/fireball.gltf",
-      modelScale: 1,
-      tintColor: { r: 200, g: 200, b: 0 },
-      rigidBodyOptions: {
-        type: RigidBodyType.KINEMATIC_POSITION,
-      },
-    });
-    entity.spawn(this.world, this.energySpawnLocations[0]);
+    // const entity = new Entity({
+    //   name: "Energy",
+    //   modelUri: "models/projectiles/scene.gltf",
+    //   modelScale: 1,
+    //   tintColor: { r: 255, g: 255, b: 0 },
+    //   rigidBodyOptions: {
+    //     type: RigidBodyType.KINEMATIC_POSITION,
+    //   },
+    // });
+    // entity.spawn(this.world, this.energySpawnLocations[0]);
 
     this.resetScores();
     this.updateAllPlayersUI();

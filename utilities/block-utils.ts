@@ -46,6 +46,7 @@ export function clearBlockStates(blockStateMap: Map<string, BLOCK_STATE>, world:
     setBlockState(blockStateMap, { x, y, z }, BLOCK_STATE.EMPTY);
     world.chunkLattice.setBlock({ x, y, z }, BLANK_BLOCK_ID);
   });
+  blockStateMap.clear();
 }
 
 // Block IDs for different colored blocks
