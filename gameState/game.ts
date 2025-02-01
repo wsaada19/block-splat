@@ -167,6 +167,9 @@ export default class Game {
       'FFFF00'
     )
 
+    // send all players to lobby
+    this.teamManager.sendAllPlayersToLobby(this.world)
+
     // Call end handler if set
     if (this.onEndHandler) {
       this.onEndHandler()

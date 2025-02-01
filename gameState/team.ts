@@ -1,5 +1,6 @@
 import type { Vector3Like, World } from "hytopia";
 import type { PlayerDataManager, PlayerStats } from "./player-data";
+import { LOBBY_SPAWN } from "../events/player-events";
 
 interface Team {
   id: number;
@@ -55,6 +56,13 @@ export default class TeamManager {
       if (spawn) {
         player.setPosition(spawn);
       }
+    }
+  }
+
+  sendAllPlayersToLobby(world: World) {
+    const players = world.entityManager.getAllPlayerEntities();
+    for(const player of players) {
+      player.setPosition(LOBBY_SPAWN);
     }
   }
 

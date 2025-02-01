@@ -103,9 +103,9 @@ export function onBlockHit(
           if (blockState === getBlockIdFromState(newState)) continue
   
           // Update scores in one pass
-          if (blockState === BLOCK_STATE.BLUE) {
+          if (blockState === BLUE_BLOCK_ID) {
             game.changeScore(TEAM_COLORS.BLUE, -1)
-          } else if (blockState === BLOCK_STATE.RED) {
+          } else if (blockState === RED_BLOCK_ID) {
             game.changeScore(TEAM_COLORS.RED, -1)
           }
   

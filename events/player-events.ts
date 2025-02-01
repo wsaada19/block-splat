@@ -1,5 +1,5 @@
 // This file contains the player join, death, and respawn events
-import { Player, World, PlayerEntity, Entity, PlayerEntityController, PlayerUI, SceneUI } from "hytopia"
+import { Player, World, PlayerEntity, Entity, PlayerEntityController, PlayerUI, SceneUI, ChatManager } from "hytopia"
 import { onTickWithPlayerInput } from "./player-input"
 import type Game from "../gameState/game"
 import { type PlayerDataManager, PlayerClass } from "../gameState/player-data"
@@ -43,7 +43,8 @@ export function onPlayerJoin(
       handlePlayerDeath(
         entity as PlayerEntity,
         teamManager,
-        playerDataManager
+        playerDataManager,
+        world.chatManager
       )
     }
   }
@@ -142,20 +143,24 @@ export function onPlayerJoin(
 export function handlePlayerDeath(
   entity: PlayerEntity,
   teamManager: TeamManager,
-  playerDataManager: PlayerDataManager
+  playerDataManager: PlayerDataManager,
+  chatManager: ChatManager
 ) {
   if (entity.position.y === 50) return // dont respawn if player is already dead
   entity.player.ui.sendData({
     type: 'player-death',
     message: 'You fell off the map!'
   })
-
   const playerStats = playerDataManager.getPlayer(entity.player.id)
   if (playerStats) {
     playerStats.playerDeaths++
     if (playerStats.lastHitBy) {
+      const killer = playerDataManager.getPlayerName(playerStats.lastHitBy)
+      chatManager.sendBroadcastMessage(`${entity.player.username} was killed by ${killer}`, 'FF0000')
       playerDataManager.addKill(playerStats.lastHitBy)
       playerDataManager.setLastHitBy(entity.player.id, '')
+    } else {
+      chatManager.sendBroadcastMessage(`${entity.player.username} fell off the map!`, 'FF0000')
     }
   }
 
