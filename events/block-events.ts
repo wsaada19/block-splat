@@ -128,8 +128,8 @@ export function onBlockHit(
         new Audio({
           uri: 'audio/sfx/liquid/splash-01.mp3',
           playbackRate: 2,
-          volume: 1,
-          referenceDistance: 20,
+          volume: .5,
+          referenceDistance: 10,
           position: position,
           loop: false
         }).play(world)

@@ -10,11 +10,11 @@ import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
 import { PlayerDataManager } from "./gameState/player-data";
 import Teams from "./gameState/team";
-import { onPlayerJoin } from "./events/player-events";
+import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 
-const TIME_LIMIT = 60 * 5; // 5 minutes
+const TIME_LIMIT = 10; // 5 minutes
 const blockStateMap = new Map<string, BLOCK_STATE>();
 
 startServer((world) => {
@@ -41,13 +41,8 @@ startServer((world) => {
   world.onPlayerJoin = (player) =>
     onPlayerJoin(player, world, teamManager, game, playerData, map);
 
-  world.onPlayerLeave = (player) => {
-    teamManager.removePlayer(player.id);
-    playerData.removePlayer(player.id);
-    world.entityManager
-      .getPlayerEntitiesByPlayer(player)
-      .forEach((entity) => entity.despawn());
-  };
+  world.onPlayerLeave = (player) =>
+    onPlayerLeave(player, world, teamManager, playerData);
 
   coloredBlockData.forEach((blockData) => {
     const block = world.blockTypeRegistry.registerGenericBlockType({

@@ -5,6 +5,7 @@ import {
   type Vector3Like,
   Entity,
   RigidBodyType,
+  PlayerEntity,
 } from "hytopia";
 import TeamManager from "./team";
 import type { PlayerDataManager } from "./player-data";
@@ -36,6 +37,10 @@ export default class Game {
     timeLimit: number = 500,
     blockStateMap: Map<string, BLOCK_STATE>
   ) {
+
+    if (this.gameTimer) clearInterval(this.gameTimer);
+    if (this.uiTimer) clearInterval(this.uiTimer);
+
     this.world = world;
     this.teamManager = teamManager;
     this.timeRemaining = timeLimit;
@@ -56,6 +61,18 @@ export default class Game {
 
   startGame() {
     if (this.isGameRunning) return;
+
+    if (this.gameTimer) {
+      clearInterval(this.gameTimer);
+      this.gameTimer = null;
+    }
+    if (this.uiTimer) {
+      clearInterval(this.uiTimer);
+      this.uiTimer = null;
+    }
+
+    this.playerDataManager.clearPlayerData();
+
     this.isGameRunning = true;
     this.timeRemaining = this.timeLimit;
 
@@ -95,9 +112,16 @@ export default class Game {
   }
 
   restartGame() {
-    this.isGameRunning = false;
-    if (this.gameTimer) clearInterval(this.gameTimer);
-    if (this.uiTimer) clearInterval(this.uiTimer);
+    if (this.gameTimer) {
+      clearInterval(this.gameTimer);
+      this.gameTimer = null;
+    }
+    if (this.uiTimer) {
+      clearInterval(this.uiTimer);
+      this.uiTimer = null;
+    }
+    this.scores = new Map();
+    clearBlockStates(this.blockStateMap, this.world);
     // TODO randomize teams
     this.startGame();
   }
@@ -176,6 +200,28 @@ export default class Game {
       `Game Over! ${winningTeamName} wins with ${highestScore} blocks!`,
       "FFFF00"
     );
+    
+    for (const player of PlayerManager.instance.getConnectedPlayers()) {
+      const playerTeam = this.teamManager.getTeamName(
+        this.teamManager.getPlayerTeam(player.id) ?? 1
+      );
+      if (playerTeam === winningTeamName) {
+        player.ui.sendData({
+          type: "victory",
+        });
+      } else {
+        player.ui.sendData({
+          type: "defeat",
+        });
+      }
+    }
+
+    // clear all entities
+    this.world.entityManager.getAllEntities().forEach((entity) => {
+      if(!(entity instanceof PlayerEntity)) {
+        entity.despawn();
+      }
+    });
 
     // send all players to lobby
     this.teamManager.sendAllPlayersToLobby(this.world);

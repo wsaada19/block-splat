@@ -701,8 +701,52 @@
     font-size: 16px;
     color: #cccccc;
   }
-</style>
 
+  .victory-screen {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    color: green;
+  }
+
+  .victory-content {
+    text-align: center;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .victory-message {
+    font-size: 48px;
+    font-weight: bold;
+    color: #00ffaa;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+  }
+
+  .defeat-screen {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    color: red;
+  }
+
+  .defeat-content {
+    text-align: center;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .defeat-message {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ff4444;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+  }
+</style>
+  
 <div class="crosshair" id="crosshair"></div>
 
 <div class="stamina-container">
@@ -779,6 +823,18 @@
   <div class="respawn-content">
     <div class="death-message" id="death-message">You fell off the map!</div>
     <div class="respawn-timer" id="respawn-timer">5</div>
+  </div>
+</div>
+
+<div class="victory-screen" id="victory-screen">
+  <div class="victory-content">
+    <div class="victory-message" id="victory-message">You won!</div>
+  </div>
+</div>
+
+<div class="defeat-screen" id="defeat-screen">
+  <div class="defeat-content">
+    <div class="defeat-message" id="defeat-message">You lost!</div>
   </div>
 </div>
 
@@ -943,6 +999,20 @@
           respawnScreen.style.display = 'none'
         }
       }, 1000)
+    }
+
+    if (data.type === 'victory') {
+      document.querySelector('.victory-screen').style.display = 'block'
+      setTimeout(() => {
+        document.querySelector('.victory-screen').style.display = 'none'
+      }, 5000)
+    }
+
+    if (data.type === 'defeat') {
+      document.querySelector('.defeat-screen').style.display = 'block'
+      setTimeout(() => {
+        document.querySelector('.defeat-screen').style.display = 'none'
+      }, 5000)
     }
 
     if (data.type === 'show-class-select') {

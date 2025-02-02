@@ -16,6 +16,8 @@ import type TeamManager from "../gameState/team";
 import type GameMap from "../gameState/map";
 export const LOBBY_SPAWN = { x: 0, y: 65, z: 0 };
 
+const playerNameInterval = new Map<string, Timer>();
+
 export function onPlayerJoin(
   player: Player,
   world: World,
@@ -33,7 +35,7 @@ export function onPlayerJoin(
     modelUri:
       team === 1
         ? "models/players/player-blue.gltf"
-        : "models/players/player.gltf",
+        : "models/players/player-red.gltf",
     modelLoopedAnimations: ["idle"],
     modelScale: 0.5,
   });
@@ -127,7 +129,7 @@ export function onPlayerJoin(
     offset: { x: 0, y: 1.1, z: 0 },
   });
 
-  setInterval(() => {
+  const interval = setInterval(() => {
     const playerName = playerDataManager.getPlayerName(player.id);
     usernameSceneUI.setState({
       message: playerName,
@@ -135,6 +137,8 @@ export function onPlayerJoin(
       playerId: player.id,
     });
   }, 1000);
+
+  playerNameInterval.set(player.id, interval);
 
   usernameSceneUI.load(world);
 
@@ -160,6 +164,24 @@ export function onPlayerJoin(
   );
 }
 
+export function onPlayerLeave(
+  player: Player,
+  world: World,
+  teamManager: TeamManager,
+  playerDataManager: PlayerDataManager
+) {
+  teamManager.removePlayer(player.id);
+  playerDataManager.removePlayer(player.id);
+  world.entityManager
+    .getPlayerEntitiesByPlayer(player)
+    .forEach((entity) => entity.despawn());
+
+  if (playerNameInterval.has(player.id)) {
+    clearInterval(playerNameInterval.get(player.id));
+    playerNameInterval.delete(player.id);
+  }
+}
+
 export function handlePlayerDeath(
   entity: PlayerEntity,
   teamManager: TeamManager,
@@ -174,7 +196,7 @@ export function handlePlayerDeath(
   const playerStats = playerDataManager.getPlayer(entity.player.id);
   if (playerStats) {
     playerStats.playerDeaths++;
-    const killed = playerDataManager.getPlayerName(entity.player.id)
+    const killed = playerDataManager.getPlayerName(entity.player.id);
     if (playerStats.lastHitBy) {
       const killer = playerDataManager.getPlayerName(playerStats.lastHitBy);
       chatManager.sendBroadcastMessage(
@@ -184,10 +206,7 @@ export function handlePlayerDeath(
       playerDataManager.addKill(playerStats.lastHitBy);
       playerDataManager.setLastHitBy(entity.player.id, "");
     } else {
-      chatManager.sendBroadcastMessage(
-        `${killed} fell off the map!`,
-        "FF0000"
-      );
+      chatManager.sendBroadcastMessage(`${killed} fell off the map!`, "FF0000");
     }
   }
 

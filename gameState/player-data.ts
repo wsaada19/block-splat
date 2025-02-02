@@ -134,12 +134,25 @@ export class PlayerDataManager {
     this.playerData.delete(playerId)
   }
 
+  public clearPlayerData() {
+    // keep player name and class
+    this.playerData.forEach((player, id) => {
+      this.playerData.set(id, {
+        ...player,
+        kills: 0,
+        playerDeaths: 0,
+        playerPoints: 0,
+        respawning: false
+      })
+    })
+  }
+
   public staminaRegen() {
     for (const player of this.playerData.values()) {
-      if (player.stamina + 8 > player.maxStamina) {
+      if (player.stamina + 9 > player.maxStamina) {
         player.stamina = player.maxStamina
       } else {
-        player.stamina += 8
+        player.stamina += 9
       }
     }
   }
