@@ -65,7 +65,8 @@ export function onPlayerJoin(
         entity as PlayerEntity,
         teamManager,
         playerDataManager,
-        world.chatManager
+        world.chatManager,
+        game
       );
     }
   };
@@ -186,7 +187,8 @@ export function handlePlayerDeath(
   entity: PlayerEntity,
   teamManager: TeamManager,
   playerDataManager: PlayerDataManager,
-  chatManager: ChatManager
+  chatManager: ChatManager,
+  game: Game
 ) {
   if (entity.position.y === 50) return; // dont respawn if player is already dead
   entity.player.ui.sendData({
@@ -217,14 +219,15 @@ export function handlePlayerDeath(
   }
 
   setTimeout(() => {
-    respawnPlayer(entity as PlayerEntity, teamManager, playerDataManager);
+    respawnPlayer(entity as PlayerEntity, teamManager, playerDataManager, game);
   }, 5000);
 }
 
 export function respawnPlayer(
   entity: PlayerEntity,
   teamManager: TeamManager,
-  playerDataManager: PlayerDataManager
+  playerDataManager: PlayerDataManager,
+  game: Game
 ) {
   // Get team spawn point
   if (!entity.isSpawned) return;
@@ -240,8 +243,11 @@ export function respawnPlayer(
   // setTimeout(() => {
   //   entity.setOpacity(1)
   // }, 3000)
-
-  entity.setPosition(spawn);
+  if(game.isGameRunning) {
+    entity.setPosition(spawn);
+  } else {
+    entity.setPosition(LOBBY_SPAWN);
+  }
   playerDataManager.setPlayerRespawning(entity.player.id, true);
   setTimeout(() => {
     playerDataManager.setPlayerRespawning(entity.player.id, false);

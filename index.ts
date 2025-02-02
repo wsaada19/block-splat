@@ -14,7 +14,7 @@ import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 
-const TIME_LIMIT = 10; // 5 minutes
+const TIME_LIMIT = 60 * 5; // 5 minutes
 const blockStateMap = new Map<string, BLOCK_STATE>();
 
 startServer((world) => {
@@ -148,6 +148,6 @@ startServer((world) => {
   new Audio({
     uri: "audio/music/to-the-death.mp3",
     loop: true,
-    volume: 0.1,
+    volume: 0.08,
   }).play(world);
 });
