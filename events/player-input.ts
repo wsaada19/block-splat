@@ -119,7 +119,7 @@ export function onTickWithPlayerInput(
       }
     );
     entity.startModelOneshotAnimations(["simple_interact"]);
-    if (raycastResult?.hitEntity?.name === "Player") {
+    if (raycastResult?.hitEntity instanceof PlayerEntity) {
       // knockback player
       const verticalForce = Math.max(direction.y, 0.7) * 15;
       // raycastResult.hitEntity.startModelOneshotAnimations(['jump'])
@@ -129,6 +129,7 @@ export function onTickWithPlayerInput(
         z: direction.z * 12,
       });
       playerDataManager.updateStamina(entity.player.id, -10);
+      playerDataManager.setLastHitBy(raycastResult.hitEntity.player.id, entity.player.id);
       input.mr = false;
     }
   } else if (input.sp) {
@@ -164,6 +165,15 @@ export function onTickWithPlayerInput(
       blueLeaderboard: blueLeaderboard,
     });
     input.r = false;
+  } else if (input["1"]) {
+    playerDataManager.setPlayerClass(entity.player.id, PlayerClass.RUNNER);
+    input["1"] = false;
+  } else if (input["2"]) {
+    playerDataManager.setPlayerClass(entity.player.id, PlayerClass.GRENADER);
+    input["2"] = false;
+  } else if (input["3"]) {
+    playerDataManager.setPlayerClass(entity.player.id, PlayerClass.SNIPER);
+    input["3"] = false;
   }
 }
 
