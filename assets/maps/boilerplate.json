@@ -17,8 +17,8 @@
     },
     {
       "id": 24,
-      "name": "purple_wool",
-      "textureUri": "blocks/colors/purple_wool.png"
+      "name": "white",
+      "textureUri": "blocks/colors/white_concrete.png"
     }
   ],
   "blocks": {
