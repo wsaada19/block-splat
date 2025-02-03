@@ -2,7 +2,7 @@ import { startServer, Audio, Entity, BlockType, SceneUI, World } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
-import worldMap from "./assets/maps/boilerplate.json";
+import worldMap from "./assets/maps/mainMap.json";
 import { PlayerDataManager } from "./gameState/player-data";
 import Teams from "./gameState/team";
 import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
