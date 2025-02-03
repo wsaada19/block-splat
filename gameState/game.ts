@@ -6,11 +6,14 @@ import {
   Entity,
   RigidBodyType,
   PlayerEntity,
+  ColliderShape,
+  Audio,
 } from "hytopia";
 import TeamManager from "./team";
 import type { PlayerDataManager } from "./player-data";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
-import { UI_EVENT_TYPES } from "../utilities/gameConfig";
+import { ENERGY_BLOCK_STAMINA_REGEN, UI_EVENT_TYPES } from "../utilities/gameConfig";
+import { createEnergyBoost } from "../utilities/boosts";
 
 export type GameEventHandler = () => void;
 
@@ -27,8 +30,8 @@ export default class Game {
   private scores: Map<number, number> = new Map();
   public isGameRunning: boolean = false;
   private energySpawnLocations: Vector3Like[] = [
-    { x: 5, y: 7, z: 1 },
-    { x: -5, y: 7, z: 1 },
+    { x: 3.5, y: 6, z: 0.5 },
+    { x: -4.5, y: 6, z: 1.5 },
   ];
 
   constructor(
@@ -38,7 +41,6 @@ export default class Game {
     timeLimit: number = 500,
     blockStateMap: Map<string, BLOCK_STATE>
   ) {
-
     if (this.gameTimer) clearInterval(this.gameTimer);
     if (this.uiTimer) clearInterval(this.uiTimer);
 
@@ -78,6 +80,11 @@ export default class Game {
     this.timeRemaining = this.timeLimit;
 
     clearBlockStates(this.blockStateMap, this.world);
+
+    for (const location of this.energySpawnLocations) {
+      const energyBoost = createEnergyBoost(this.world, this.playerDataManager);
+      energyBoost.spawn(this.world, location);
+    }
 
     // Start main game timer
     this.gameTimer = setInterval(() => {
@@ -202,7 +209,7 @@ export default class Game {
       `Game Over! ${winningTeamName} wins with ${highestScore} blocks!`,
       "FFFF00"
     );
-    
+
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       const playerTeam = this.teamManager.getTeamName(
         this.teamManager.getPlayerTeam(player.id) ?? 1
@@ -220,7 +227,7 @@ export default class Game {
 
     // clear all entities
     this.world.entityManager.getAllEntities().forEach((entity) => {
-      if(!(entity instanceof PlayerEntity)) {
+      if (!(entity instanceof PlayerEntity)) {
         entity.despawn();
       }
     });

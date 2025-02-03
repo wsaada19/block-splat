@@ -1,5 +1,8 @@
 import { PlayerClass } from "../gameState/player-data";
 
+// game time in seconds
+export const GAME_TIME = 4 * 60;
+
 // cooldowns
 export const SHOOTING_COOLDOWN = 250;
 export const JUMP_COOLDOWN = 300;
@@ -8,7 +11,9 @@ export const PUNCH_COOLDOWN = 500;
 // energy costs
 export const SPRINT_ENERGY_COST = 1;
 export const PUNCH_ENERGY_COST = 20;
-export const STAMINA_REGEN_RATE = 10;
+
+export const STAMINA_REGEN_RATE = 9;
+export const ENERGY_BLOCK_STAMINA_REGEN = 150;
 
 // class max stamina
 export const MAX_STAMINA = {

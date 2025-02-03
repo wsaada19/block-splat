@@ -42,6 +42,7 @@ export function onPlayerJoin(
     modelScale: 0.5,
   });
 
+
   if (game.isGameRunning) {
     playerEntity.spawn(
       world,
@@ -97,10 +98,21 @@ export function onPlayerJoin(
 
   player.ui.onData = (
     playerUI: PlayerUI,
-    data: { button?: string; class?: string; type?: string; name?: string }
+    data: { button?: string; class?: string; type?: string; name?: string, team?: string }
   ) => {
     if (data.type === "set-name" && data.name) {
       playerDataManager.setPlayerName(playerUI.player.id, data.name);
+    }
+
+    if (data.button === "select-team" && data.team) {
+      playerUI.player.camera.setAttachedToEntity(playerEntity)
+
+      if (data.team === "Red") {
+        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.RED);
+      } else if (data.team === "Blue") {
+        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.BLUE);
+        playerUI.player.camera.setAttachedToEntity(playerEntity)
+      }
     }
 
     if (!data.button) return;

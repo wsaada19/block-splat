@@ -8,8 +8,8 @@ import Teams from "./gameState/team";
 import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
+import { GAME_TIME } from "./utilities/gameConfig";
 
-const TIME_LIMIT = 60 * 5; // 5 minutes
 const BACKGROUND_MUSIC = new Audio({
   uri: "audio/music/to-the-death.mp3",
   loop: true,
@@ -34,7 +34,7 @@ startServer((world) => {
     world,
     teamManager,
     playerData,
-    TIME_LIMIT,
+    GAME_TIME,
     blockStateMap
   );
 

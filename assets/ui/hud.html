@@ -117,28 +117,85 @@
     transform: translateY(0);
   }
 
-  .restart-button {
+  .start-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    background: linear-gradient(to bottom, #6c1414, #971c1c);
-    border: 2px solid rgba(200, 200, 200, 0.2);
-    border-radius: 6px;
-    color: #ffffff;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
-    font-size: 14px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .start-menu-content {
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .start-menu-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  .start-title {
+    color: white;
+    font-size: 48px;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+
+  .start-selection {
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+  }
+
+  .team-selection {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .team-select-button {
+    width: 200px;
+    padding: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
 
-  .restart-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  .team-select-button.red {
+    background: linear-gradient(to bottom, #ff4444, #cc0000);
+    color: white;
+    border: 3px solid #ff7777;
   }
 
-  .restart-button:active {
-    transform: translateY(0);
+  .team-select-button.blue {
+    background: linear-gradient(to bottom, #4444ff, #0000cc);
+    color: white;
+    border: 3px solid #7777ff;
+  }
+
+  .team-select-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
 
   .class-button {
@@ -785,6 +842,19 @@
   </div>
 </div>
 
+<!-- <div class="start-menu" id="start-menu">
+  <img src="{{CDN_ASSETS_URL}}/ui/logos/background.jpeg" alt="start-menu" class="start-menu-image">
+  <div class="start-menu-content">
+    <div class="start-title">Block Splat</div>
+    <div class="start-selection">Select which team you'd like to join!</div>
+    <div class="team-selection">
+      <button class="team-select-button red" id="red-team-button">Red Team</button>
+      <button class="team-select-button blue" id="blue-team-button">Blue Team</button>
+    </div>
+  </div>
+</div> -->
+
+
 <div class="class-select" id="class-select">
   <div class="class-card" id="runner-class">
     <div class="class-name">Runner</div>
@@ -1145,6 +1215,16 @@
   document
     .getElementById('grenader-class')
     .addEventListener('click', () => selectClass('grenader'))
+
+  // document.getElementById('red-team-button').addEventListener('click', () => {
+  //   hytopia.sendData({ button: 'select-team', team: 'Red' })
+  //   document.getElementById('start-menu').style.display = 'none'
+  // })
+
+  // document.getElementById('blue-team-button').addEventListener('click', () => {
+  //   hytopia.sendData({ button: 'select-team', team: 'Blue' })
+  //   document.getElementById('start-menu').style.display = 'none'
+  // })
 
   document.getElementById('change-class').addEventListener('click', () => {
     const select = document.getElementById('class-select')
