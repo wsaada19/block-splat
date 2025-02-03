@@ -52,7 +52,7 @@ To help facilitate quick play testing, I created the gameConfig.ts file that con
 2. Friendly fire is fun but there should be a way to toggle it on and off.
 3. Standing at a high ground and spraying as slingshot was too OP, I buffed the other classes and created a new sniper class that can snipe players from a distance.
 4. Slightly increase respawn time to make kills more rewarding and increased player knockback immunity duration after respawning.
-5. Updated the bottom of the map so those blocks can't have their color changed so its harder to hit blocks when falling off the map and less block entities might help with performance.
+5. Updated the bottom of the map so those blocks can't have their color changed so its harder to hit blocks when falling off the map and less block entities may help with performance.
 6. Added boosts for some more variety in gameplay and to force players to move around more.
 7. 5 minutes was a little too long, make gameplay quicker
 
