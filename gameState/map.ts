@@ -1,5 +1,5 @@
 import type { World } from "hytopia";
-import map1 from "../assets/maps/boilerplate.json";
+import map1 from "../assets/maps/mainMap.json";
 import map2 from "../assets/maps/secondMap.json";
 
 const MAPS = [
