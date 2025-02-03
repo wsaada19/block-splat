@@ -252,16 +252,14 @@
   .class-select#player-leaderboard {
     padding: 24px;
     top: 20%;
-    gap: 32px;
+    gap: 14px;
     width: 60%;
   }
 
-
-
   .leaderboard {
     border-radius: 8px;
-    padding: 16px;
-    min-width: 350px;
+    padding: 8px;
+    width: 100%;
   }
 
   .leaderboard#red-leaderboard {
@@ -312,11 +310,11 @@
   }
 
   .class-card {
-    width: 180px;
+    width: 160px;
     background: rgba(60, 60, 60, 0.4);
     border: 2px solid rgba(200, 200, 200, 0.2);
     border-radius: 8px;
-    padding: 20px;
+    padding: 8px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -412,7 +410,7 @@
     transform: translate(-50%, -50%);
     width: 16px;
     height: 16px;
-    opacity: 0.8;
+    opacity: 1;
     pointer-events: none;
   }
 
@@ -583,6 +581,12 @@
     font-size: 16px;
   }
 
+  .current-class {
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+  }
+
   .stat-label {
     font-weight: bold;
   }
@@ -591,6 +595,15 @@
     font-size: 24px;
     color: #ffffff;
     font-family: 'Georgia', serif;
+  }
+
+  .player-name {
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+    padding-bottom: 6px;
   }
 
   .time-display {
@@ -786,14 +799,25 @@
     </div>
   </div>
 
-  <div class="class-card" id="sniper-class">
+  <div class="class-card" id="slingshot-class">
     <div class="class-name">Slingshot</div>
-    <img src="{{CDN_ASSETS_URL}}/ui/icons/range-icon.png" alt="Sniper" class="class-icon">
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/attack-icon.png" alt="slingshot" class="class-icon">
     <div class="class-desc">Spray damage, shoot 3 paint balls at once</div>
     <div class="class-stats">
       <div class="stat pro">+ Shoot 3 paint balls at once</div>
-      <div class="stat pro">+ Shooting takes less stamina</div>
-      <div class="stat con">- Smaller splash radius</div>
+      <div class="stat con">- Small splash radius</div>
+    </div>
+  </div>
+
+  <div class="class-card" id="sniper-class">
+    <div class="class-name">Sniper</div>
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/range-icon.png" alt="sniper" class="class-icon">
+    <div class="class-desc">Long range fast bullets with knockback, shoot 1 paint ball at a time</div>
+    <div class="class-stats">
+      <div class="stat pro">+ Long range</div>
+      <div class="stat pro">+ Fast bullets</div>
+      <div class="stat con">- Small splash radius</div>
+      <div class="stat con">- 1 bullet</div>
     </div>
   </div>
 
@@ -803,8 +827,9 @@
     <div class="class-desc">Area control expert with explosive projectiles</div>
     <div class="class-stats">
       <div class="stat pro">+ Large Splash</div>
-      <div class="stat pro">+ Bounces off players</div>
+      <div class="stat pro">+ Strong knockback</div>
       <div class="stat con">- Harder to aim</div>
+      <div class="stat con">- Slower projectiles</div>
     </div>
   </div>
 </div>
@@ -849,6 +874,7 @@
 </div>
 
 <div class="player-stats">
+  <div class="player-name" id="player-name">Player</div>
   <div class="stats-row">
     <div class="stat-counter death-count">
       <span class="stat-label">Deaths</span>
@@ -861,6 +887,10 @@
     <div class="stat-counter kills-count">
       <span class="stat-label">Kills</span>
       <span class="stat-value" id="kills-count">0</span>
+    </div>
+    <div class="stat-counter current-class">
+      <span class="stat-label">Class </span>
+      <span class="current-class" id="current-class">Runner</span>
     </div>
   </div>
 </div>
@@ -881,6 +911,10 @@
           <li><strong>WASD</strong> - Move around</li>
           <li><strong>Space</strong> - Jump</li>
           <li><strong>Shift</strong> - Sprint</li>
+          <li><strong>1</strong> - Change to Runner</li>
+          <li><strong>2</strong> - Change to Grenader</li>
+          <li><strong>3</strong> - Change to Sniper</li>
+          <li><strong>4</strong> - Change to Slingshot</li>
         </ul>
       </div>
       <div class="instruction-section">
@@ -911,7 +945,9 @@
 <script>
   hytopia.onData((data) => {
     if (data.type === 'game-ui') {
-      document.getElementById('time-left').textContent = data.time
+      if(data.time !== undefined) {
+        document.getElementById('time-left').textContent = data.time
+      }
 
       // Update points counter
       if (data.playerPoints !== undefined) {
@@ -920,6 +956,14 @@
 
       if (data.playerKills !== undefined) {
         document.getElementById('kills-count').textContent = data.playerKills
+      }
+
+      if (data.playerClass !== undefined) {
+        document.getElementById('current-class').textContent = data.playerClass
+      }
+
+      if (data.playerName !== undefined) {
+        document.getElementById('player-name').textContent = data.playerName
       }
 
       // Update stamina bar
@@ -987,7 +1031,7 @@
       deathMessage.textContent = data.message || 'You died!'
       respawnScreen.style.display = 'block'
 
-      let timeLeft = 5
+      let timeLeft = data.time
       respawnTimer.textContent = timeLeft
 
       const countdown = setInterval(() => {
@@ -1049,11 +1093,13 @@
       localStorage.setItem('playerId', data.playerId)
       const playerName = localStorage.getItem('playerName')
       if (playerName) {
+        document.getElementById('player-name').textContent = playerName
         hytopia.sendData({ type: 'set-name', name: playerName })
       }
     }
 
     if (data.type === 'set-name') {
+      document.getElementById('player-name').textContent = data.name
       localStorage.setItem('playerName', data.name)
     }
   })
@@ -1083,6 +1129,7 @@
 
     // Send selection to game
     hytopia.sendData({ button: 'select-class', class: className })
+    document.getElementById('current-class').textContent = className
 
     // Hide class selection after choosing
     document.getElementById('class-select').style.display = 'none'
@@ -1093,8 +1140,8 @@
     .getElementById('runner-class')
     .addEventListener('click', () => selectClass('runner'))
   document
-    .getElementById('sniper-class')
-    .addEventListener('click', () => selectClass('sniper'))
+    .getElementById('slingshot-class')
+    .addEventListener('click', () => selectClass('slingshot'))
   document
     .getElementById('grenader-class')
     .addEventListener('click', () => selectClass('grenader'))
@@ -1108,13 +1155,12 @@
     }
   })
 
-  hytopia.registerSceneUITemplate('my-game-message', (id, onState) => {
+  hytopia.registerSceneUITemplate('name-indicator', (id, onState) => {
     const template = document.getElementById('my-game-message-template');
     const clone = template.content.cloneNode(true);
     
     const messageElement = clone.querySelector('.message');
     const backgroundElement = clone.querySelector('.my-game-message');
-
 
     onState(state => {
       const playerId = localStorage.getItem('playerId')
@@ -1128,7 +1174,7 @@
         messageElement.style.display = 'block'
       }
 
-      messageElement.textContent = state.message;
+      messageElement.textContent = state.playerName;
       backgroundElement.style.backgroundColor = state.color;
       backgroundElement.style.borderColor = state.color;
     });

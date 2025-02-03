@@ -1,7 +1,10 @@
+import { MAX_STAMINA, STAMINA_REGEN_RATE } from "../utilities/gameConfig";
+
 export enum PlayerClass {
-  RUNNER = 'runner',
-  SNIPER = 'sniper',
-  GRENADER = 'grenader'
+  RUNNER = 'Runner',
+  SNIPER = 'Sniper',
+  GRENADER = 'Grenader',
+  SLINGSHOT = 'Slingshot'
 }
 
 export interface PlayerStats {
@@ -77,7 +80,7 @@ export class PlayerDataManager {
     return this.playerData.get(playerId) || {
       class: PlayerClass.RUNNER,
       stamina: 0,
-      maxStamina: 100,
+      maxStamina: MAX_STAMINA[PlayerClass.RUNNER],
       playerDeaths: 0,
       playerPoints: 0,
       lastHitBy: '',
@@ -115,7 +118,7 @@ export class PlayerDataManager {
 
   // Get a player's max stamina
   public getMaxStamina(playerId: string): number {
-    return this.playerData.get(playerId)?.maxStamina ?? 100
+    return this.playerData.get(playerId)?.maxStamina ?? MAX_STAMINA[PlayerClass.RUNNER]
   }
 
   // Update a player's stamina
@@ -149,10 +152,10 @@ export class PlayerDataManager {
 
   public staminaRegen() {
     for (const player of this.playerData.values()) {
-      if (player.stamina + 9 > player.maxStamina) {
+      if (player.stamina + STAMINA_REGEN_RATE > player.maxStamina) {
         player.stamina = player.maxStamina
       } else {
-        player.stamina += 9
+        player.stamina += STAMINA_REGEN_RATE
       }
     }
   }
@@ -168,13 +171,15 @@ export class PlayerDataManager {
   private getMaxStaminaForClass(playerClass: PlayerClass): number {
     switch (playerClass) {
       case PlayerClass.RUNNER:
-        return 200
+        return MAX_STAMINA[PlayerClass.RUNNER]
       case PlayerClass.SNIPER:
-        return 400
+        return MAX_STAMINA[PlayerClass.SNIPER]
       case PlayerClass.GRENADER:
-        return 450
+        return MAX_STAMINA[PlayerClass.GRENADER]
+      case PlayerClass.SLINGSHOT:
+        return MAX_STAMINA[PlayerClass.SLINGSHOT]
       default:
-        return 100
+        return MAX_STAMINA[PlayerClass.RUNNER]
     }
   }
 

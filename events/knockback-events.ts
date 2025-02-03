@@ -1,16 +1,18 @@
 import { PlayerEntity, type Entity, Audio } from "hytopia";
 import type { PlayerDataManager } from "../gameState/player-data";
-import { PROJECTILES } from "../utilities/projectiles";
+import { PROJECTILES } from "../utilities/gameConfig";
+import type TeamManager from "../gameState/team";
+import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
 
 export const knockBackCollisionHandler = (
   projectile: Entity,
   otherEntity: Entity,
   started: boolean,
   tag: string,
-  playerDataManager: PlayerDataManager
+  playerDataManager: PlayerDataManager,
+  teams: TeamManager
 ) => {
-  // IF the projectile hits another player that isn't themselves
-  // ALLOW FRIENDLY FIRE because it's funnier
+  // only allow if it's a different player who isn't respawning and the game is active 
   if (
     !(otherEntity instanceof PlayerEntity) ||
     otherEntity.player.id === tag ||
@@ -18,6 +20,8 @@ export const knockBackCollisionHandler = (
     otherEntity.position.y > 40
   )
     return;
+
+  if (FRIENDLY_FIRE_DISABLED && teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id)) return;
 
   if (started && projectile.isSpawned) {
     // tag player so we can reward kills
@@ -37,26 +41,20 @@ export const knockBackCollisionHandler = (
     const normalizedDz = dz / length;
 
     // Calculate impact force based on relative velocity
-    const impactForce =
-      projectile.name === PROJECTILES.BLOB.NAME
-        ? PROJECTILES.BLOB.KNOCKBACK
-        : PROJECTILES.ARROW.KNOCKBACK;
-    const verticalForce = Math.max(normalizedDy, 0.7) * impactForce * 0.8;
+    const impactForce = PROJECTILES[projectile.name as keyof typeof PROJECTILES].KNOCKBACK;
+    const verticalForce = Math.max(normalizedDy, 0.6) * impactForce * 0.8;
+    
     // Add some jitter to the knockback to make it more chaotic
     const jitter = 0.5 + (Math.random() * 0.1 - 0.1);
 
-    if (projectile.name === PROJECTILES.BLOB.NAME) {
-      otherEntity.applyImpulse({
-        x: normalizedDx * impactForce * jitter,
-        y: verticalForce, // Ensure some upward force
-        z: normalizedDz * impactForce * jitter,
-      });
-    } else if (projectile.name === PROJECTILES.ARROW.NAME) {
-      otherEntity.applyImpulse({
-        x: normalizedDx * impactForce * jitter,
-        y: verticalForce, // Increased vertical force
-        z: normalizedDz * impactForce * jitter,
-      });
+    otherEntity.applyImpulse({
+      x: normalizedDx * impactForce * jitter,
+      y: verticalForce, 
+      z: normalizedDz * impactForce * jitter,
+    });
+
+    // immediately despawn slingshot projectiles 
+    if(projectile.name === PROJECTILES.ARROW.NAME) {
       projectile.despawn();
     }
 

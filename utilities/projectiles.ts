@@ -1,29 +1,9 @@
 import { type Vector3Like, type QuaternionLike, World, Entity, RigidBodyType, BlockType, Audio, PlayerEntity } from "hytopia"
-import { knockBackCollisionHandler } from "../events/collision-events"
+import { knockBackCollisionHandler } from "../events/knockback-events"
 import { blockIds } from "./block-utils"
 import type { PlayerDataManager } from "../gameState/player-data"
 import TeamManager, { TEAM_COLOR_STRINGS, TEAM_COLORS } from "../gameState/team"
-
-export type ProjectileType = 'BLOB' | 'ARROW'
-
-export const PROJECTILES = {
-  BLOB: {
-    NAME: 'Blob',
-    MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
-    MODEL_SCALE: 2,
-    SPEED: 30,
-    KNOCKBACK: 20,
-    ENERGY: -42
-  },
-  ARROW: {
-    NAME: 'Arrow',
-    MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
-    MODEL_SCALE: 0.8,
-    SPEED: 40,
-    KNOCKBACK: 20,
-    ENERGY: -42
-  }
-}
+import { PROJECTILES, type ProjectileType } from "./gameConfig"
 
 function getRotationFromDirection(direction: Vector3Like): QuaternionLike {
   // Calculate yaw (rotation around Y-axis)
@@ -82,7 +62,8 @@ export function spawnProjectile(
       otherEntity,
         started,
         tag,
-        playerDataManager
+        playerDataManager,
+        teamManager
       )
     }
   })

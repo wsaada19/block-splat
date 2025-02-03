@@ -10,6 +10,7 @@ import {
 import TeamManager from "./team";
 import type { PlayerDataManager } from "./player-data";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
+import { UI_EVENT_TYPES } from "../utilities/gameConfig";
 
 export type GameEventHandler = () => void;
 
@@ -131,7 +132,6 @@ export default class Game {
   }
 
   private resetScores() {
-    // Reset scores
     this.scores.forEach((_, teamId) => {
       this.scores.set(teamId, 0);
     });
@@ -165,7 +165,7 @@ export default class Game {
       this.teamManager.getPlayerTeam(player.id) ?? 1
     );
     player.ui.sendData({
-      type: "game-ui",
+      type: UI_EVENT_TYPES.GAME_UI,
       time: timeStr,
       scores: scoreStr,
       playerTeam: playerTeam,
@@ -173,6 +173,8 @@ export default class Game {
       maxStamina: maxStamina,
       playerPoints: playerPoints,
       playerKills: playerKills,
+      playerName: playerStats.name,
+      playerClass: playerStats.class,
     });
   }
 
@@ -207,11 +209,11 @@ export default class Game {
       );
       if (playerTeam === winningTeamName) {
         player.ui.sendData({
-          type: "victory",
+          type: UI_EVENT_TYPES.VICTORY,
         });
       } else {
         player.ui.sendData({
-          type: "defeat",
+          type: UI_EVENT_TYPES.DEFEAT,
         });
       }
     }

@@ -1,10 +1,5 @@
-import { startServer, Audio, Entity, BlockType, SceneUI } from "hytopia";
-import {
-  BLOCK_STATE,
-  BLUE_BLOCK_ID,
-  coloredBlockData,
-  RED_BLOCK_ID,
-} from "./utilities/block-utils";
+import { startServer, Audio, Entity, BlockType, SceneUI, World } from "hytopia";
+import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
@@ -15,6 +10,13 @@ import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 
 const TIME_LIMIT = 60 * 5; // 5 minutes
+const BACKGROUND_MUSIC = new Audio({
+  uri: "audio/music/to-the-death.mp3",
+  loop: true,
+  volume: 0.08,
+});
+const GLASS_BLOCK_ID = 21;
+
 const blockStateMap = new Map<string, BLOCK_STATE>();
 
 startServer((world) => {
@@ -23,7 +25,7 @@ startServer((world) => {
   const teamManager = new Teams(
     ["Blue Bandits", "Red Raiders"],
     [
-      { x: -32, y: 25, z: -3 },
+      { x: -32, y: 25, z: -4 },
       { x: 32, y: 20, z: 5 },
     ],
     playerData
@@ -74,48 +76,7 @@ startServer((world) => {
 
   world.loadMap(worldMap);
 
-  // const boundaries = [50, -50]
-
-  // boundaries.forEach((x) => {
-  //   for(let y = -10; y < 50; y++) {
-  //     for(let z = -50; z < 50; z++) {
-  //       world.chunkLattice.setBlock({x, y, z}, 22);
-  //     }
-  //   }
-  // })
-
-  // boundaries.forEach((z) => {
-  //   for(let y = -10; y < 50; y++) {
-  //     for(let x = -50; x < 50; x++) {
-  //       world.chunkLattice.setBlock({x, y, z}, 23);
-  //     }
-  //   }
-  // })
-
-  // for(let x = -50; x < 50; x++) {
-  //   for(let z = -50; z < 50; z++) {
-  //     world.chunkLattice.setBlock({x, y: 50, z}, 24);
-  //   }
-  // }
-
-  // spawn a 20 by 20 by 20 glass box between y 60 and y 70
-  for (let x = -10; x < 10; x++) {
-    for (let z = -10; z < 10; z++) {
-      world.chunkLattice.setBlock({ x, y: 60, z }, 21);
-    }
-  }
-
-  // add walls around the glass box
-  for (let y = 60; y < 70; y++) {
-    for (let z = -10; z < 10; z++) {
-      world.chunkLattice.setBlock({ x: -10, y, z }, 21);
-      world.chunkLattice.setBlock({ x: 10, y, z }, 21);
-    }
-    for (let x = -10; x < 10; x++) {
-      world.chunkLattice.setBlock({ x, y, z: -10 }, 21);
-      world.chunkLattice.setBlock({ x, y, z: 10 }, 21);
-    }
-  }
+  loadGameLobby(world)
 
   const instructionsSceneUI = new SceneUI({
     templateId: "game-instructions",
@@ -125,7 +86,7 @@ startServer((world) => {
 
   instructionsSceneUI.load(world);
 
-  world.chatManager.registerCommand("/start-game", () => {
+  world.chatManager.registerCommand("/start", () => {
     if (game.isGameRunning) {
       world.chatManager.sendBroadcastMessage("Game already running!");
       return;
@@ -134,10 +95,11 @@ startServer((world) => {
     game.startGame();
   });
 
-  world.chatManager.registerCommand("/set-name", (player, args) => {
-    playerData.setPlayerName(player.id, args[0]);
-    world.chatManager.sendPlayerMessage(player, `Name set to ${args[0]}`);
-    player.ui.sendData({ type: "set-name", name: args[0] });
+  world.chatManager.registerCommand("/set-name", (player, [name]) => {
+    if(!name && name.length < 1) return;
+    playerData.setPlayerName(player.id, name);
+    world.chatManager.sendPlayerMessage(player, `Name set to ${name}`);
+    player.ui.sendData({ type: "set-name", name });
   });
 
   world.chatManager.registerCommand("/change-team", (player, args) => {
@@ -145,9 +107,49 @@ startServer((world) => {
     world.chatManager.sendPlayerMessage(player, "Team changed!");
   });
 
-  new Audio({
-    uri: "audio/music/to-the-death.mp3",
-    loop: true,
-    volume: 0.08,
-  }).play(world);
+  BACKGROUND_MUSIC.play(world);
 });
+
+const loadGameLobby = (world: World) => {
+  for (let x = -10; x < 10; x++) {
+    for (let z = -10; z < 10; z++) {
+      world.chunkLattice.setBlock({ x, y: 60, z }, GLASS_BLOCK_ID);
+    }
+  }
+
+  // add walls around the glass box
+  for (let y = 60; y < 70; y++) {
+    for (let z = -10; z < 10; z++) {
+      world.chunkLattice.setBlock({ x: -10, y, z }, GLASS_BLOCK_ID);
+      world.chunkLattice.setBlock({ x: 10, y, z }, GLASS_BLOCK_ID);
+    }
+    for (let x = -10; x < 10; x++) {
+      world.chunkLattice.setBlock({ x, y, z: -10 }, GLASS_BLOCK_ID);
+      world.chunkLattice.setBlock({ x, y, z: 10 }, GLASS_BLOCK_ID);
+    }
+  }
+}
+
+// unused method for adding colored walls around the arena
+const loadWalls = (world: World) => {
+  const boundaries = [50, -50]
+  boundaries.forEach((x) => {
+    for(let y = -10; y < 50; y++) {
+      for(let z = -50; z < 50; z++) {
+        world.chunkLattice.setBlock({x, y, z}, 22);
+      }
+    }
+  })
+  boundaries.forEach((z) => {
+    for(let y = -10; y < 50; y++) {
+      for(let x = -50; x < 50; x++) {
+        world.chunkLattice.setBlock({x, y, z}, 23);
+      }
+    }
+  })
+  for(let x = -50; x < 50; x++) {
+    for(let z = -50; z < 50; z++) {
+      world.chunkLattice.setBlock({x, y: 50, z}, 24);
+    }
+  }
+};
