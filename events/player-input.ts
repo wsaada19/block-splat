@@ -129,7 +129,7 @@ function handleShooting(
       type as ProjectileType,
       playerDataManager
     );
-    playerData.stamina + -energy;
+    playerData.stamina = playerData.stamina + energy;
     setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
   }
 }

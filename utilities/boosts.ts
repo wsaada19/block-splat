@@ -64,8 +64,8 @@ export function createEnergyBoost(
         `You earned ${ENERGY_BLOCK_STAMINA_REGEN} stamina from an energy drink!`,
         "FFFF00"
       );
-      entity.despawn();
       boostsSpawned.delete(locationString(entity.position));
+      entity.despawn();
     } else {
       otherEntity.despawn(); // despawn projectile if it hits the boost
     }

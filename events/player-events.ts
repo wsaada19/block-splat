@@ -61,9 +61,8 @@ export function onPlayerJoin(
     };
     playerEntity.spawn(world, randomLobbySpawn);
   }
-  const playerData = playerDataManager.getPlayer(player.id);
-  playerData.class = PlayerClass.SLINGSHOT;
-  playerData.name = player.username;
+  playerDataManager.setPlayerClass(player.id, PlayerClass.SLINGSHOT);
+  playerDataManager.setPlayerName(player.id, player.username)
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 

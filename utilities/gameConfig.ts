@@ -9,25 +9,25 @@ export const JUMP_COOLDOWN = 0;
 export const PUNCH_COOLDOWN = 500;
 
 // boost spawn interval
-export const BOOST_SPAWN_INTERVAL = 10;
+export const BOOST_SPAWN_INTERVAL = 15;
 
 // energy costs
 export const SPRINT_ENERGY_COST = 1;
 export const PUNCH_ENERGY_COST = 20;
 
-export const STAMINA_REGEN_RATE = 9;
+export const STAMINA_REGEN_RATE = 8;
 export const ENERGY_BLOCK_STAMINA_REGEN = 150;
 
-// class max stamina
+// class max staminas
 export const MAX_STAMINA = {
   [PlayerClass.RUNNER]: 200,
   [PlayerClass.SNIPER]: 500,
-  [PlayerClass.GRENADER]: 450,
-  [PlayerClass.SLINGSHOT]: 400
+  [PlayerClass.GRENADER]: 460,
+  [PlayerClass.SLINGSHOT]: 425
 }
 
 // respawn
-export const RESPAWN_TIME = 6 * 1000;
+export const RESPAWN_TIME = 5 * 1000;
 export const RESPAWN_INVINCIBILITY_TIME = 6 * 1000;
 export const RESPAWN_HEIGHT = 45;
 

@@ -30,6 +30,8 @@ export default class Game {
     { x: -10, y: 6, z: 10 },
     { x: 0, y: 6, z: 10 },
     { x: 0, y: 6, z: -10 },
+    {x: 34, y: 10, z: -3},
+    {x: 6, y: 12, z: 35}
   ];
 
   constructor(
@@ -116,9 +118,6 @@ export default class Game {
       this.updateAllPlayersUI();
     }, 225);
 
-    for (const player of PlayerManager.instance.getConnectedPlayers()) {
-      this.playerDataManager.setToMaxStamina(player.id);
-    }
     this.teamManager.spawnPlayers(this.world);
     // const entity = new Entity({
     //   name: "Energy",
