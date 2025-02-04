@@ -35,7 +35,7 @@ export function createEnergyBoost(
 ) {
   const energyBoost = new Entity({
     name: "Energy Boost",
-    blockTextureUri: "blocks/diamond-block.png",
+    blockTextureUri: "blocks/colors/green_concrete.png",
     blockHalfExtents: { x: 0.2, y: 0.3, z: 0.2 },
     rigidBodyOptions: {
       type: RigidBodyType.FIXED,
