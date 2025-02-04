@@ -1,6 +1,40 @@
-import { Entity, PlayerEntity, RigidBodyType, World, Audio } from "hytopia";
+import {
+  Entity,
+  PlayerEntity,
+  RigidBodyType,
+  World,
+  Audio,
+  type Vector3Like,
+} from "hytopia";
 import { ENERGY_BLOCK_STAMINA_REGEN } from "./gameConfig";
 import type { PlayerDataManager } from "../gameState/player-data";
+
+// TODO dont despawn, but dont spawn another one if it is already active at a given location
+const boostSpawnedAtLocation = new Map<string, boolean>();
+
+export const spawnRandomEnergyBoost = (
+  world: World,
+  playerDataManager: PlayerDataManager,
+  energySpawnLocations: Vector3Like[]
+) => {
+  const randomLocation =
+    energySpawnLocations[
+      Math.floor(Math.random() * energySpawnLocations.length)
+    ];
+  if (
+    boostSpawnedAtLocation.get(
+      `${randomLocation.x}-${randomLocation.y}-${randomLocation.z}`
+    )
+  ) {
+    return;
+  }
+  boostSpawnedAtLocation.set(
+    `${randomLocation.x}-${randomLocation.y}-${randomLocation.z}`,
+    true
+  );
+  const energyBoost = createEnergyBoost(world, playerDataManager);
+  energyBoost.spawn(world, randomLocation);
+};
 
 export const createEnergyBoost = (
   world: World,
@@ -13,6 +47,7 @@ export const createEnergyBoost = (
     rigidBodyOptions: {
       type: RigidBodyType.FIXED,
     },
+    tag: "energy-boost",
   });
   energyBoost.onEntityCollision = (
     entity,
@@ -33,10 +68,13 @@ export const createEnergyBoost = (
       }).play(world);
       world.chatManager.sendPlayerMessage(
         otherEntity.player,
-        `You earned ${ENERGY_BLOCK_STAMINA_REGEN} stamina from eating an energy block!`,
+        `You earned ${ENERGY_BLOCK_STAMINA_REGEN} stamina from an energy drink!`,
         "FFFF00"
       );
       entity.despawn();
+      boostSpawnedAtLocation.delete(
+        `${entity.position.x}-${entity.position.y}-${entity.position.z}`
+      );
     } else {
       otherEntity.despawn(); // despawn projectile if it hits the boost
     }

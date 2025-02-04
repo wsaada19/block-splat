@@ -5,8 +5,11 @@ export const GAME_TIME = 4 * 60;
 
 // cooldowns
 export const SHOOTING_COOLDOWN = 250;
-export const JUMP_COOLDOWN = 300;
+export const JUMP_COOLDOWN = 0;
 export const PUNCH_COOLDOWN = 500;
+
+// boost spawn interval
+export const BOOST_SPAWN_INTERVAL = 10;
 
 // energy costs
 export const SPRINT_ENERGY_COST = 1;

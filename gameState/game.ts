@@ -3,19 +3,13 @@ import {
   Player,
   PlayerManager,
   type Vector3Like,
-  Entity,
-  RigidBodyType,
   PlayerEntity,
-  ColliderShape,
-  Audio,
 } from "hytopia";
 import TeamManager from "./team";
 import type { PlayerDataManager } from "./player-data";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
-import { ENERGY_BLOCK_STAMINA_REGEN, UI_EVENT_TYPES } from "../utilities/gameConfig";
-import { createEnergyBoost } from "../utilities/boosts";
-
-export type GameEventHandler = () => void;
+import { BOOST_SPAWN_INTERVAL, UI_EVENT_TYPES } from "../utilities/gameConfig";
+import { spawnRandomEnergyBoost } from "../utilities/boosts";
 
 export default class Game {
   private world: World;
@@ -23,7 +17,7 @@ export default class Game {
   private playerDataManager: PlayerDataManager;
   private gameTimer: Timer | null = null;
   private uiTimer: Timer | null = null;
-  private onEndHandler: GameEventHandler | null = null;
+  private boostTimer: Timer | null = null;
   private blockStateMap: Map<string, BLOCK_STATE>;
   private timeRemaining: number;
   private timeLimit: number;
@@ -32,6 +26,10 @@ export default class Game {
   private energySpawnLocations: Vector3Like[] = [
     { x: 3.5, y: 6, z: 0.5 },
     { x: -4.5, y: 6, z: 1.5 },
+    { x: 10, y: 6, z: -10 },
+    { x: -10, y: 6, z: 10 },
+    { x: 0, y: 6, z: 10 },
+    { x: 0, y: 6, z: -10 },
   ];
 
   constructor(
@@ -57,9 +55,18 @@ export default class Game {
     }
   }
 
-  // Add event handler setter
-  setOnEnd(handler: GameEventHandler) {
-    this.onEndHandler = handler;
+  checkPlayerCount() {
+    const players = PlayerManager.instance.getConnectedPlayers();
+    if (players.length >= 4 && !this.isGameRunning) {
+      // start game in 20 seconds
+      this.world.chatManager.sendBroadcastMessage(
+        "Game starting in 20 seconds!",
+        "FFFF00"
+      );
+      setTimeout(() => {
+        this.startGame();
+      }, 20 * 1000);
+    }
   }
 
   startGame() {
@@ -81,10 +88,11 @@ export default class Game {
 
     clearBlockStates(this.blockStateMap, this.world);
 
-    for (const location of this.energySpawnLocations) {
-      const energyBoost = createEnergyBoost(this.world, this.playerDataManager);
-      energyBoost.spawn(this.world, location);
-    }
+    spawnRandomEnergyBoost(this.world, this.playerDataManager, this.energySpawnLocations);
+
+    this.boostTimer = setInterval(() => {
+      spawnRandomEnergyBoost(this.world, this.playerDataManager, this.energySpawnLocations);
+    }, BOOST_SPAWN_INTERVAL * 1000);
 
     // Start main game timer
     this.gameTimer = setInterval(() => {
@@ -98,7 +106,7 @@ export default class Game {
     this.uiTimer = setInterval(() => {
       this.playerDataManager.staminaRegen();
       this.updateAllPlayersUI();
-    }, 200);
+    }, 225);
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       this.playerDataManager.setToMaxStamina(player.id);
@@ -191,6 +199,7 @@ export default class Game {
 
     if (this.gameTimer) clearInterval(this.gameTimer);
     if (this.uiTimer) clearInterval(this.uiTimer);
+    if (this.boostTimer) clearInterval(this.boostTimer);
 
     // Find winning team
     let winningTeam = 1;
@@ -234,10 +243,5 @@ export default class Game {
 
     // send all players to lobby
     this.teamManager.sendAllPlayersToLobby(this.world);
-
-    // Call end handler if set
-    if (this.onEndHandler) {
-      this.onEndHandler();
-    }
   }
 }

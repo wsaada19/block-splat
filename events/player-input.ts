@@ -84,11 +84,11 @@ function handleShooting(
   teamManager: TeamManager,
   world: World
 ) {
-  const playerClass = playerDataManager.getPlayerClass(entity.player.id);
+  const playerData = playerDataManager.getPlayer(entity.player.id);
 
   if (
-    !playerClass ||
-    playerClass === PlayerClass.RUNNER ||
+    !playerData ||
+    playerData.class === PlayerClass.RUNNER ||
     isPlayerRespawning(entity)
   ) {
     input.ml = false;
@@ -114,11 +114,11 @@ function handleShooting(
     [PlayerClass.SNIPER]: { type: "SNIPER", energy: PROJECTILES.SNIPER.ENERGY },
   };
 
-  const projectileConfig = projectileMap[playerClass];
+  const projectileConfig = projectileMap[playerData.class];
   if (!projectileConfig) return;
 
   const { type, energy } = projectileConfig;
-  if (playerDataManager.getPlayerStamina(entity.player.id) >= -1 * energy) {
+  if (playerData.stamina >= Math.abs(energy)) {
     entity.startModelOneshotAnimations(["chuck"]);
     const projectile = spawnProjectile(
       world,
@@ -129,7 +129,7 @@ function handleShooting(
       type as ProjectileType,
       playerDataManager
     );
-    playerDataManager.updateStamina(entity.player.id, energy);
+    playerData.stamina +- energy;
     setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
   }
 }
@@ -191,10 +191,11 @@ function handleSprint(
   input: PlayerInput,
   playerDataManager: PlayerDataManager
 ) {
+  const player = playerDataManager.getPlayer(entity.player.id);
   if (
-    playerDataManager.getPlayerStamina(entity.player.id) > SPRINT_ENERGY_COST
+    player.stamina > SPRINT_ENERGY_COST
   ) {
-    playerDataManager.updateStamina(entity.player.id, -SPRINT_ENERGY_COST);
+    player.stamina -= SPRINT_ENERGY_COST
   } else {
     input.sh = false;
   }

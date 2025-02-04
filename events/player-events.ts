@@ -56,9 +56,9 @@ export function onPlayerJoin(
     };
     playerEntity.spawn(world, randomLobbySpawn);
   }
-
-  playerDataManager.setPlayerClass(player.id, PlayerClass.SLINGSHOT);
-  playerDataManager.setPlayerName(player.id, player.username);
+  const playerData = playerDataManager.getPlayer(player.id);
+  playerData.class = PlayerClass.SLINGSHOT
+  playerData.name = player.username
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
@@ -201,20 +201,19 @@ export function handlePlayerDeath(
     message: "You fell off the map!",
     time: RESPAWN_TIME / 1000
   });
-  const playerStats = playerDataManager.getPlayer(entity.player.id);
-  if (playerStats) {
-    playerStats.playerDeaths++;
-    const killed = playerDataManager.getPlayerName(entity.player.id);
-    if (playerStats.lastHitBy) {
-      const killer = playerDataManager.getPlayerName(playerStats.lastHitBy);
+  const killed = playerDataManager.getPlayer(entity.player.id);
+  if (killed) {
+    killed.playerDeaths++;
+    if (killed.lastHitBy) {
+      const killer = playerDataManager.getPlayer(killed.lastHitBy);
       chatManager.sendBroadcastMessage(
-        getFunnyKillingMessage(killer, killed),
+        getFunnyKillingMessage(killer.name, killed.name),
         "FF0000"
       );
-      playerDataManager.addKill(playerStats.lastHitBy);
-      playerDataManager.setLastHitBy(entity.player.id, "");
+      killer.kills++;
+      killed.lastHitBy = "";
     } else {
-      chatManager.sendBroadcastMessage(getFunnyFallingMessage(killed), "FF0000");
+      chatManager.sendBroadcastMessage(getFunnyFallingMessage(killed.name), "FF0000");
     }
   }
 

@@ -62,13 +62,6 @@ export class PlayerDataManager {
     return this.playerData.get(playerId)?.class
   }
 
-  public addKill(playerId: string) {
-    const player = this.playerData.get(playerId)
-    if (player) {
-      player.kills++
-    }
-  }
-
   public setLastHitBy(playerId: string, lastHitBy: string) {
     const player = this.playerData.get(playerId)
     if (player) {

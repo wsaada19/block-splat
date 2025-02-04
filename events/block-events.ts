@@ -6,7 +6,6 @@ import type Game from "../gameState/game";
 import { PlayerClass, type PlayerDataManager } from "../gameState/player-data";
 import type TeamManager from "../gameState/team";
 import {
-  BLANK_BLOCK_ID,
   BLOCK_STATE,
   blockIds,
   BLUE_BLOCK_ID,
@@ -149,8 +148,8 @@ export function onBlockHit(
 
   if (entity instanceof PlayerEntity && started && blockIds.includes(type.id)) {
     const player = entity.player;
-    const playerClass = playerDataManager.getPlayerClass(player.id);
-    if (playerClass === PlayerClass.RUNNER) {
+    const playerData = playerDataManager.getPlayer(player.id)
+    if (playerData.class === PlayerClass.RUNNER) {
       const teamColor = teamManager.getPlayerColor(player.id);
       const position = entity.position;
       const blockPos = {
@@ -159,29 +158,39 @@ export function onBlockHit(
         z: Math.floor(position.z),
       };
 
-      const blockState = world.chunkLattice.getBlockId(blockPos);
-      const newState = getStateFromTag(teamColor);
-      const blockId =
-        newState === BLOCK_STATE.BLUE ? BLUE_BLOCK_ID : RED_BLOCK_ID;
-      if (blockState !== blockId) {
-        // dont do anything if block is air
-        if (blockState === 0) {
-          return;
-        }
-        // Remove point from old team if block was colored
-        if (blockState === BLOCK_STATE.BLUE) {
-          game.changeScore(TEAM_COLORS.BLUE, -1);
-        } else if (blockState === BLOCK_STATE.RED) {
-          game.changeScore(TEAM_COLORS.RED, -1);
-        }
+      const nearbyBlocks = [
+        blockPos,
+        { x: blockPos.x + 1, y: blockPos.y + 1, z: blockPos.z },
+        { x: blockPos.x - 1, y: blockPos.y + 1, z: blockPos.z },
+        { x: blockPos.x, y: blockPos.y + 1, z: blockPos.z + 1 },
+        { x: blockPos.x, y: blockPos.y + 1, z: blockPos.z - 1 },
+      ];
 
-        // Add point to new team
-        game.changeScore(newState, 1);
-        playerDataManager.updatePlayerPoints(player.id, 1);
+      for (const block of nearbyBlocks) {
+        const blockState = world.chunkLattice.getBlockId(block);
+        const newState = getStateFromTag(teamColor);
+        const blockId =
+          newState === BLOCK_STATE.BLUE ? BLUE_BLOCK_ID : RED_BLOCK_ID;
+        if (blockState !== blockId) {
+          // dont do anything if block is air
+          if (blockState === 0) {
+            return;
+          }
+          // Remove point from old team if block was colored
+          if (blockState === BLOCK_STATE.BLUE) {
+            game.changeScore(TEAM_COLORS.BLUE, -1);
+          } else if (blockState === BLOCK_STATE.RED) {
+            game.changeScore(TEAM_COLORS.RED, -1);
+          }
 
-        // Update block
-        world.chunkLattice.setBlock(blockPos, blockId);
-        setBlockState(blockStateMap, blockPos, newState);
+          // Add point to new team
+          game.changeScore(newState, 1);
+          playerData.playerPoints++;
+
+          // Update block
+          world.chunkLattice.setBlock(block, blockId);
+          setBlockState(blockStateMap, block, newState);
+        }
       }
     }
   }
