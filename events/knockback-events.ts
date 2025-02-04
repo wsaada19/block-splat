@@ -4,14 +4,14 @@ import { PROJECTILES } from "../utilities/gameConfig";
 import type TeamManager from "../gameState/team";
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
 
-export const knockBackCollisionHandler = (
+export function knockBackCollisionHandler(
   projectile: Entity,
   otherEntity: Entity,
   started: boolean,
   tag: string,
   playerDataManager: PlayerDataManager,
   teams: TeamManager
-) => {
+) {
   // only allow if it's a different player who isn't respawning and the game is active
   if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag)
     return;
@@ -66,8 +66,8 @@ export const knockBackCollisionHandler = (
         volume: 0.5,
         playbackRate: 1.5,
         position: otherEntity.position,
-        referenceDistance: 20,
+        referenceDistance: 10,
       }).play(otherEntity.world);
     }
   }
-};
+}

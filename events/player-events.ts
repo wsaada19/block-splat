@@ -15,8 +15,14 @@ import { type PlayerDataManager, PlayerClass } from "../gameState/player-data";
 import type TeamManager from "../gameState/team";
 import type GameMap from "../gameState/map";
 import { TEAM_COLORS } from "../gameState/team";
-import { getFunnyFallingMessage, getFunnyKillingMessage } from "../utilities/language";
-import { RESPAWN_TIME, RESPAWN_INVINCIBILITY_TIME, RESPAWN_HEIGHT, UI_BUTTONS, UI_EVENT_TYPES } from "../utilities/gameConfig";
+import { getFallingMessage, getKillingMessage } from "../utilities/language";
+import {
+  RESPAWN_TIME,
+  RESPAWN_INVINCIBILITY_TIME,
+  RESPAWN_HEIGHT,
+  UI_BUTTONS,
+  UI_EVENT_TYPES,
+} from "../utilities/gameConfig";
 
 export const LOBBY_SPAWN = { x: 0, y: 65, z: 0 };
 
@@ -42,7 +48,6 @@ export function onPlayerJoin(
     modelScale: 0.5,
   });
 
-
   if (game.isGameRunning) {
     playerEntity.spawn(
       world,
@@ -57,8 +62,8 @@ export function onPlayerJoin(
     playerEntity.spawn(world, randomLobbySpawn);
   }
   const playerData = playerDataManager.getPlayer(player.id);
-  playerData.class = PlayerClass.SLINGSHOT
-  playerData.name = player.username
+  playerData.class = PlayerClass.SLINGSHOT;
+  playerData.name = player.username;
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
@@ -98,20 +103,26 @@ export function onPlayerJoin(
 
   player.ui.onData = (
     playerUI: PlayerUI,
-    data: { button?: string; class?: string; type?: string; name?: string, team?: string }
+    data: {
+      button?: string;
+      class?: string;
+      type?: string;
+      name?: string;
+      team?: string;
+    }
   ) => {
     if (data.type === "set-name" && data.name) {
       playerDataManager.setPlayerName(playerUI.player.id, data.name);
     }
 
     if (data.button === "select-team" && data.team) {
-      playerUI.player.camera.setAttachedToEntity(playerEntity)
+      playerUI.player.camera.setAttachedToEntity(playerEntity);
 
       if (data.team === "Red") {
         teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.RED);
       } else if (data.team === "Blue") {
         teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.BLUE);
-        playerUI.player.camera.setAttachedToEntity(playerEntity)
+        playerUI.player.camera.setAttachedToEntity(playerEntity);
       }
     }
 
@@ -199,7 +210,7 @@ export function handlePlayerDeath(
   entity.player.ui.sendData({
     type: UI_EVENT_TYPES.PLAYER_DEATH,
     message: "You fell off the map!",
-    time: RESPAWN_TIME / 1000
+    time: RESPAWN_TIME / 1000,
   });
   const killed = playerDataManager.getPlayer(entity.player.id);
   if (killed) {
@@ -207,13 +218,16 @@ export function handlePlayerDeath(
     if (killed.lastHitBy) {
       const killer = playerDataManager.getPlayer(killed.lastHitBy);
       chatManager.sendBroadcastMessage(
-        getFunnyKillingMessage(killer.name, killed.name),
+        getKillingMessage(killer.name, killed.name),
         "FF0000"
       );
       killer.kills++;
       killed.lastHitBy = "";
     } else {
-      chatManager.sendBroadcastMessage(getFunnyFallingMessage(killed.name), "FF0000");
+      chatManager.sendBroadcastMessage(
+        getFallingMessage(killed.name),
+        "FF0000"
+      );
     }
   }
 
@@ -239,7 +253,6 @@ export function respawnPlayer(
 
   const team = teamManager.getPlayerTeam(entity.player.id);
   const spawn = teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN;
-  // Re-enable physics and move to spawn
   entity.rawRigidBody?.setEnabled(true);
 
   // currently a bug with opacity dont use it now
@@ -247,6 +260,7 @@ export function respawnPlayer(
   // setTimeout(() => {
   //   entity.setOpacity(1)
   // }, 3000)
+
   if (game.isGameRunning) {
     entity.setPosition(spawn);
   } else {

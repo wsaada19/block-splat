@@ -1,4 +1,4 @@
-export const getFunnyFallingMessage = (killed: string) => {
+export function getFallingMessage(killed: string) {
   const messages = [
     `${killed} has fallen into the void!`,
     `${killed} slipped on a banana peel!`,
@@ -7,9 +7,9 @@ export const getFunnyFallingMessage = (killed: string) => {
     `${killed} fell into a bottomless pit!`,
   ];
   return messages[Math.floor(Math.random() * messages.length)];
-};
+}
 
-export const getFunnyKillingMessage = (killer: string, killed: string) => {
+export function getKillingMessage(killer: string, killed: string) {
   const messages = [
     `${killer} sent ${killed} out of this world!`,
     `${killer} threw a paintball right at ${killed}'s face!`,
@@ -18,4 +18,4 @@ export const getFunnyKillingMessage = (killer: string, killed: string) => {
     `${killer} just proved that ${killed} was never meant to be an astronaut.`,
   ];
   return messages[Math.floor(Math.random() * messages.length)];
-};
+}

@@ -129,7 +129,7 @@ function handleShooting(
       type as ProjectileType,
       playerDataManager
     );
-    playerData.stamina +- energy;
+    playerData.stamina + -energy;
     setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
   }
 }
@@ -192,10 +192,8 @@ function handleSprint(
   playerDataManager: PlayerDataManager
 ) {
   const player = playerDataManager.getPlayer(entity.player.id);
-  if (
-    player.stamina > SPRINT_ENERGY_COST
-  ) {
-    player.stamina -= SPRINT_ENERGY_COST
+  if (player.stamina > SPRINT_ENERGY_COST) {
+    player.stamina -= SPRINT_ENERGY_COST;
   } else {
     input.sh = false;
   }
@@ -232,7 +230,10 @@ function handleClassSelection(
   const selectedClass = classMap[input];
   if (selectedClass) {
     playerDataManager.setPlayerClass(entity.player.id, selectedClass);
-    entity.player.ui.sendData({ type: UI_EVENT_TYPES.GAME_UI, playerClass: selectedClass });
+    entity.player.ui.sendData({
+      type: UI_EVENT_TYPES.GAME_UI,
+      playerClass: selectedClass,
+    });
     playerInput[input] = false;
   }
 }
@@ -262,6 +263,6 @@ function calculateBulletOrigin(
   return bulletOrigin;
 }
 
-const isPlayerRespawning = (entity: PlayerEntity) => {
+function isPlayerRespawning(entity: PlayerEntity) {
   return entity.position.y === RESPAWN_HEIGHT;
-};
+}

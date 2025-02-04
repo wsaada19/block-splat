@@ -1,3 +1,4 @@
+// Spawns stamina boosts randomly across the map at a defined interval
 import {
   Entity,
   PlayerEntity,
@@ -9,37 +10,29 @@ import {
 import { ENERGY_BLOCK_STAMINA_REGEN } from "./gameConfig";
 import type { PlayerDataManager } from "../gameState/player-data";
 
-// TODO dont despawn, but dont spawn another one if it is already active at a given location
-const boostSpawnedAtLocation = new Map<string, boolean>();
+const boostsSpawned = new Map<string, boolean>();
 
-export const spawnRandomEnergyBoost = (
+export function spawnRandomEnergyBoost(
   world: World,
   playerDataManager: PlayerDataManager,
   energySpawnLocations: Vector3Like[]
-) => {
+) {
   const randomLocation =
     energySpawnLocations[
       Math.floor(Math.random() * energySpawnLocations.length)
     ];
-  if (
-    boostSpawnedAtLocation.get(
-      `${randomLocation.x}-${randomLocation.y}-${randomLocation.z}`
-    )
-  ) {
+  if (boostsSpawned.get(locationString(randomLocation))) {
     return;
   }
-  boostSpawnedAtLocation.set(
-    `${randomLocation.x}-${randomLocation.y}-${randomLocation.z}`,
-    true
-  );
+  boostsSpawned.set(locationString(randomLocation), true);
   const energyBoost = createEnergyBoost(world, playerDataManager);
   energyBoost.spawn(world, randomLocation);
-};
+}
 
-export const createEnergyBoost = (
+export function createEnergyBoost(
   world: World,
   playerDataManager: PlayerDataManager
-) => {
+) {
   const energyBoost = new Entity({
     name: "Energy Boost",
     blockTextureUri: "blocks/diamond-block.png",
@@ -64,7 +57,7 @@ export const createEnergyBoost = (
         volume: 0.8,
         playbackRate: 1,
         position: otherEntity.position,
-        referenceDistance: 20,
+        referenceDistance: 5,
       }).play(world);
       world.chatManager.sendPlayerMessage(
         otherEntity.player,
@@ -72,12 +65,14 @@ export const createEnergyBoost = (
         "FFFF00"
       );
       entity.despawn();
-      boostSpawnedAtLocation.delete(
-        `${entity.position.x}-${entity.position.y}-${entity.position.z}`
-      );
+      boostsSpawned.delete(locationString(entity.position));
     } else {
       otherEntity.despawn(); // despawn projectile if it hits the boost
     }
   };
   return energyBoost;
-};
+}
+
+function locationString(loc: Vector3Like) {
+  return `${loc.x}-${loc.y}-${loc.z}`;
+}
