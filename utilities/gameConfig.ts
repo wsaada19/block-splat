@@ -1,7 +1,7 @@
 import { PlayerClass } from "../gameState/player-data";
 
 // game time in seconds
-export const GAME_TIME = 4 * 60;
+export const GAME_TIME = 5 * 60;
 
 // cooldowns
 export const SHOOTING_COOLDOWN = 250;

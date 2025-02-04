@@ -69,6 +69,16 @@ export default class Game {
     }
   }
 
+  clearMapThenStartGame() {
+    if (this.blockStateMap.size > 0) {
+      clearBlockStates(this.blockStateMap, this.world).then(() => {
+        this.startGame();
+      });
+    } else {
+      this.startGame();
+    }
+  }
+
   startGame() {
     if (this.isGameRunning) return;
 
@@ -85,8 +95,6 @@ export default class Game {
 
     this.isGameRunning = true;
     this.timeRemaining = this.timeLimit;
-
-    clearBlockStates(this.blockStateMap, this.world);
 
     spawnRandomEnergyBoost(this.world, this.playerDataManager, this.energySpawnLocations);
 
@@ -137,9 +145,7 @@ export default class Game {
       this.uiTimer = null;
     }
     this.scores = new Map();
-    clearBlockStates(this.blockStateMap, this.world);
-    // TODO randomize teams
-    this.startGame();
+    this.clearMapThenStartGame();
   }
 
   changeScore(teamId: number, score: number) {

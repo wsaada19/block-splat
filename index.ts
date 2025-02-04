@@ -92,7 +92,7 @@ startServer((world) => {
       return;
     }
     world.chatManager.sendBroadcastMessage("Starting game...");
-    game.startGame();
+    game.clearMapThenStartGame();
   });
 
   world.chatManager.registerCommand("/set-name", (player, [name]) => {

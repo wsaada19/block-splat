@@ -40,12 +40,18 @@ export function getBlockState(blockStateMap: Map<string, BLOCK_STATE>, pos: Vect
   return blockStateMap.get(getBlockKey(pos)) ?? BLOCK_STATE.EMPTY;
 }
 
-export function clearBlockStates(blockStateMap: Map<string, BLOCK_STATE>, world: World): void {
-  blockStateMap.forEach((state, key) => {
+export async function clearBlockStates(blockStateMap: Map<string, BLOCK_STATE>, world: World): Promise<void> {
+  const blockKeys = Array.from(blockStateMap.keys());
+  
+  for (const key of blockKeys) {
     const [x, y, z] = key.split(',').map(Number);
     setBlockState(blockStateMap, { x, y, z }, BLOCK_STATE.EMPTY);
     world.chunkLattice.setBlock({ x, y, z }, BLANK_BLOCK_ID);
-  });
+    
+    // Yield control to allow other operations between block updates
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+  
   blockStateMap.clear();
 }
 
