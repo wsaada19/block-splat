@@ -31,7 +31,7 @@ export default class Game {
     { x: 0, y: 6, z: 10 },
     { x: 0, y: 6, z: -10 },
     {x: 34, y: 10, z: -3},
-    {x: 6, y: 12, z: 35}
+    {x: 6, y: 11, z: 35}
   ];
 
   constructor(
@@ -70,10 +70,12 @@ export default class Game {
       }, 20 * 1000);
     }
   }
-
+  
   clearMapThenStartGame() {
     if (this.blockStateMap.size > 0) {
+      this.world.chatManager.sendBroadcastMessage('Game will begin once the map is reset!')
       clearBlockStates(this.blockStateMap, this.world).then(() => {
+        this
         this.startGame();
       });
     } else {

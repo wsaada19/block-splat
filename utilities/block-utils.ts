@@ -49,7 +49,8 @@ export async function clearBlockStates(blockStateMap: Map<string, BLOCK_STATE>, 
     world.chunkLattice.setBlock({ x, y, z }, BLANK_BLOCK_ID);
     
     // Yield control to allow other operations between block updates
-    await new Promise(resolve => setTimeout(resolve, 0));
+    // TODO would probably perform better somewhere in ontick
+    await new Promise(resolve => setTimeout(resolve, 1));
   }
   
   blockStateMap.clear();

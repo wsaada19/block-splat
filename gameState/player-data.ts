@@ -132,7 +132,6 @@ export class PlayerDataManager {
 
   public clearPlayerData() {
     // keep player name and class
-    console.log(this.playerData.size)
     this.playerData.forEach((player, id) => {
       this.playerData.set(id, {
         ...player,
