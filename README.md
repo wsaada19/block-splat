@@ -63,7 +63,7 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 - A set name command to set your name with a name indicator above your head, used local storage to persist across play sessions from the same browser.
 
 ![Leaderboard image](/screenshots/leaderboard.png)
-![Kill messages](/screenshots/kill-messages.png)
+![Kill messages](/screenshots/killmessages.png)
 
 ## Play test results and feedback
 
