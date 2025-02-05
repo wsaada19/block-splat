@@ -12,7 +12,6 @@ import { spawnProjectile } from "../utilities/projectiles";
 import { PlayerDataManager, PlayerClass } from "../gameState/player-data";
 import TeamManager, { TEAM_COLORS } from "../gameState/team";
 import {
-  SHOOTING_COOLDOWN,
   JUMP_COOLDOWN,
   PUNCH_COOLDOWN,
   PUNCH_ENERGY_COST,
@@ -30,7 +29,6 @@ import {
 
 // maps used to add cooldowns on player input
 let lastJumpMap = new Map<string, number>();
-let lastShotMap = new Map<string, number>();
 let lastPunchMap = new Map<string, number>();
 
 export function onTickWithPlayerInput(
@@ -44,7 +42,6 @@ export function onTickWithPlayerInput(
   world: World
 ) {
   if (!entity.world) return;
-
 
   if (input.ml) {
     handleShooting(
@@ -97,13 +94,6 @@ function handleShooting(
     return;
   }
 
-  const lastShot = lastShotMap.get(entity.player.id);
-  if (lastShot && Date.now() - lastShot < SHOOTING_COOLDOWN) {
-    input.ml = false;
-    return;
-  }
-
-  lastShotMap.set(entity.player.id, Date.now());
   const direction = calculateShootingDirection(entity, cameraOrientation);
   const bulletOrigin = calculateBulletOrigin(entity, direction);
 
