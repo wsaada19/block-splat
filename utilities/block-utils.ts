@@ -1,3 +1,4 @@
+// Utility functions for managing block states and help with map cleanup
 import type { Vector3Like, World } from 'hytopia';
 
 export enum BLOCK_STATE {

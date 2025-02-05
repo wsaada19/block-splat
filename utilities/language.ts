@@ -1,3 +1,4 @@
+// helper functions for generating random death messages
 export function getFallingMessage(killed: string) {
   const messages = [
     `${killed} has fallen into the void!`,

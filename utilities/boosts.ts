@@ -1,4 +1,4 @@
-// Spawns stamina boosts randomly across the map at a defined interval
+// Spawns stamina and strength boosts randomly across the map at a defined interval
 import {
   Entity,
   PlayerEntity,
@@ -7,21 +7,10 @@ import {
   Audio,
   type Vector3Like,
 } from "hytopia";
-import { STRENGTH_BOOST_DURATION, ENERGY_BOOST_STAMINA_REGEN } from "./gameConfig";
+import { STRENGTH_BOOST_DURATION, ENERGY_BOOST_STAMINA_REGEN, INVINCIBILITY_BOOST_DURATION, BOOST_PROBABILITIES } from "./gameConfig";
 import type { PlayerDataManager } from "../gameState/player-data";
 
 const boostsSpawned = new Map<string, boolean>();
-
-const BOOSTS = [
-  {
-    type: "energy",
-    spawnProbability: 0.75,
-  },
-  {
-    type: "strength",
-    spawnProbability: 0.25,
-  },
-];
 
 export function spawnRandomEnergyBoost(
   world: World,
@@ -35,16 +24,31 @@ export function spawnRandomEnergyBoost(
   if (boostsSpawned.get(locationString(randomLocation))) {
     return;
   }
-  let boost;
+  let randomBoost;
   const random = Math.random();
-  if (random < BOOSTS[0].spawnProbability) {
-    boost = createEnergyBoost(world, playerDataManager);
-  } else {
-    boost = createStrengthBoost(world, playerDataManager);
+  let probability = 0;
+  for( const boost of BOOST_PROBABILITIES) {
+    probability += boost.spawnProbability;
+    if (random <= probability) {
+      if(boost.type === "energy") {
+        randomBoost = createEnergyBoost(world, playerDataManager);
+        break;
+      } else if(boost.type === "strength") {
+        randomBoost = createStrengthBoost(world, playerDataManager);
+        break;
+      } else if(boost.type === "invincibility") {
+        randomBoost = createInvincibilityBoost(world, playerDataManager);
+        break;
+      }
+    }
   }
 
   boostsSpawned.set(locationString(randomLocation), true);
-  boost.spawn(world, randomLocation);
+  if(randomBoost) {
+    randomBoost.spawn(world, randomLocation);
+  } else {
+    console.log("No boost spawned");
+  }
 }
 
 export function createEnergyBoost(
@@ -95,7 +99,7 @@ function locationString(loc: Vector3Like) {
   return `${loc.x}-${loc.y}-${loc.z}`;
 }
 
-const createStrengthBoost = (world: World, playerDataManager: PlayerDataManager) => {
+function createStrengthBoost (world: World, playerDataManager: PlayerDataManager) {
   const strengthBoost = new Entity({
     name: "Strength Boost",
     modelUri: "strength_up/strength.gltf",
@@ -135,3 +139,37 @@ const createStrengthBoost = (world: World, playerDataManager: PlayerDataManager)
   };
   return strengthBoost;
 };
+
+function createInvincibilityBoost (world: World, playerDataManager: PlayerDataManager) {
+  const invincibilityBoost = new Entity({
+    name: "Invincibility Boost",
+    modelUri: "invincibility/invincibility.gltf",
+    modelScale: 0.15,
+    modelLoopedAnimations: ["Take 001"],
+    rigidBodyOptions: {
+      type: RigidBodyType.FIXED,
+    }
+  });
+  invincibilityBoost.onEntityCollision = (entity, otherEntity, started, colliderHandleA, colliderHandleB) => {
+    if (started && otherEntity instanceof PlayerEntity) {
+      const playerId = otherEntity.player.id;
+      playerDataManager.setPlayerInvincible(playerId, true);
+      world.chatManager.sendPlayerMessage(
+        otherEntity.player,
+        `You're invincible! You won't be impacted by knockback for ${INVINCIBILITY_BOOST_DURATION / 1000} seconds!`,
+        "FFFF00"
+      );
+      setTimeout(() => {
+        playerDataManager.setPlayerInvincible(playerId, false);
+        world.chatManager.sendPlayerMessage(
+          otherEntity.player,
+          `Your invincibility has expired!`,
+          "FFFF00"
+        );
+      }, INVINCIBILITY_BOOST_DURATION);
+      boostsSpawned.delete(locationString(entity.position));
+      entity.despawn();
+    }
+  };
+  return invincibilityBoost;
+}

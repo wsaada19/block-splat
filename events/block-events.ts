@@ -16,6 +16,28 @@ import {
 } from "../utilities/block-utils";
 import { PROJECTILES } from "../utilities/gameConfig";
 import { TEAM_COLORS } from "../gameState/team";
+const checkOrder = [
+  [0, 0, 0], // Center block
+  [0, 1, 0], // Above
+  [0, -1, 0], // Below
+  [1, 0, 0], // East
+  [-1, 0, 0], // West
+  [0, 0, 1], // North
+  [0, 0, -1], // South
+  // Diagonals if needed for blob
+  [1, 0, 1],
+  [-1, 0, 1],
+  [1, 0, -1],
+  [-1, 0, -1],
+  [-1, -1, -1],
+  [1, -1, -1],
+  [0, -1, 1],
+  [1, 1, 1],
+  [-1, 1, 1],
+  [1, 1, -1],
+  [-1, 1, -1],
+  [0, -2, 0],
+];
 
 export function onBlockHit(
   type: BlockType,
@@ -44,7 +66,6 @@ export function onBlockHit(
     const color = teamManager.getPlayerColor(tag);
     let contactPoint: Vector3Like | undefined;
 
-    // Find first contact point
     for (const contactManifold of contactManifolds) {
       if (contactManifold.contactPoints.length > 0) {
         contactPoint = contactManifold.contactPoints[0];
@@ -54,7 +75,6 @@ export function onBlockHit(
 
     let position = entity.position;
     if (contactPoint) {
-      // The contact point is in world space, round to nearest block coordinates
       position = {
         x: Math.round(contactPoint.x),
         y: Math.floor(contactPoint.y),
@@ -62,39 +82,16 @@ export function onBlockHit(
       };
 
       const maxBlocks =
-        entity.name === PROJECTILES.ARROW.NAME ||
+        entity.name === PROJECTILES.SLINGSHOT.NAME ||
         entity.name === PROJECTILES.SNIPER.NAME
           ? 2
-          : 18;
+          : 12;
 
       let blocksColored = 0;
       const newState = getStateFromTag(color ?? "WHITE");
       const blockId = getBlockIdFromState(newState);
 
       // Spiral outward from center, checking closest blocks first
-      const checkOrder = [
-        [0, 0, 0], // Center block
-        [0, 1, 0], // Above
-        [0, -1, 0], // Below
-        [1, 0, 0], // East
-        [-1, 0, 0], // West
-        [0, 0, 1], // North
-        [0, 0, -1], // South
-        // Diagonals if needed for blob
-        [1, 0, 1],
-        [-1, 0, 1],
-        [1, 0, -1],
-        [-1, 0, -1],
-        [-1, -1, -1],
-        [1, -1, -1],
-        [0, -1, 1],
-        [1, 1, 1],
-        [-1, 1, 1],
-        [1, 1, -1],
-        [-1, 1, -1],
-        [0, -2, 0],
-      ];
-
       for (const [dx, dy, dz] of checkOrder) {
         if (blocksColored >= maxBlocks) break;
 
@@ -148,7 +145,7 @@ export function onBlockHit(
 
   if (entity instanceof PlayerEntity && started && blockIds.includes(type.id)) {
     const player = entity.player;
-    const playerData = playerDataManager.getPlayer(player.id)
+    const playerData = playerDataManager.getPlayer(player.id);
     if (playerData.class === PlayerClass.RUNNER) {
       const teamColor = teamManager.getPlayerColor(player.id);
       const position = entity.position;

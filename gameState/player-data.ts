@@ -1,3 +1,4 @@
+// Map of player stats object to store statistics, class, name and other important player information
 import { MAX_STAMINA, STAMINA_REGEN_RATE } from "../utilities/gameConfig";
 
 export enum PlayerClass {
@@ -16,7 +17,7 @@ export interface PlayerStats {
   lastHitBy: string
   kills: number
   name: string
-  respawning: boolean
+  invincible: boolean
   strengthBoostActive: boolean
 }
 
@@ -35,15 +36,15 @@ export class PlayerDataManager {
       lastHitBy: player?.lastHitBy || '',
       kills: player?.kills || 0,
       name: player?.name || '',
-      respawning: player?.respawning || false,
+      invincible: player?.invincible || false,
       strengthBoostActive: player?.strengthBoostActive || false
     })
   }
 
-  public setPlayerRespawning(playerId: string, respawning: boolean): void {
+  public setPlayerInvincible(playerId: string, invincible: boolean): void {
     const player = this.playerData.get(playerId)
     if (player) {
-      player.respawning = respawning
+      player.invincible = invincible
     }
   }
 
@@ -54,12 +55,12 @@ export class PlayerDataManager {
     }
   }
 
-  public getStrengthBoostActive(playerId: string): boolean {
+  public isStrengthBoostActive(playerId: string): boolean {
     return this.playerData.get(playerId)?.strengthBoostActive || false
   }
 
-  public getPlayerRespawning(playerId: string): boolean {
-    return this.playerData.get(playerId)?.respawning || false
+  public isPlayerInvincible(playerId: string): boolean {
+    return this.playerData.get(playerId)?.invincible || false
   }
 
   public getPlayerData(): Map<string, PlayerStats> {
@@ -92,7 +93,7 @@ export class PlayerDataManager {
       lastHitBy: '',
       kills: 0,
       name: '',
-      respawning: false,
+      invincible: false,
       strengthBoostActive: false
     };
   }
@@ -153,7 +154,7 @@ export class PlayerDataManager {
         kills: 0,
         playerDeaths: 0,
         playerPoints: 0,
-        respawning: false
+        invincible: false
       })
     })
   }

@@ -269,8 +269,8 @@ export function respawnPlayer(
   } else {
     entity.setPosition(LOBBY_SPAWN);
   }
-  playerDataManager.setPlayerRespawning(entity.player.id, true);
+  playerDataManager.setPlayerInvincible(entity.player.id, true);
   setTimeout(() => {
-    playerDataManager.setPlayerRespawning(entity.player.id, false);
+    playerDataManager.setPlayerInvincible(entity.player.id, false);
   }, RESPAWN_INVINCIBILITY_TIME);
 }

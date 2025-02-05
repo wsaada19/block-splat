@@ -1,3 +1,4 @@
+// Manages active teams, their metadata and active players
 import type { Vector3Like, World } from "hytopia";
 import type { PlayerDataManager, PlayerStats } from "./player-data";
 import { LOBBY_SPAWN } from "../events/player-events";

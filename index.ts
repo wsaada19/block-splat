@@ -1,4 +1,4 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World } from "hytopia";
+import { startServer, Audio, Entity, BlockType, SceneUI, World, RigidBodyType } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
@@ -134,6 +134,49 @@ const loadGameLobby = (world: World) => {
       world.chunkLattice.setBlock({ x, y, z: 10 }, GLASS_BLOCK_ID);
     }
   }
+
+  // Spawn example boosts
+  // const energyBoost = new Entity({
+  //   name: "Energy Boost Example",
+  //   modelUri: "energy_drink/energy_drink.gltf",
+  //   modelScale: 0.04,
+  //   rigidBodyOptions: {
+  //     type: RigidBodyType.FIXED,
+  //   },
+  // });
+  // energyBoost.spawn(world, { x: -5, y: 61.5, z: 0 });
+
+  // const strengthBoost = new Entity({
+  //   name: "Strength Boost Example",
+  //   modelUri: "strength_up/strength.gltf",
+  //   modelScale: 0.25,
+  //   modelLoopedAnimations: ["Movement"],
+  //   rigidBodyOptions: {
+  //     type: RigidBodyType.FIXED,
+  //   }
+  // });
+  // strengthBoost.spawn(world, { x: 5, y: 61.5, z: 0 });
+
+  // Add instruction signs
+  // const energyInstructions = new SceneUI({
+  //   templateId: "boost-instructions",
+  //   position: { x: -5, y: 62.5, z: 0 },
+  //   state: { 
+  //     title: "Energy Boost",
+  //     description: `Restores ${ENERGY_BOOST_STAMINA_REGEN} stamina instantly!`
+  //   },
+  // });
+  // energyInstructions.load(world);
+
+  // const strengthInstructions = new SceneUI({
+  //   templateId: "boost-instructions", 
+  //   position: { x: 5, y: 62.5, z: 0 },
+  //   state: {
+  //     title: "Strength Boost",
+  //     description: `Increases knockback power for ${STRENGTH_BOOST_DURATION/1000} seconds!`
+  //   },
+  // });
+  // strengthInstructions.load(world);
 }
 
 // unused method for adding colored walls around the arena

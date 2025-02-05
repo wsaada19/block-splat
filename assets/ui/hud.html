@@ -11,7 +11,7 @@
       inset 0 0 20px rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 12px;
-    width: 200px;
+    width: 160px;
     backdrop-filter: blur(4px);
   }
 
@@ -67,6 +67,7 @@
 
   .time-value {
     color: #fff;
+    font-size: 18px;
   }
 
   .red-score {
@@ -681,8 +682,7 @@
   .time-label {
     color: #ffffff;
     font-family: 'Trebuchet MS', 'Arial', sans-serif;
-    font-size: 16px;
-    margin-right: 8px;
+    font-size: 18px;
     font-weight: bold;
   }
 
@@ -737,7 +737,7 @@
 
   .instructions h2 {
     text-align: center;
-    color: #00ffaa;
+    color: #1c971c;
     margin: 0 0 15px 0;
     font-size: 26px;
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
@@ -774,7 +774,7 @@
   .victory-screen {
     display: none;
     position: fixed;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
@@ -788,15 +788,16 @@
 
   .victory-message {
     font-size: 48px;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
     font-weight: bold;
-    color: #00ffaa;
+    color: #1c971c;
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
   }
 
   .defeat-screen {
     display: none;
     position: fixed;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
@@ -1008,6 +1009,20 @@
         <p>Color more blocks than the enemy team before time runs out! Shoot paint balls that color blocks and push players off the map, but be careful, because you can knock of your teammates as well! Paint balls will overwrite the existing paint on the block.</p>
       </div>
     </div>
+  </div>
+</template>
+
+<template id="boost-instructions">
+  <div style="
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    min-width: 200px;
+  ">
+    <h3 style="color: #FFFF00; margin: 0 0 5px 0;">Boosts</h3>
+    <p style="margin: 0;">Pick up energy and strength boosts to gain temporary boosts!</p>
   </div>
 </template>
 
@@ -1268,6 +1283,24 @@
     
     onState(state => {
       instructionsElement.style.display = state.visible ? 'block' : 'none';
+    });
+    
+    return clone;
+  });
+
+  hytopia.registerSceneUITemplate('boost-instructions', (id, onState) => {
+    const template = document.getElementById('boost-instructions');
+    const clone = template.content.cloneNode(true);
+    console.log(clone)
+    onState(state => {
+      const titleElement = clone.querySelector('h3');
+      const descriptionElement = clone.querySelector('p');
+      console.log(state)
+      console.log(titleElement)
+      console.log(descriptionElement)
+      
+      titleElement.textContent = state.title;
+      descriptionElement.textContent = state.description;
     });
     
     return clone;

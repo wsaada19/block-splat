@@ -1,3 +1,4 @@
+// Handles player - projectile collisions applying knockback to the player when applicable
 import { PlayerEntity, type Entity, Audio } from "hytopia";
 import type { PlayerDataManager } from "../gameState/player-data";
 import { PROJECTILES, STRENGTH_BOOST_MULTIPLIER } from "../utilities/gameConfig";
@@ -17,7 +18,7 @@ export function knockBackCollisionHandler(
     return;
   const playerStats = playerDataManager.getPlayer(otherEntity.player.id);
   if (
-    playerStats.respawning ||
+    playerStats.invincible ||
     otherEntity.position.y > 40 ||
     (FRIENDLY_FIRE_DISABLED &&
       teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
@@ -31,7 +32,7 @@ export function knockBackCollisionHandler(
     }
 
     let multiplier = 1;
-    if(playerDataManager.getStrengthBoostActive(tag)) {
+    if(playerDataManager.isStrengthBoostActive(tag)) {
       multiplier = STRENGTH_BOOST_MULTIPLIER;
     }
 
@@ -61,7 +62,7 @@ export function knockBackCollisionHandler(
     });
 
     // immediately despawn slingshot projectiles
-    if (projectile.name === PROJECTILES.ARROW.NAME) {
+    if (projectile.name === PROJECTILES.SLINGSHOT.NAME) {
       projectile.despawn();
     }
 

@@ -1,3 +1,4 @@
+// helper functions for spawning projectiles
 import {
   type Vector3Like,
   type QuaternionLike,
@@ -6,7 +7,6 @@ import {
   RigidBodyType,
   BlockType,
   Audio,
-  PlayerEntity,
 } from "hytopia";
 import { knockBackCollisionHandler } from "../events/knockback-events";
 import { blockIds } from "./block-utils";
@@ -15,7 +15,7 @@ import TeamManager, {
   TEAM_COLOR_STRINGS,
   TEAM_COLORS,
 } from "../gameState/team";
-import { PROJECTILES, type ProjectileType } from "./gameConfig";
+import { PROJECTILES, SLINGSHOT_OFFSET, SLINGSHOT_SPEED_OFFSET, type ProjectileType } from "./gameConfig";
 
 export function spawnProjectile(
   world: World,
@@ -35,25 +35,25 @@ export function spawnProjectile(
   );
 
   let projectiles = [projectileEntity];
-  if (type === "ARROW") {
-    // create two additional arrows to the left and right of the original arrow
-    const leftDirection = rotateDirectionVector(direction, -20);
-    const rightDirection = rotateDirectionVector(direction, 20);
-    const leftArrow = createProjectileEntity(
+  if (type === PROJECTILES.SLINGSHOT.NAME) {
+    // create two additional orbs to the left and right of the original
+    const leftDirection = rotateDirectionVector(direction, -SLINGSHOT_OFFSET);
+    const rightDirection = rotateDirectionVector(direction, SLINGSHOT_OFFSET);
+    const leftOrb = createProjectileEntity(
       leftDirection,
       tag,
       teamManager,
-      "ARROW",
-      -5
+      PROJECTILES.SLINGSHOT.NAME as ProjectileType,
+      SLINGSHOT_SPEED_OFFSET
     );
-    const rightArrow = createProjectileEntity(
+    const rightOrb = createProjectileEntity(
       rightDirection,
       tag,
       teamManager,
-      "ARROW",
-      -5
+      PROJECTILES.SLINGSHOT.NAME as ProjectileType,
+      SLINGSHOT_SPEED_OFFSET
     );
-    projectiles.push(leftArrow, rightArrow);
+    projectiles.push(leftOrb, rightOrb);
   }
 
   projectiles.forEach((projectile) => {
@@ -95,7 +95,7 @@ export function spawnProjectile(
     uri: "audio/sfx/player/player-swing-woosh.mp3",
     playbackRate: 2,
     volume: 0.5,
-    referenceDistance: 20,
+    referenceDistance: 10,
     position: coordinate,
     loop: false,
   });
@@ -147,13 +147,13 @@ function createProjectileEntity(
         ? { r: 255, g: 0, b: 0 }
         : { r: 0, g: 0, b: 255 },
     rigidBodyOptions: {
-      type: RigidBodyType.DYNAMIC, // Kinematic means entity's rigid body will not be affected by physics. KINEMATIC_VELOCITY means the entity is moved by setting velocity.
+      type: RigidBodyType.DYNAMIC,
       linearVelocity: {
         x: direction.x * (projectile.SPEED + speedOffset),
         y: direction.y * (projectile.SPEED + speedOffset),
         z: direction.z * (projectile.SPEED + speedOffset),
       },
-      rotation: getRotationFromDirection(direction), // Get the rotation from the direction vector so it's facing the right way we shot it
+      rotation: getRotationFromDirection(direction),
     },
     tag: tag,
   });

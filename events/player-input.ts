@@ -1,3 +1,4 @@
+// handle player input events
 import {
   PlayerEntityController,
   PlayerEntity,
@@ -24,6 +25,7 @@ import {
   RESPAWN_HEIGHT,
   UI_EVENT_TYPES,
   STRENGTH_BOOST_MULTIPLIER,
+  MELEE_HIT_DISTANCE,
 } from "../utilities/gameConfig";
 
 // maps used to add cooldowns on player input
@@ -43,7 +45,6 @@ export function onTickWithPlayerInput(
 ) {
   if (!entity.world) return;
 
-  // Find the first active input
 
   if (input.ml) {
     handleShooting(
@@ -109,8 +110,8 @@ function handleShooting(
   const projectileMap = {
     [PlayerClass.GRENADER]: { type: "BLOB", energy: PROJECTILES.BLOB.ENERGY },
     [PlayerClass.SLINGSHOT]: {
-      type: "ARROW",
-      energy: PROJECTILES.ARROW.ENERGY,
+      type: "SLINGSHOT",
+      energy: PROJECTILES.SLINGSHOT.ENERGY,
     },
     [PlayerClass.SNIPER]: { type: "SNIPER", energy: PROJECTILES.SNIPER.ENERGY },
   };
@@ -145,7 +146,7 @@ function handleMeleeAttack(
   const raycastResult = world.simulation.raycast(
     entity.position,
     direction,
-    3.5,
+    MELEE_HIT_DISTANCE,
     { filterExcludeRigidBody: entity.rawRigidBody }
   );
   const lastPunch = lastPunchMap.get(entity.player.id);
@@ -155,7 +156,7 @@ function handleMeleeAttack(
   }
   lastPunchMap.set(entity.player.id, Date.now());
   let multiplier = 1;
-  if (playerDataManager.getStrengthBoostActive(entity.player.id)) {
+  if (playerDataManager.isStrengthBoostActive(entity.player.id)) {
     multiplier = STRENGTH_BOOST_MULTIPLIER;
   }
 

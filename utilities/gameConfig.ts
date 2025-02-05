@@ -1,7 +1,7 @@
-import { PlayerClass } from "../gameState/player-data";
+ import { PlayerClass } from "../gameState/player-data";
 
 // game time in seconds
-export const GAME_TIME = 5 * 60;
+export const GAME_TIME = 4.5 * 60;
 
 // cooldowns
 export const SHOOTING_COOLDOWN = 250;
@@ -13,6 +13,22 @@ export const BOOST_SPAWN_INTERVAL = 16;
 export const STRENGTH_BOOST_DURATION = 10000;
 export const STRENGTH_BOOST_MULTIPLIER = 5;
 export const ENERGY_BOOST_STAMINA_REGEN = 150;
+export const INVINCIBILITY_BOOST_DURATION = 10000;
+
+export const BOOST_PROBABILITIES = [
+  {
+    type: "energy",
+    spawnProbability: 0.50,
+  },
+  {
+    type: "strength",
+    spawnProbability: 0.25,
+  },
+  {
+    type: "invincibility",
+    spawnProbability: 0.25,
+  }
+];
 
 // energy costs
 export const SPRINT_ENERGY_COST = 1;
@@ -42,7 +58,7 @@ export const PUNCH_PLAYER_FORCE = 10;
 export const PUNCH_VERTICAL_FORCE = 15;
 
 // projectiles
-export type ProjectileType = 'BLOB' | 'ARROW' | 'SNIPER'
+export type ProjectileType = 'BLOB' | 'SLINGSHOT' | 'SNIPER'
 
 export const PROJECTILES = {
   BLOB: {
@@ -53,8 +69,8 @@ export const PROJECTILES = {
     KNOCKBACK: 25,
     ENERGY: -28
   },
-  ARROW: {
-    NAME: 'ARROW',
+  SLINGSHOT: {
+    NAME: 'SLINGSHOT',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
@@ -70,6 +86,10 @@ export const PROJECTILES = {
     ENERGY: -25
   }
 }
+
+export const SLINGSHOT_OFFSET = 19;
+export const SLINGSHOT_SPEED_OFFSET = -5;
+export const MELEE_HIT_DISTANCE = 3.5;
 
 // UI Events
 export const UI_EVENT_TYPES = {
