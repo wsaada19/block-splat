@@ -29,15 +29,16 @@ To encourage more movement, boosts spawn around the map and can be picked up to 
 [Older gameplay footage](https://x.com/AdonisOnX/status/1886064643870773467)
 
 ![Boost image](/screenshots/boosts.png)
+All 3 boosts are depicted in the image above.
 
 
 ## Classes
 
 There are 4 classes to choose from to encourage variety in gameplay, easily move between them by pressing 1, 2, 3, or 4 or press e to open the class selection menu:
-- Runner: Colors blocks by running around the map!
-- Grenader: Area control with heavy knockback but harder to aim
-- Sniper: Long range, fast bullets, but a small spray radius. Good for sniping players from a distance.
-- Slingshot: Spray shots, higher stamina cost lower knockback but best class for quick coloring
+- Runner: Colors blocks by running around the map! (1)
+- Grenader: Area control with heavy knockback but harder to aim (2)
+- Sniper: Long range, fast bullets, but a small spray radius. Good for sniping players from a distance. (3)
+- Slingshot: Spray shots, higher stamina cost lower knockback but best class for quick coloring (4)
 
 ## Installation
 
@@ -108,12 +109,11 @@ This repo has a github action which automatically deploys a docker image to my a
 
 ## Credits
 
-Used models and music from the following sources, all other assets are original or came from the Hytopia asset library:
+Models and music from the following sources, all other assets are mine or came from the Hytopia asset library:
 
 - [Hytopia SDK](https://dev.hytopia.com) - Game engine
 - [Strength Boost Model](https://sketchfab.com/3d-models/strength-up-9b2c543b66914721b772ba8dbf8455da)
 - [Energy Drink Model](https://sketchfab.com/3d-models/cold-energy-drink-a7c77ba7ff844fd78d3a429865181b9e)
 - [Invincibility Boost Model](https://sketchfab.com/3d-models/potion-bottle-heart-64d3d02fa816415987d4585919dae0c6)
-- [Battle Music](https://freesound.org/people/InspectorJ/sounds/613009/)
-- [To The Death Music](https://pixabay.com/music/video-games-to-the-death-159171/)
+- [To The Death Battle Music](https://pixabay.com/music/video-games-to-the-death-159171/)
 - [Class Icons](https://captaincatsparrow.itch.io/25-free-hunter-skill-icons)
