@@ -435,7 +435,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
-    height: 15px;
+    height: 18px;
     background: rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
@@ -447,6 +447,10 @@
     width: 100%;
     background: linear-gradient(to right, #2ecc71, #27ae60);
     transition: width 0.3s ease;
+  }
+
+  div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
+    display: none !important;
   }
 
   .stamina-text {
