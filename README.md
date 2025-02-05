@@ -4,7 +4,10 @@ Block Splat is a fast paced PVP game where players compete to cover the majority
 
 When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping the demo simple. There's a admin command /change-team that allows you to switch teams (it will not update a player's model to match their team color) and was put in place mainly for testing purposes.
 
-When the game starts player's can run around and shoot projectiles or punch other players or if they're smart focus on coloring as many blocks as possible to score points for their team. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time they're colored to the latest color. To encourage more movement, energy and strength boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy boost increases your stamina.
+When the game starts player's can run around and shoot projectiles or punch other players or if they're smart focus on coloring as many blocks as possible to score points for their team. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time they're colored to the latest color. 
+
+To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
+
 
 There are 4 classes to choose from to encourage variety in gameplay, easily move between them by pressing 1, 2, 3, or 4 or press e to open the class selection menu:
 - Runner: Colors blocks by running around the map!
