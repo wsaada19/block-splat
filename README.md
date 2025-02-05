@@ -54,7 +54,7 @@ bun --watch index.ts
 
 ## Configuration
 
-To help facilitate quick play testing, I created the [gameConfig.ts](utilities/gameConfig.ts) file that contains a large number of configuration options. This file can be tweaked to change the game rules and balance quickly in one place. Feel free to clone this repo and change the configuration to make the game your own!
+To help facilitate quick play testing, I created the [gameConfig.ts](utilities/gameConfig.ts) file that contains a large number of configuration options such as game time, boost spawn interval, knockback, and more. This file can be tweaked to change the game rules and balance quickly in one place. Feel free to clone this repo and change the configuration to make the game your own!
 
 ## Social Features
 
@@ -67,6 +67,8 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 
 ## Play test results and feedback
 
+I ran a play test with some friends midway through the jam and gathered some valuable feedback that influenced the final game. Here are some of the important changes:
+
 1. Changing classed via the UI was not a good user experience, players can now change classes with the number keys.
 2. Friendly fire is fun but should be toggled off by default.
 3. Standing at a high ground and spraying as slingshot was OP, I buffed the other classes and created a new sniper class that can snipe players from a distance.
@@ -76,6 +78,8 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 7. 5 minutes was a little too long, make gameplay quicker
 
 ## Future Plans
+
+Future plans for the game to make it playable and more fun once Hytopia launches. If any of these changes interest you, feel free to open up a PR or reach out to me!
 
 - Better animations for the character model and animations for projectile hits to make gameplay smoother and more satisfying.
 - More benefits to classes and make them more unique with custom models.
@@ -89,7 +93,7 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 
 ## Continuous Deployment
 
-This repo has a github action which automatically deploys a docker image to my azure container registry making it easy to deploy game instaces to a server when needed for testing and gamplay.
+This repo has a github action which automatically deploys a docker image to my azure container registry making it easy to deploy game instaces to a server when needed for testing and gameplay.
 
 ## Credits
 
