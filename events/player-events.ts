@@ -99,6 +99,12 @@ export function onPlayerJoin(
   };
 
   player.ui.load("ui/hud.html");
+  const usernameSceneUI = new SceneUI({
+    templateId: "name-indicator",
+    attachedToEntity: playerEntity,
+    state: { message: player.username, playerId: player.id },
+    offset: { x: 0, y: 1.1, z: 0 },
+  });
 
   player.ui.onData = (
     playerUI: PlayerUI,
@@ -112,6 +118,11 @@ export function onPlayerJoin(
   ) => {
     if (data.type === "set-name" && data.name) {
       playerDataManager.setPlayerName(playerUI.player.id, data.name);
+      usernameSceneUI.setState({
+        playerName: data.name,
+        color: teamManager.getPlayerColor(playerUI.player.id),
+        playerId: playerUI.player.id,
+      });
     }
 
     if (data.button === "select-team" && data.team) {
@@ -147,13 +158,6 @@ export function onPlayerJoin(
     playerId: player.id,
   });
 
-  const usernameSceneUI = new SceneUI({
-    templateId: "name-indicator",
-    attachedToEntity: playerEntity,
-    state: { message: player.username, playerId: player.id },
-    offset: { x: 0, y: 1.1, z: 0 },
-  });
-
   const playerName = playerDataManager.getPlayerName(player.id);
   usernameSceneUI.setState({
     playerName,
@@ -173,8 +177,8 @@ export function onPlayerJoin(
     player,
     "Press left mouse button to shoot."
   );
-  world.chatManager.sendPlayerMessage(player, "Press Q button to punch.");
-  world.chatManager.sendPlayerMessage(player, "Press E to select your class.");
+  world.chatManager.sendPlayerMessage(player, "Press Q or left mouse to punch.");
+  world.chatManager.sendPlayerMessage(player, "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.");
   world.chatManager.sendPlayerMessage(
     player,
     "Press R to view the leaderboard."

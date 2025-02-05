@@ -10,7 +10,7 @@ import type { PlayerDataManager } from "./player-data";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
 import { BOOST_SPAWN_INTERVAL, UI_EVENT_TYPES } from "../utilities/gameConfig";
 import { spawnRandomEnergyBoost } from "../utilities/boosts";
-
+import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
 export default class Game {
   private world: World;
   private teamManager: TeamManager;
@@ -24,12 +24,12 @@ export default class Game {
   private scores: Map<number, number> = new Map();
   public isGameRunning: boolean = false;
   private energySpawnLocations: Vector3Like[] = [
-    { x: 3.5, y: 6, z: 0.5 },
-    { x: -4.5, y: 6, z: 1.5 },
-    { x: 10, y: 6, z: -10 },
-    { x: -10, y: 6, z: 10 },
-    { x: 0, y: 6, z: 10 },
-    { x: 0, y: 6, z: -10 },
+    { x: 3.5, y: 5.5, z: 0.5 },
+    { x: -4.5, y: 5.5, z: 1.5 },
+    { x: 10, y: 5.5, z: -10 },
+    { x: -10, y: 5.5, z: 10 },
+    { x: 0, y: 5.5, z: 10 },
+    { x: 0, y: 5.5, z: -10 },
     {x: 34, y: 10, z: -3},
     {x: 6, y: 11, z: 35}
   ];
@@ -94,6 +94,9 @@ export default class Game {
       clearInterval(this.uiTimer);
       this.uiTimer = null;
     }
+
+    BACKGROUND_MUSIC.pause();
+    TO_THE_DEATH_MUSIC.play(this.world);
 
     this.playerDataManager.clearPlayerData();
 
@@ -225,6 +228,9 @@ export default class Game {
       `Game Over! ${winningTeamName} wins with ${highestScore} blocks!`,
       "FFFF00"
     );
+
+    TO_THE_DEATH_MUSIC.pause();
+    BACKGROUND_MUSIC.play(this.world);
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       const playerTeam = this.teamManager.getTeamName(

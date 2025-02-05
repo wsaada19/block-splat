@@ -23,6 +23,7 @@ import {
   PUNCH_VERTICAL_FORCE,
   RESPAWN_HEIGHT,
   UI_EVENT_TYPES,
+  STRENGTH_BOOST_MULTIPLIER,
 } from "../utilities/gameConfig";
 
 // maps used to add cooldowns on player input
@@ -153,20 +154,24 @@ function handleMeleeAttack(
     return;
   }
   lastPunchMap.set(entity.player.id, Date.now());
+  let multiplier = 1;
+  if (playerDataManager.getStrengthBoostActive(entity.player.id)) {
+    multiplier = STRENGTH_BOOST_MULTIPLIER;
+  }
 
   entity.startModelOneshotAnimations(["simple_interact"]);
   entity.applyImpulse({
     x: direction.x * PUNCH_PLAYER_FORCE,
-    y: 0,
+    y: 0.1,
     z: direction.z * PUNCH_PLAYER_FORCE,
   });
 
   if (raycastResult?.hitEntity instanceof PlayerEntity) {
     const verticalForce = Math.max(direction.y, 0.7) * PUNCH_VERTICAL_FORCE;
     raycastResult.hitEntity.applyImpulse({
-      x: direction.x * PUNCH_FORCE,
+      x: direction.x * PUNCH_FORCE * multiplier,
       y: verticalForce,
-      z: direction.z * PUNCH_FORCE,
+      z: direction.z * PUNCH_FORCE * multiplier,
     });
     playerDataManager.updateStamina(entity.player.id, -PUNCH_ENERGY_COST);
     playerDataManager.setLastHitBy(

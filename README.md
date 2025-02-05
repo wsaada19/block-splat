@@ -4,7 +4,13 @@ Block Splat is a fast paced PVP game where players compete to cover the majority
 
 When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping the demo simple. There's a secret /change-team command that allows you to switch teams (it will not update a player's model to match their team color) and was put in place mainly for testing purposes.
 
-When the game starts player's can run around and shoot projectiles at other players. Players can pick up energy boosts to regain stamina that will randomly spawn around the map.
+When the game starts player's can run around and shoot projectiles or punch other players or if they're smart focus on coloring as many blocks as possible to score points for their team. Energy and strength boosts will spawn around the map and can be picked up to gain temporary boosts during the game. Strength increases knockback and punch force while energy boosts increase your stamina.
+
+There are 4 classes to choose from, easily move between them by pressing 1, 2, 3, or 4:
+- Runner: Colors blocks by running around the map!
+- Grenader: Area control with heavy knockback but harder to aim
+- Sniper: Long range, fast bullets, but a small spray radius. Good for sniping players from a distance.
+- Slingshot: Spray shots, higher stamina cost lower knockback but best class for quick coloring
 
 ## Table of Contents
 
@@ -15,6 +21,7 @@ When the game starts player's can run around and shoot projectiles at other play
 - [Play test results and feedback](#play-test-results-and-feedback)
 - [Future Features](#future-features)
 - [Continuous Deployment](#continuous-deployment)
+- [Credits](#credits)
 
 ## Installation
 
@@ -53,7 +60,7 @@ To help facilitate quick play testing, I created the gameConfig.ts file that con
 3. Standing at a high ground and spraying as slingshot was too OP, I buffed the other classes and created a new sniper class that can snipe players from a distance.
 4. Slightly increase respawn time to make kills more rewarding and increased player knockback immunity duration after respawning.
 5. Updated the bottom of the map so those blocks can't have their color changed so its harder to hit blocks when falling off the map and less block entities may help with performance.
-6. Added boosts for some more variety in gameplay and to force players to move around more.
+6. Added boosts for some more variety in gameplay and to force players to move around the map.
 7. 5 minutes was a little too long, make gameplay quicker
 
 ## Future Features
@@ -70,3 +77,13 @@ To help facilitate quick play testing, I created the gameConfig.ts file that con
 ## Continuous Deployment
 
 This repo has a github action which automatically deploys a docker image to my azure container registry making it easy to deploy game instaces to a server when needed.
+
+## Credits
+
+Used models and music from the following sources, all other assets are original or came from the Hytopia asset library:
+
+- [Hytopia SDK](https://dev.hytopia.com) - Game engine
+- [Strength Boost Model](https://sketchfab.com/3d-models/strength-up-9b2c543b66914721b772ba8dbf8455da)
+- [Energy Drink Model](https://sketchfab.com/3d-models/cold-energy-drink-a7c77ba7ff844fd78d3a429865181b9e)
+- [Battle Music](https://freesound.org/people/InspectorJ/sounds/613009/)
+- [To The Death Music](https://pixabay.com/music/video-games-to-the-death-159171/)

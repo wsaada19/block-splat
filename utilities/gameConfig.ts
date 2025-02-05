@@ -9,21 +9,23 @@ export const JUMP_COOLDOWN = 0;
 export const PUNCH_COOLDOWN = 500;
 
 // boost spawn interval
-export const BOOST_SPAWN_INTERVAL = 15;
+export const BOOST_SPAWN_INTERVAL = 16;
+export const STRENGTH_BOOST_DURATION = 10000;
+export const STRENGTH_BOOST_MULTIPLIER = 5;
+export const ENERGY_BOOST_STAMINA_REGEN = 150;
 
 // energy costs
 export const SPRINT_ENERGY_COST = 1;
 export const PUNCH_ENERGY_COST = 20;
 
-export const STAMINA_REGEN_RATE = 8;
-export const ENERGY_BLOCK_STAMINA_REGEN = 150;
+export const STAMINA_REGEN_RATE = 9;
 
 // class max staminas
 export const MAX_STAMINA = {
   [PlayerClass.RUNNER]: 200,
-  [PlayerClass.SNIPER]: 500,
+  [PlayerClass.SNIPER]: 520,
   [PlayerClass.GRENADER]: 460,
-  [PlayerClass.SLINGSHOT]: 425
+  [PlayerClass.SLINGSHOT]: 440
 }
 
 // respawn
@@ -49,7 +51,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 2,
     SPEED: 30,
     KNOCKBACK: 25,
-    ENERGY: -35
+    ENERGY: -28
   },
   ARROW: {
     NAME: 'ARROW',
@@ -57,7 +59,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 40,
     KNOCKBACK: 23,
-    ENERGY: -35
+    ENERGY: -30
   },
   SNIPER: {
     NAME: 'SNIPER',
@@ -65,7 +67,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 70,
     KNOCKBACK: 25,
-    ENERGY: -30
+    ENERGY: -25
   }
 }
 

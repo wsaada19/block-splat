@@ -1,6 +1,6 @@
 import { PlayerEntity, type Entity, Audio } from "hytopia";
 import type { PlayerDataManager } from "../gameState/player-data";
-import { PROJECTILES } from "../utilities/gameConfig";
+import { PROJECTILES, STRENGTH_BOOST_MULTIPLIER } from "../utilities/gameConfig";
 import type TeamManager from "../gameState/team";
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
 
@@ -19,8 +19,8 @@ export function knockBackCollisionHandler(
   if (
     playerStats.respawning ||
     otherEntity.position.y > 40 ||
-    FRIENDLY_FIRE_DISABLED ||
-    teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id)
+    (FRIENDLY_FIRE_DISABLED &&
+      teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
   )
     return;
 
@@ -29,6 +29,12 @@ export function knockBackCollisionHandler(
     if (playerStats) {
       playerStats.lastHitBy = tag;
     }
+
+    let multiplier = 1;
+    if(playerDataManager.getStrengthBoostActive(tag)) {
+      multiplier = STRENGTH_BOOST_MULTIPLIER;
+    }
+
     // Calculate direction from projectile to player
     const dx = otherEntity.position.x - projectile.position.x;
     const dy = otherEntity.position.y - projectile.position.y;
@@ -43,15 +49,15 @@ export function knockBackCollisionHandler(
     // Calculate impact force based on relative velocity
     const impactForce =
       PROJECTILES[projectile.name as keyof typeof PROJECTILES].KNOCKBACK;
-    const verticalForce = Math.max(normalizedDy, 0.6) * impactForce * 0.8;
+    const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.8;
 
     // Add some jitter to the knockback to make it more chaotic
     const jitter = 0.5 + (Math.random() * 0.1 - 0.1);
 
     otherEntity.applyImpulse({
-      x: normalizedDx * impactForce * jitter,
+      x: normalizedDx * impactForce * jitter * multiplier,
       y: verticalForce,
-      z: normalizedDz * impactForce * jitter,
+      z: normalizedDz * impactForce * jitter * multiplier,
     });
 
     // immediately despawn slingshot projectiles

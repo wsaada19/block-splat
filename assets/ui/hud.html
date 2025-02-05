@@ -58,16 +58,15 @@
 
   .panel-value {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     font-family: 'Georgia', serif;
     padding: 0 4px;
-    background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
   }
 
   .time-value {
-    color: #e5ec1d;
+    color: #fff;
   }
 
   .red-score {
@@ -548,7 +547,7 @@
   }
 
   .team-banner.red {
-    left: 20%;
+    left: 25%;
     background: linear-gradient(to right,
         rgba(200, 30, 30, 0.95),
         rgba(120, 20, 20, 0.85));
@@ -556,7 +555,7 @@
   }
 
   .team-banner.blue {
-    right: 20%;
+    right: 25%;
     background: linear-gradient(to left,
         rgba(30, 30, 200, 0.95),
         rgba(20, 20, 120, 0.85));
@@ -671,7 +670,7 @@
     background: linear-gradient(to bottom,
         rgba(40, 40, 40, 0.92),
         rgba(25, 25, 25, 0.92));
-    border: 1px solid rgba(180, 180, 180, 0.4);
+    border: 1px solid rgba(237, 235, 235, 0.4);
     border-radius: 12px;
     padding: 14px;
     display: flex;
@@ -825,7 +824,6 @@
 </div>
 
 <div class="time-display">
-  <span class="time-label">Time Left</span>
   <span class="panel-value time-value" id="time-left">5:00</span>
 </div>
 
@@ -990,9 +988,10 @@
       <div class="instruction-section">
         <h3>Classes</h3>
         <ul>
-          <li><strong></strong>Runner</strong> - Colors blocks by walking, can punch players</li>
-          <li><strong>Slingshot</strong> - Spray shots, low stamina cost</li>
-          <li><strong>Grenader</strong> - Area control, bouncy projectiles</li>
+          <li><strong></strong>Runner</strong> - Colors blocks by walking</li>
+          <li><strong>Slingshot</strong> - Spray shots, higer stamina cost lower knockback</li>
+          <li><strong>Grenader</strong> - Area control, heavy knockback</li>
+          <li><strong>Sniper</strong> - Long range, fast bullets, small spray radius</li>
         </ul>
       </div>
       <div class="instruction-section">

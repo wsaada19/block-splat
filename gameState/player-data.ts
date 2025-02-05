@@ -17,6 +17,7 @@ export interface PlayerStats {
   kills: number
   name: string
   respawning: boolean
+  strengthBoostActive: boolean
 }
 
 export class PlayerDataManager {
@@ -34,7 +35,8 @@ export class PlayerDataManager {
       lastHitBy: player?.lastHitBy || '',
       kills: player?.kills || 0,
       name: player?.name || '',
-      respawning: player?.respawning || false
+      respawning: player?.respawning || false,
+      strengthBoostActive: player?.strengthBoostActive || false
     })
   }
 
@@ -43,6 +45,17 @@ export class PlayerDataManager {
     if (player) {
       player.respawning = respawning
     }
+  }
+
+  public setStrengthBoostActive(playerId: string, active: boolean): void {
+    const player = this.playerData.get(playerId)
+    if (player) {
+      player.strengthBoostActive = active
+    }
+  }
+
+  public getStrengthBoostActive(playerId: string): boolean {
+    return this.playerData.get(playerId)?.strengthBoostActive || false
   }
 
   public getPlayerRespawning(playerId: string): boolean {
@@ -79,7 +92,8 @@ export class PlayerDataManager {
       lastHitBy: '',
       kills: 0,
       name: '',
-      respawning: false
+      respawning: false,
+      strengthBoostActive: false
     };
   }
 

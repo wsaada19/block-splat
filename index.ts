@@ -10,8 +10,14 @@ import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
 
-const BACKGROUND_MUSIC = new Audio({
+export const TO_THE_DEATH_MUSIC = new Audio({
   uri: "audio/music/to-the-death.mp3",
+  loop: true,
+  volume: 0.08,
+});
+
+export const BACKGROUND_MUSIC = new Audio({
+  uri: "audio/music/hytopia-main.mp3",
   loop: true,
   volume: 0.08,
 });
@@ -25,8 +31,8 @@ startServer((world) => {
   const teamManager = new Teams(
     ["Blue Bandits", "Red Raiders"],
     [
-      { x: -32, y: 25, z: -4 },
-      { x: 32, y: 20, z: 5 },
+      { x: -31.5, y: 25, z: -4 },
+      { x: 31.5, y: 20, z: 5 },
     ],
     playerData
   );
