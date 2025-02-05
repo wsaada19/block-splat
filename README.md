@@ -1,24 +1,8 @@
 # Block Splat - Hytopia Game Jam 2025
 
-Block Splat is a fast paced PVP game where players compete to cover the majority of the map by running and shooting projectiles. It's best played with 4-10 players given the map size but could be played with more.
-
-When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping this demo simple.
-
-When the game starts player's can run around and shoot projectiles and punch other players, if they're smart they will focus on coloring as many blocks as possible to score points for their team and steal points from other teams. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time theyre hit with a paintball of a different color.
-
-To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
-
-![Boost image](/screenshots/boosts.png)
-
-
-There are 4 classes to choose from to encourage variety in gameplay, easily move between them by pressing 1, 2, 3, or 4 or press e to open the class selection menu:
-- Runner: Colors blocks by running around the map!
-- Grenader: Area control with heavy knockback but harder to aim
-- Sniper: Long range, fast bullets, but a small spray radius. Good for sniping players from a distance.
-- Slingshot: Spray shots, higher stamina cost lower knockback but best class for quick coloring
-
 ## Table of Contents
 
+- [Gameplay](#gameplay)
 - [Installation](#installation)
 - [Commands](#commands)
 - [Configuration](#configuration)
@@ -27,6 +11,33 @@ There are 4 classes to choose from to encourage variety in gameplay, easily move
 - [Future Features](#future-features)
 - [Continuous Deployment](#continuous-deployment)
 - [Credits](#credits)
+
+## Gameplay
+
+Block Splat is a fast paced PVP game where players compete to cover the majority of the map by running and shooting projectiles. It's best played with 4-10 players given the map size but could be played with more.
+
+When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping this demo simple.
+
+When the game starts player's can run around and shoot projectiles and punch other players, if they're smart they will focus on coloring as many blocks as possible to score points for their team and steal points from other teams. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time theyre hit with a paintball of a different color.
+
+To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
+
+## Demo
+
+[Live video showcase](https://youtu.be/OvSbGs74PyQ)
+
+[Older gameplay footage](https://x.com/AdonisOnX/status/1886064643870773467)
+
+![Boost image](/screenshots/boosts.png)
+
+
+## Classes
+
+There are 4 classes to choose from to encourage variety in gameplay, easily move between them by pressing 1, 2, 3, or 4 or press e to open the class selection menu:
+- Runner: Colors blocks by running around the map!
+- Grenader: Area control with heavy knockback but harder to aim
+- Sniper: Long range, fast bullets, but a small spray radius. Good for sniping players from a distance.
+- Slingshot: Spray shots, higher stamina cost lower knockback but best class for quick coloring
 
 ## Installation
 
