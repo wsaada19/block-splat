@@ -62,7 +62,7 @@ export function onPlayerJoin(
     playerEntity.spawn(world, randomLobbySpawn);
   }
   playerDataManager.setPlayerClass(player.id, PlayerClass.SLINGSHOT);
-  playerDataManager.setPlayerName(player.id, player.username)
+  playerDataManager.setPlayerName(player.id, player.username);
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
@@ -167,26 +167,21 @@ export function onPlayerJoin(
 
   usernameSceneUI.load(world);
 
-  world.chatManager.sendPlayerMessage(
-    player,
-    "Welcome! Use WASD to move around."
-  );
-  world.chatManager.sendPlayerMessage(player, "Press space to jump.");
-  world.chatManager.sendPlayerMessage(player, "Hold shift to sprint.");
-  world.chatManager.sendPlayerMessage(
-    player,
-    "Press left mouse button to shoot."
-  );
-  world.chatManager.sendPlayerMessage(player, "Press Q or left mouse to punch.");
-  world.chatManager.sendPlayerMessage(player, "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.");
-  world.chatManager.sendPlayerMessage(
-    player,
-    "Press R to view the leaderboard."
-  );
-  world.chatManager.sendPlayerMessage(
-    player,
-    "Type /set-name to set your name."
-  );
+  const messages = [
+    "Welcome! Use WASD to move around.",
+    "Press space to jump.",
+    "If you get stuck, use /stuck to respawn",
+    "Hold shift to sprint.",
+    "Press left mouse button to shoot.",
+    "Press Q or left mouse to punch.",
+    "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.",
+    "Press R to view the leaderboard.",
+    "Type /set-name to set your name.",
+  ];
+
+  messages.forEach((message) => {
+    world.chatManager.sendPlayerMessage(player, message);
+  });
 }
 
 export function onPlayerLeave(
