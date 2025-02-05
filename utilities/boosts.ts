@@ -76,10 +76,10 @@ export function createEnergyBoost(
       playerDataManager.updateStamina(playerId, ENERGY_BOOST_STAMINA_REGEN);
       new Audio({
         uri: "audio/sfx/player/eat.mp3",
-        volume: 0.8,
+        volume: 0.5,
         playbackRate: 1,
         position: otherEntity.position,
-        referenceDistance: 5,
+        referenceDistance: 4,
       }).play(world);
       world.chatManager.sendPlayerMessage(
         otherEntity.player,
@@ -114,10 +114,10 @@ function createStrengthBoost (world: World, playerDataManager: PlayerDataManager
       const playerId = otherEntity.player.id;
       new Audio({
         uri: "audio/sfx/fire/fire-ignite-2.mp3",
-        volume: 0.8,
+        volume: 0.5,
         playbackRate: 1,
         position: otherEntity.position,
-        referenceDistance: 5,
+        referenceDistance: 4,
       }).play(world);
       world.chatManager.sendPlayerMessage(
         otherEntity.player,
@@ -168,6 +168,13 @@ function createInvincibilityBoost (world: World, playerDataManager: PlayerDataMa
         );
       }, INVINCIBILITY_BOOST_DURATION);
       boostsSpawned.delete(locationString(entity.position));
+      new Audio({
+        uri: "audio/sfx/player/eat.mp3",
+        volume: 0.5,
+        playbackRate: 1,
+        position: otherEntity.position,
+        referenceDistance: 4,
+      }).play(world);
       entity.despawn();
     }
   };

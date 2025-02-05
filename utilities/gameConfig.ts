@@ -1,7 +1,7 @@
  import { PlayerClass } from "../gameState/player-data";
 
 // game time in seconds
-export const GAME_TIME = 4.5 * 60;
+export const GAME_TIME = 4 * 60;
 
 // cooldowns
 export const SHOOTING_COOLDOWN = 250;
@@ -9,10 +9,10 @@ export const JUMP_COOLDOWN = 0;
 export const PUNCH_COOLDOWN = 500;
 
 // boost spawn interval
-export const BOOST_SPAWN_INTERVAL = 16;
+export const BOOST_SPAWN_INTERVAL = 10;
 export const STRENGTH_BOOST_DURATION = 10000;
 export const STRENGTH_BOOST_MULTIPLIER = 5;
-export const ENERGY_BOOST_STAMINA_REGEN = 150;
+export const ENERGY_BOOST_STAMINA_REGEN = 180;
 export const INVINCIBILITY_BOOST_DURATION = 10000;
 
 export const BOOST_PROBABILITIES = [
@@ -66,7 +66,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 2,
     SPEED: 30,
-    KNOCKBACK: 25,
+    KNOCKBACK: 14,
     ENERGY: -28
   },
   SLINGSHOT: {
@@ -74,16 +74,16 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
-    KNOCKBACK: 23,
+    KNOCKBACK: 12,
     ENERGY: -30
   },
   SNIPER: {
     NAME: 'SNIPER',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
-    SPEED: 70,
-    KNOCKBACK: 25,
-    ENERGY: -25
+    SPEED: 60,
+    KNOCKBACK: 10,
+    ENERGY: -20
   }
 }
 

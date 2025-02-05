@@ -124,17 +124,6 @@ export default class Game {
     }, 225);
 
     this.teamManager.spawnPlayers(this.world);
-    // const entity = new Entity({
-    //   name: "Energy",
-    //   modelUri: "models/projectiles/scene.gltf",
-    //   modelScale: 1,
-    //   tintColor: { r: 255, g: 255, b: 0 },
-    //   rigidBodyOptions: {
-    //     type: RigidBodyType.KINEMATIC_POSITION,
-    //   },
-    // });
-    // entity.spawn(this.world, this.energySpawnLocations[0]);
-
     this.resetScores();
     this.updateAllPlayersUI();
   }

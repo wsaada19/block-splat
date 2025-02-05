@@ -133,8 +133,8 @@ export function onBlockHit(
       new Audio({
         uri: "audio/sfx/liquid/splash-01.mp3",
         playbackRate: 2,
-        volume: 0.5,
-        referenceDistance: 10,
+        volume: 0.4,
+        referenceDistance: 8,
         position: position,
         loop: false,
       }).play(world);

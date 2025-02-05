@@ -8,6 +8,8 @@ When the game starts player's can run around and shoot projectiles or punch othe
 
 To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
 
+![Boost image](/screenshots/boosts.png)
+
 
 There are 4 classes to choose from to encourage variety in gameplay, easily move between them by pressing 1, 2, 3, or 4 or press e to open the class selection menu:
 - Runner: Colors blocks by running around the map!
@@ -44,7 +46,9 @@ bun --watch index.ts
 
 - `/set-name <name>` - Sets your name
 
-- `/change-team` - Change your team - this will not update a player's model to match their team color and was put in place mainly for testing purposes.
+- `/change-team` - Change your team - this will not update a player model to match their new team color and was put in place mainly for testing purposes.
+
+- `/stuck` - Respawns player - can be used if you get stuck in a block
 
 ## Configuration
 
@@ -55,6 +59,9 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 - Player Leaderboard during each match to follow along with your stats
 - Kill tracking with randomized global messages
 - A set name command to set your name with a name indicator above your head, used local storage to persist across play sessions from the same browser.
+
+![Leaderboard image](/screenshots/leaderboard.png)
+![Kill messages](/screenshots/kill-messages.png)
 
 ## Play test results and feedback
 
@@ -70,12 +77,12 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 
 - Better animations for the character model and animations for projectile hits to make gameplay smoother and more satisfying.
 - More benefits to classes and make them more unique with custom models.
-- More performance optimizations
 - kill streak rewards
 - More maps with unique designs and team bases
-- Different game modes like only runners
+- Different game modes like only runners or increased knockback
 - UI code got out of hand in an effort to move fast, id like to refactor it in the future so it's easier to modify
 - explore mobile friendly controls along with UI refactor
+- better lobby experience with more intuitive instructions
 - boost indicators 
 
 ## Continuous Deployment
@@ -92,3 +99,4 @@ Used models and music from the following sources, all other assets are original 
 - [Invincibility Boost Model](https://sketchfab.com/3d-models/potion-bottle-heart-64d3d02fa816415987d4585919dae0c6)
 - [Battle Music](https://freesound.org/people/InspectorJ/sounds/613009/)
 - [To The Death Music](https://pixabay.com/music/video-games-to-the-death-159171/)
+- [Class Icons](https://captaincatsparrow.itch.io/25-free-hunter-skill-icons)

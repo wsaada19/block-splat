@@ -306,11 +306,18 @@
     backdrop-filter: blur(8px);
   }
 
-  .class-select#player-leaderboard {
+  #player-leaderboard {
+    display: none;
     padding: 24px;
     top: 20%;
     gap: 14px;
     width: 60%;
+    position: fixed;
+    justify-content: space-around;
+    left: 50%;
+    top: 30%;
+    opacity: 1;
+    transform: translate(-50%, -50%);
   }
 
   .leaderboard {
@@ -320,11 +327,11 @@
   }
 
   .leaderboard#red-leaderboard {
-    background: rgba(255, 68, 68, 0.6);
+    background: rgba(255, 68, 68);
   }
 
   .leaderboard#blue-leaderboard {
-    background: rgba(68, 68, 255, 0.6);
+    background: rgba(68, 68, 255);
   }
 
   .leaderboard-title {
@@ -434,8 +441,8 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 18px;
+    width: 220px;
+    height: 22px;
     background: rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
@@ -451,17 +458,6 @@
 
   div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
     display: none !important;
-  }
-
-  .stamina-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 10px;
-    line-height: 10px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
   }
 
   .crosshair {
@@ -736,7 +732,6 @@
     color: white;
     font-family: 'Trebuchet MS', Arial, sans-serif;
     width: 500px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
 
   .instructions h2 {
@@ -829,7 +824,7 @@
 </div>
 
 <div class="time-display">
-  <span class="panel-value time-value" id="time-left">5:00</span>
+  <span class="panel-value time-value" id="time-left">4:00</span>
 </div>
 
 <div class="hud-panel">
@@ -907,7 +902,7 @@
   </div>
 </div>
 
-<div class="class-select" id="player-leaderboard">
+<div id="player-leaderboard">
   <div id="red-leaderboard" class="leaderboard">
 
     <!-- <div>Red Raiders</div> -->
@@ -977,17 +972,13 @@
 <template id="game-instructions-template">
   <div class="instructions">
     <div class="instructions-panel">
-      <h2>How to Play</h2>
+      <h2>Block Splat Instructions</h2>
       <div class="instruction-section">
         <h3>Movement</h3>
         <ul>
           <li><strong>WASD</strong> - Move around</li>
           <li><strong>Space</strong> - Jump</li>
           <li><strong>Shift</strong> - Sprint</li>
-          <li><strong>1</strong> - Change to Runner</li>
-          <li><strong>2</strong> - Change to Grenader</li>
-          <li><strong>3</strong> - Change to Sniper</li>
-          <li><strong>4</strong> - Change to Slingshot</li>
         </ul>
       </div>
       <div class="instruction-section">
@@ -1002,6 +993,10 @@
       <div class="instruction-section">
         <h3>Controls</h3>
         <ul>
+          <li><strong>1</strong> - Change to Runner</li>
+          <li><strong>2</strong> - Change to Grenader</li>
+          <li><strong>3</strong> - Change to Sniper</li>
+          <li><strong>4</strong> - Change to Slingshot</li>
           <li></strong>Left Click</strong> - Shoot</li>
           <li><strong>Q or Right Click</strong> - Punch</li>
           <li><strong>E</strong> - Change Class</li>
@@ -1010,7 +1005,10 @@
       </div>
       <div class="instruction-section">
         <h3>Objective</h3>
-        <p>Color more blocks than the enemy team before time runs out! Shoot paint balls that color blocks and push players off the map, but be careful, because you can knock of your teammates as well! Paint balls will overwrite the existing paint on the block.</p>
+        <p>Color more blocks than the enemy team before time runs out! 
+          Shoot paint balls that color blocks and push players off the map, to rack up kills! 
+          Steal points from the other team by throwing paint at their colored blocks. 
+          Look out for power ups throughout the map to gain temporary boosts and increased stamina.</p>
       </div>
     </div>
   </div>
@@ -1170,8 +1168,6 @@
         blueLeaderboard.forEach(player => {
           document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
-        // document.getElementById('red-leaderboard').innerHTML = 'Red Raiders'
-        // document.getElementById('blue-leaderboard').innerHTML = 'Blue Bandits'
       } else {
         document.getElementById('player-leaderboard').style.display = 'none'
       }

@@ -25,11 +25,13 @@ import {
   UI_EVENT_TYPES,
   STRENGTH_BOOST_MULTIPLIER,
   MELEE_HIT_DISTANCE,
+  SHOOTING_COOLDOWN,
 } from "../utilities/gameConfig";
 
 // maps used to add cooldowns on player input
 let lastJumpMap = new Map<string, number>();
 let lastPunchMap = new Map<string, number>();
+let lastShootMap = new Map<string, number>();
 
 export function onTickWithPlayerInput(
   this: PlayerEntityController,
@@ -93,6 +95,13 @@ function handleShooting(
     input.ml = false;
     return;
   }
+
+  const lastShoot = lastShootMap.get(entity.player.id);
+  if (lastShoot && Date.now() - lastShoot < SHOOTING_COOLDOWN) {
+    input.ml = false;
+    return;
+  }
+  lastShootMap.set(entity.player.id, Date.now());
 
   const direction = calculateShootingDirection(entity, cameraOrientation);
   const bulletOrigin = calculateBulletOrigin(entity, direction);

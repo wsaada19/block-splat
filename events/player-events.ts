@@ -239,6 +239,7 @@ export function handlePlayerDeath(
   if (entity.rawRigidBody) {
     entity.rawRigidBody.setEnabled(false);
   }
+  entity.setLinearVelocity({ x: 0, y: 0, z: 0 });
 
   setTimeout(() => {
     respawnPlayer(entity as PlayerEntity, teamManager, playerDataManager, game);

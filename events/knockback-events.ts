@@ -14,16 +14,18 @@ export function knockBackCollisionHandler(
   teams: TeamManager
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag)
+  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
     return;
   const playerStats = playerDataManager.getPlayer(otherEntity.player.id);
   if (
     playerStats.invincible ||
-    otherEntity.position.y > 40 ||
     (FRIENDLY_FIRE_DISABLED &&
       teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
-  )
+  ) {
+    // despawn projectile if it's a friendly fire or the player is invincible so it doesn't bounce off them
+    projectile.despawn();
     return;
+  }
 
   if (started && projectile.isSpawned) {
     // tag player so we can reward kills
@@ -53,12 +55,13 @@ export function knockBackCollisionHandler(
     const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.8;
 
     // Add some jitter to the knockback to make it more chaotic
-    const jitter = 0.5 + (Math.random() * 0.1 - 0.1);
+    // const jitter = 0.5 + (Math.random() * 0.1 - 0.1);
+    const jitter = 1.01;
 
     otherEntity.applyImpulse({
-      x: normalizedDx * impactForce * jitter * multiplier,
+      x: normalizedDx * impactForce * multiplier,
       y: verticalForce,
-      z: normalizedDz * impactForce * jitter * multiplier,
+      z: normalizedDz * impactForce * multiplier,
     });
 
     // immediately despawn slingshot projectiles

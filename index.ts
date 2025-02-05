@@ -1,11 +1,11 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World, RigidBodyType } from "hytopia";
+import { startServer, Audio, Entity, BlockType, SceneUI, World, RigidBodyType, EntityManager } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
 import { PlayerDataManager } from "./gameState/player-data";
 import Teams from "./gameState/team";
-import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
+import { onPlayerJoin, onPlayerLeave, respawnPlayer } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
@@ -113,6 +113,14 @@ startServer((world) => {
     world.chatManager.sendPlayerMessage(player, "Team changed!");
   });
 
+  world.chatManager.registerCommand("/stuck", (player) => {
+    const playerEntity = world.entityManager.getAllPlayerEntities().find(p => p.player.id === player.id);
+
+    if(playerEntity) {
+      playerEntity.setPosition({ x: 0, y: -8, z: 0 });
+    }
+  });
+
   BACKGROUND_MUSIC.play(world);
 });
 
@@ -134,49 +142,6 @@ const loadGameLobby = (world: World) => {
       world.chunkLattice.setBlock({ x, y, z: 10 }, GLASS_BLOCK_ID);
     }
   }
-
-  // Spawn example boosts
-  // const energyBoost = new Entity({
-  //   name: "Energy Boost Example",
-  //   modelUri: "energy_drink/energy_drink.gltf",
-  //   modelScale: 0.04,
-  //   rigidBodyOptions: {
-  //     type: RigidBodyType.FIXED,
-  //   },
-  // });
-  // energyBoost.spawn(world, { x: -5, y: 61.5, z: 0 });
-
-  // const strengthBoost = new Entity({
-  //   name: "Strength Boost Example",
-  //   modelUri: "strength_up/strength.gltf",
-  //   modelScale: 0.25,
-  //   modelLoopedAnimations: ["Movement"],
-  //   rigidBodyOptions: {
-  //     type: RigidBodyType.FIXED,
-  //   }
-  // });
-  // strengthBoost.spawn(world, { x: 5, y: 61.5, z: 0 });
-
-  // Add instruction signs
-  // const energyInstructions = new SceneUI({
-  //   templateId: "boost-instructions",
-  //   position: { x: -5, y: 62.5, z: 0 },
-  //   state: { 
-  //     title: "Energy Boost",
-  //     description: `Restores ${ENERGY_BOOST_STAMINA_REGEN} stamina instantly!`
-  //   },
-  // });
-  // energyInstructions.load(world);
-
-  // const strengthInstructions = new SceneUI({
-  //   templateId: "boost-instructions", 
-  //   position: { x: 5, y: 62.5, z: 0 },
-  //   state: {
-  //     title: "Strength Boost",
-  //     description: `Increases knockback power for ${STRENGTH_BOOST_DURATION/1000} seconds!`
-  //   },
-  // });
-  // strengthInstructions.load(world);
 }
 
 // unused method for adding colored walls around the arena
