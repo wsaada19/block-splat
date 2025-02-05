@@ -1,10 +1,10 @@
 # Block Splat - Hytopia Game Jam 2025
 
-Block Splat is a fast paced PVP game where players compete to cover the majority of the map by running and shooting projectiles. It's best played with 6-12 players given the map size and potential lag issues with so many entities being spawned.
+Block Splat is a fast paced PVP game where players compete to cover the majority of the map by running and shooting projectiles. It's best played with 4-10 players given the map size but could be played with more.
 
-When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping the demo simple. There's a admin command /change-team that allows you to switch teams (it will not update a player's model to match their team color) and was put in place mainly for testing purposes.
+When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping this demo simple.
 
-When the game starts player's can run around and shoot projectiles or punch other players or if they're smart focus on coloring as many blocks as possible to score points for their team. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time they're colored to the latest color. 
+When the game starts player's can run around and shoot projectiles and punch other players, if they're smart they will focus on coloring as many blocks as possible to score points for their team and steal points from other teams. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time theyre hit with a paintball of a different color.
 
 To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
 
@@ -42,9 +42,11 @@ To run:
 bun --watch index.ts
 ```
 
+## Commands
+
 - `/start` - Start the game - a current limitation is that anyone can start the game. I decided to leave it like this to make things easier to test. However, I will ultimately setup an automated system for handling the game lobby and when to start a new game based on player count.
 
-- `/set-name <name>` - Sets your name
+- `/set-name <name>` - Sets your name on the leaderboard and the indicator above your head
 
 - `/change-team` - Change your team - this will not update a player model to match their new team color and was put in place mainly for testing purposes.
 
@@ -65,7 +67,7 @@ To help facilitate quick play testing, I created the [gameConfig.ts](utilities/g
 
 ## Play test results and feedback
 
-1. Changing classed via the UI was not a good user experience, players can change classes with the number keys.
+1. Changing classed via the UI was not a good user experience, players can now change classes with the number keys.
 2. Friendly fire is fun but should be toggled off by default.
 3. Standing at a high ground and spraying as slingshot was OP, I buffed the other classes and created a new sniper class that can snipe players from a distance.
 4. Slightly increase respawn time to make kills more rewarding and increased player knockback immunity duration after respawning.
