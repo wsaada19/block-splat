@@ -39,9 +39,9 @@ export function knockBackCollisionHandler(
     }
 
     // Calculate direction from projectile to player
-    const dx = otherEntity.position.x - projectile.position.x;
-    const dy = otherEntity.position.y - projectile.position.y;
-    const dz = otherEntity.position.z - projectile.position.z;
+    const dx = projectile.linearVelocity.x;
+    const dy = projectile.linearVelocity.y;
+    const dz = projectile.linearVelocity.z;
 
     // Normalize the direction vector
     const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
