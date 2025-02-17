@@ -1,6 +1,5 @@
 // Manages active teams, their metadata and active players
 import type { Vector3Like, World } from "hytopia";
-import type { PlayerDataManager, PlayerStats } from "./player-data";
 import { LOBBY_SPAWN } from "../events/player-events";
 
 interface Team {
@@ -26,7 +25,6 @@ export const TEAM_COLOR_STRINGS: { [key: number]: string } = {
 
 export default class TeamManager {
   private teams: Map<number, Team>;
-  private playerDataManager: PlayerDataManager;
   
   // Will add support for multiple teams later
   // private maxTeams: number;
@@ -36,9 +34,8 @@ export default class TeamManager {
     return teamId ? TEAM_COLOR_STRINGS[teamId] ?? 'WHITE' : 'WHITE';
   }
 
-  constructor(teamNames: string[] = ["Blue Bandits", "Red Raiders"], spawns: Vector3Like[], playerDataManager: PlayerDataManager) {
+  constructor(teamNames: string[] = ["Blue Bandits", "Red Raiders"], spawns: Vector3Like[]) {
     this.teams = new Map();
-    this.playerDataManager = playerDataManager;
     for (let i = 1; i <= teamNames.length; i++) {
       this.teams.set(i, {
         id: i,
@@ -70,19 +67,6 @@ export default class TeamManager {
     for(const player of players) {
       player.setPosition(LOBBY_SPAWN);
     }
-  }
-
-  getTeamPlayerData(teamId: number): PlayerStats[] {
-    const playerIds = Array.from(this.playerDataManager.getPlayerData().keys()).filter(player => {
-      const team = this.getPlayerTeam(player);
-      return team === teamId;
-    }).map(player => this.playerDataManager.getPlayer(player));
-
-    if(playerIds) {
-      return playerIds;
-    }
-
-    return [];
   }
 
   addPlayerToTeam(playerId: string, teamId: number) {

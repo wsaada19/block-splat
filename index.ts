@@ -1,14 +1,14 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World, RigidBodyType, EntityManager } from "hytopia";
+import { startServer, Audio, Entity, BlockType, SceneUI, World } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
-import { PlayerDataManager } from "./gameState/player-data";
 import Teams from "./gameState/team";
 import { onPlayerJoin, onPlayerLeave, respawnPlayer } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
+import { globalState } from "./gameState/global-state";
 
 export const TO_THE_DEATH_MUSIC = new Audio({
   uri: "audio/music/to-the-death.mp3",
@@ -26,20 +26,20 @@ const GLASS_BLOCK_ID = 21;
 const blockStateMap = new Map<string, BLOCK_STATE>();
 
 startServer((world) => {
-  const playerData = new PlayerDataManager();
+  // Initialize global state with world instance
+  globalState.setWorld(world);
+
 
   const teamManager = new Teams(
     ["Blue Bandits", "Red Raiders"],
     [
       { x: -31.5, y: 25, z: -4 },
       { x: 31.5, y: 20, z: 5 },
-    ],
-    playerData
+    ]
   );
   const game = new Game(
     world,
     teamManager,
-    playerData,
     GAME_TIME,
     blockStateMap
   );
@@ -47,10 +47,10 @@ startServer((world) => {
   const map = new GameMap(world);
 
   world.onPlayerJoin = (player) =>
-    onPlayerJoin(player, world, teamManager, game, playerData, map);
+    onPlayerJoin(player, world, teamManager, game, map);
 
   world.onPlayerLeave = (player) =>
-    onPlayerLeave(player, world, teamManager, playerData);
+    onPlayerLeave(player, world, teamManager);
 
   coloredBlockData.forEach((blockData) => {
     const block = world.blockTypeRegistry.registerGenericBlockType({
@@ -74,7 +74,6 @@ startServer((world) => {
         colliderHandleB,
         world,
         game,
-        playerData,
         teamManager,
         blockStateMap
       );
@@ -103,7 +102,8 @@ startServer((world) => {
 
   world.chatManager.registerCommand("/set-name", (player, [name]) => {
     if(!name && name.length < 1) return;
-    playerData.setPlayerName(player.id, name);
+    const playerEntity = globalState.getPlayerEntity(player.id);
+    playerEntity.setDisplayName(name);
     world.chatManager.sendPlayerMessage(player, `Name set to ${name}`);
     player.ui.sendData({ type: "set-name", name });
   });

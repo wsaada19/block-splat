@@ -1,5 +1,7 @@
  import { PlayerClass } from "../gameState/player-data";
 
+export const USE_PARTICLES = false;
+
 // game time in seconds
 export const GAME_TIME = 4 * 60;
 

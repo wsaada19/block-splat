@@ -3,7 +3,7 @@ import { PlayerEntity, type Vector3Like, type World, Audio } from "hytopia";
 import type { Entity } from "hytopia";
 import type { BlockType } from "hytopia";
 import type Game from "../gameState/game";
-import { PlayerClass, type PlayerDataManager } from "../gameState/player-data";
+import { PlayerClass} from "../gameState/player-data";
 import type TeamManager from "../gameState/team";
 import {
   BLOCK_STATE,
@@ -14,8 +14,11 @@ import {
   RED_BLOCK_ID,
   setBlockState,
 } from "../utilities/block-utils";
-import { PROJECTILES } from "../utilities/gameConfig";
+import { PROJECTILES, USE_PARTICLES } from "../utilities/gameConfig";
 import { TEAM_COLORS } from "../gameState/team";
+import { ParticleEmitter } from "../particles/particle-emmitter";
+import { ParticleFX } from "../particles/particles-fx";
+import { globalState } from "../gameState/global-state";
 const checkOrder = [
   [0, 0, 0], // Center block
   [0, 1, 0], // Above
@@ -47,7 +50,6 @@ export function onBlockHit(
   colliderHandleB: number,
   world: World,
   game: Game,
-  playerDataManager: PlayerDataManager,
   teamManager: TeamManager,
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
@@ -128,7 +130,14 @@ export function onBlockHit(
         blocksColored++;
       }
 
-      playerDataManager.updatePlayerPoints(tag, blocksColored);
+      if (blocksColored > 0 && USE_PARTICLES) {
+        const particleEmitter = new ParticleEmitter(newState === BLOCK_STATE.BLUE ? ParticleFX.BLUE_BLOODHIT : ParticleFX.BLOODHIT, world);
+        particleEmitter.spawn(world, {x: position.x, y: position.y + 2, z: position.z});
+        particleEmitter.burst();
+      }
+
+      const playerEntity = globalState.getPlayerEntity(tag);
+      playerEntity.incrementPlayerPoints(blocksColored);
 
       new Audio({
         uri: "audio/sfx/liquid/splash-01.mp3",
@@ -145,8 +154,8 @@ export function onBlockHit(
 
   if (entity instanceof PlayerEntity && started && blockIds.includes(type.id)) {
     const player = entity.player;
-    const playerData = playerDataManager.getPlayer(player.id);
-    if (playerData.class === PlayerClass.RUNNER) {
+    const playerEntity = globalState.getPlayerEntity(player.id);
+    if (playerEntity.getPlayerClass() === PlayerClass.RUNNER) {
       const teamColor = teamManager.getPlayerColor(player.id);
       const position = entity.position;
       const blockPos = {
@@ -182,7 +191,7 @@ export function onBlockHit(
 
           // Add point to new team
           game.changeScore(newState, 1);
-          playerData.playerPoints++;
+          playerEntity.incrementPlayerPoints(1);
 
           // Update block
           world.chunkLattice.setBlock(block, blockId);

@@ -6,15 +6,14 @@ import {
   PlayerEntity,
 } from "hytopia";
 import TeamManager from "./team";
-import type { PlayerDataManager } from "./player-data";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
-import { BOOST_SPAWN_INTERVAL, UI_EVENT_TYPES } from "../utilities/gameConfig";
+import { BOOST_SPAWN_INTERVAL, STAMINA_REGEN_RATE, UI_EVENT_TYPES } from "../utilities/gameConfig";
 import { spawnRandomEnergyBoost } from "../utilities/boosts";
 import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
+import { globalState } from "./global-state";
 export default class Game {
   private world: World;
   private teamManager: TeamManager;
-  private playerDataManager: PlayerDataManager;
   private gameTimer: Timer | null = null;
   private uiTimer: Timer | null = null;
   private boostTimer: Timer | null = null;
@@ -37,7 +36,6 @@ export default class Game {
   constructor(
     world: World,
     teamManager: TeamManager,
-    playerDataManager: PlayerDataManager,
     timeLimit: number = 500,
     blockStateMap: Map<string, BLOCK_STATE>
   ) {
@@ -48,7 +46,6 @@ export default class Game {
     this.teamManager = teamManager;
     this.timeRemaining = timeLimit;
     this.timeLimit = timeLimit;
-    this.playerDataManager = playerDataManager;
     this.blockStateMap = blockStateMap;
 
     // Initialize scores for each team
@@ -62,12 +59,12 @@ export default class Game {
     if (players.length >= 4 && !this.isGameRunning) {
       // start game in 20 seconds
       this.world.chatManager.sendBroadcastMessage(
-        "Game starting in 20 seconds!",
+        "Game starting in 10 seconds!",
         "FFFF00"
       );
       setTimeout(() => {
         this.startGame();
-      }, 20 * 1000);
+      }, 10 * 1000);
     }
   }
   
@@ -98,15 +95,18 @@ export default class Game {
     BACKGROUND_MUSIC.pause();
     TO_THE_DEATH_MUSIC.play(this.world);
 
-    this.playerDataManager.clearPlayerData();
+    // clear player data
+    globalState.getAllPlayers().forEach(player => {
+      player.resetData();
+    });
 
     this.isGameRunning = true;
     this.timeRemaining = this.timeLimit;
 
-    spawnRandomEnergyBoost(this.world, this.playerDataManager, this.energySpawnLocations);
+    spawnRandomEnergyBoost(this.world, this.energySpawnLocations);
 
     this.boostTimer = setInterval(() => {
-      spawnRandomEnergyBoost(this.world, this.playerDataManager, this.energySpawnLocations);
+      spawnRandomEnergyBoost(this.world, this.energySpawnLocations);
     }, BOOST_SPAWN_INTERVAL * 1000);
 
     // Start main game timer
@@ -119,7 +119,7 @@ export default class Game {
     }, 1000);
 
     this.uiTimer = setInterval(() => {
-      this.playerDataManager.staminaRegen();
+      globalState.getAllPlayers().forEach(player => player.setStamina(STAMINA_REGEN_RATE));
       this.updateAllPlayersUI();
     }, 225);
 
@@ -167,13 +167,12 @@ export default class Game {
       )
       .join(" | ");
 
-    const playerStats = this.playerDataManager.getPlayer(player.id);
+    const playerStats = globalState.getPlayerEntity(player.id);
 
-    if (!playerStats) return;
-    const playerStamina = playerStats.stamina;
-    const maxStamina = playerStats.maxStamina;
-    const playerPoints = playerStats.playerPoints;
-    const playerKills = playerStats.kills;
+    const playerStamina = playerStats.getStamina();
+    const maxStamina = playerStats.getMaxStamina();
+    const playerPoints = playerStats.getPlayerPoints();
+    const playerKills = playerStats.getKills();
 
     const playerTeam = this.teamManager.getTeamName(
       this.teamManager.getPlayerTeam(player.id) ?? 1
@@ -187,8 +186,8 @@ export default class Game {
       maxStamina: maxStamina,
       playerPoints: playerPoints,
       playerKills: playerKills,
-      playerName: playerStats.name,
-      playerClass: playerStats.class,
+      playerName: playerStats.getDisplayName(),
+      playerClass: playerStats.getPlayerClass(),
     });
   }
 

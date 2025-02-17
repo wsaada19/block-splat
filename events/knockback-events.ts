@@ -1,24 +1,23 @@
 // Handles player - projectile collisions applying knockback to the player when applicable
-import { PlayerEntity, type Entity, Audio } from "hytopia";
-import type { PlayerDataManager } from "../gameState/player-data";
+import { type Entity, Audio } from "hytopia";
 import { PROJECTILES, STRENGTH_BOOST_MULTIPLIER } from "../utilities/gameConfig";
 import type TeamManager from "../gameState/team";
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
+import CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import { globalState } from "../gameState/global-state";
 
 export function knockBackCollisionHandler(
   projectile: Entity,
   otherEntity: Entity,
   started: boolean,
   tag: string,
-  playerDataManager: PlayerDataManager,
   teams: TeamManager
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
+  if (!(otherEntity instanceof CustomPlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
     return;
-  const playerStats = playerDataManager.getPlayer(otherEntity.player.id);
   if (
-    playerStats.invincible ||
+    otherEntity.isInvincible() ||
     (FRIENDLY_FIRE_DISABLED &&
       teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
   ) {
@@ -29,12 +28,11 @@ export function knockBackCollisionHandler(
 
   if (started && projectile.isSpawned) {
     // tag player so we can reward kills
-    if (playerStats) {
-      playerStats.lastHitBy = tag;
-    }
+    otherEntity.setLastHitBy(tag);
+    const shootingEntity = globalState.getPlayerEntity(tag);
 
     let multiplier = 1;
-    if(playerDataManager.isStrengthBoostActive(tag)) {
+    if(shootingEntity.isStrengthBoostActive()) {
       multiplier = STRENGTH_BOOST_MULTIPLIER;
     }
 

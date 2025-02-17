@@ -10,7 +10,6 @@ import {
 } from "hytopia";
 import { knockBackCollisionHandler } from "../events/knockback-events";
 import { blockIds } from "./block-utils";
-import type { PlayerDataManager } from "../gameState/player-data";
 import TeamManager, {
   TEAM_COLOR_STRINGS,
   TEAM_COLORS,
@@ -23,8 +22,7 @@ export function spawnProjectile(
   direction: Vector3Like,
   tag: string,
   teamManager: TeamManager,
-  type: ProjectileType,
-  playerDataManager: PlayerDataManager
+  type: ProjectileType
 ) {
   // Spawn a projectileEntity when the player shoots.
   const projectileEntity = createProjectileEntity(
@@ -67,7 +65,6 @@ export function spawnProjectile(
         otherEntity,
         started,
         tag,
-        playerDataManager,
         teamManager
       );
     };

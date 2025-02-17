@@ -9,7 +9,7 @@ import {
   type Vector3Like,
 } from "hytopia";
 import { spawnProjectile } from "../utilities/projectiles";
-import { PlayerDataManager, PlayerClass } from "../gameState/player-data";
+import { PlayerClass } from "../gameState/player-data";
 import TeamManager, { TEAM_COLORS } from "../gameState/team";
 import {
   JUMP_COOLDOWN,
@@ -27,6 +27,8 @@ import {
   MELEE_HIT_DISTANCE,
   SHOOTING_COOLDOWN,
 } from "../utilities/gameConfig";
+import type CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import { globalState } from "../gameState/global-state";
 
 // maps used to add cooldowns on player input
 let lastJumpMap = new Map<string, number>();
@@ -35,61 +37,49 @@ let lastShootMap = new Map<string, number>();
 
 export function onTickWithPlayerInput(
   this: PlayerEntityController,
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   input: PlayerInput,
   cameraOrientation: PlayerCameraOrientation,
   _deltaTimeMs: number,
   teamManager: TeamManager,
-  playerDataManager: PlayerDataManager,
   world: World
 ) {
   if (!entity.world) return;
 
   if (input.ml) {
-    handleShooting(
-      entity,
-      input,
-      cameraOrientation,
-      playerDataManager,
-      teamManager,
-      world
-    );
+    handleShooting(entity, input, cameraOrientation, teamManager, world);
   } else if (input.mr || input.q) {
-    handleMeleeAttack(entity, input, playerDataManager, world);
+    handleMeleeAttack(entity, input, world);
   } else if (input.sp) {
     handleJump(entity, input);
   } else if (input.sh) {
-    handleSprint(entity, input, playerDataManager);
+    handleSprint(entity, input);
   } else if (input.e) {
     entity.player.ui.sendData({ type: UI_EVENT_TYPES.SHOW_CLASS_SELECT });
     input.e = false;
   } else if (input.r) {
-    showLeaderboard(entity, teamManager);
+    showLeaderboard(entity);
     input.r = false;
   } else if (input["1"]) {
-    handleClassSelection(entity, "1", input, playerDataManager);
+    handleClassSelection(entity, "1", input);
   } else if (input["2"]) {
-    handleClassSelection(entity, "2", input, playerDataManager);
+    handleClassSelection(entity, "2", input);
   } else if (input["3"]) {
-    handleClassSelection(entity, "3", input, playerDataManager);
+    handleClassSelection(entity, "3", input);
   } else if (input["4"]) {
-    handleClassSelection(entity, "4", input, playerDataManager);
+    handleClassSelection(entity, "4", input);
   }
 }
 
 function handleShooting(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   input: PlayerInput,
   cameraOrientation: PlayerCameraOrientation,
-  playerDataManager: PlayerDataManager,
   teamManager: TeamManager,
   world: World
 ) {
-  const playerData = playerDataManager.getPlayer(entity.player.id);
-
   if (
-    !playerData ||
-    playerData.class === PlayerClass.RUNNER ||
+    entity.getPlayerClass() === PlayerClass.RUNNER ||
     isPlayerRespawning(entity)
   ) {
     input.ml = false;
@@ -106,7 +96,7 @@ function handleShooting(
   const direction = calculateShootingDirection(entity, cameraOrientation);
   const bulletOrigin = calculateBulletOrigin(entity, direction);
 
-  const projectileMap = {
+  const projectileMap: { [key: string]: { type: string; energy: number } } = {
     [PlayerClass.GRENADER]: { type: "BLOB", energy: PROJECTILES.BLOB.ENERGY },
     [PlayerClass.SLINGSHOT]: {
       type: "SLINGSHOT",
@@ -115,11 +105,11 @@ function handleShooting(
     [PlayerClass.SNIPER]: { type: "SNIPER", energy: PROJECTILES.SNIPER.ENERGY },
   };
 
-  const projectileConfig = projectileMap[playerData.class];
+  const projectileConfig = projectileMap[entity.getPlayerClass()];
   if (!projectileConfig) return;
 
   const { type, energy } = projectileConfig;
-  if (playerData.stamina >= Math.abs(energy)) {
+  if (entity.getStamina() >= Math.abs(energy)) {
     entity.startModelOneshotAnimations(["chuck"]);
     const projectile = spawnProjectile(
       world,
@@ -127,18 +117,16 @@ function handleShooting(
       direction,
       entity.player.id,
       teamManager,
-      type as ProjectileType,
-      playerDataManager
+      type as ProjectileType
     );
-    playerData.stamina = playerData.stamina + energy;
+    entity.setStamina(energy);
     setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
   }
 }
 
 function handleMeleeAttack(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   input: PlayerInput,
-  playerDataManager: PlayerDataManager,
   world: World
 ) {
   const direction = entity.player.camera.facingDirection;
@@ -155,7 +143,7 @@ function handleMeleeAttack(
   }
   lastPunchMap.set(entity.player.id, Date.now());
   let multiplier = 1;
-  if (playerDataManager.isStrengthBoostActive(entity.player.id)) {
+  if (entity.isStrengthBoostActive()) {
     multiplier = STRENGTH_BOOST_MULTIPLIER;
   }
 
@@ -173,11 +161,10 @@ function handleMeleeAttack(
       y: verticalForce,
       z: direction.z * PUNCH_FORCE * multiplier,
     });
-    playerDataManager.updateStamina(entity.player.id, -PUNCH_ENERGY_COST);
-    playerDataManager.setLastHitBy(
-      raycastResult.hitEntity.player.id,
-      entity.player.id
-    );
+    entity.setStamina(PUNCH_ENERGY_COST);
+    globalState
+      .getPlayerEntity(raycastResult.hitEntity.player.id)
+      .setLastHitBy(entity.player.id);
   }
   input.mr = false;
 }
@@ -191,26 +178,38 @@ function handleJump(entity: PlayerEntity, input: PlayerInput) {
   }
 }
 
-function handleSprint(
-  entity: PlayerEntity,
-  input: PlayerInput,
-  playerDataManager: PlayerDataManager
-) {
-  const player = playerDataManager.getPlayer(entity.player.id);
-  if (player.stamina > SPRINT_ENERGY_COST) {
-    player.stamina -= SPRINT_ENERGY_COST;
+function handleSprint(entity: CustomPlayerEntity, input: PlayerInput) {
+  if (entity.getStamina() > SPRINT_ENERGY_COST) {
+    entity.setStamina(-1 * SPRINT_ENERGY_COST);
   } else {
     input.sh = false;
   }
 }
 
-function showLeaderboard(entity: PlayerEntity, teamManager: TeamManager) {
-  const redLeaderboard = teamManager
-    .getTeamPlayerData(TEAM_COLORS.RED)
-    .sort((a, b) => b.playerPoints - a.playerPoints);
-  const blueLeaderboard = teamManager
-    .getTeamPlayerData(TEAM_COLORS.BLUE)
-    .sort((a, b) => b.playerPoints - a.playerPoints);
+function showLeaderboard(entity: CustomPlayerEntity) {
+  const redLeaderboard = globalState
+    .getPlayersOnTeam(TEAM_COLORS.RED)
+    .sort((a, b) => b.getPlayerPoints() - a.getPlayerPoints())
+    .map((player) => {
+      return {
+        name: player.getDisplayName(),
+        points: player.getPlayerPoints(),
+        kills: player.getKills(),
+        deaths: player.getPlayerDeaths(),
+      };
+    });
+
+  const blueLeaderboard = globalState
+    .getPlayersOnTeam(TEAM_COLORS.BLUE)
+    .sort((a, b) => b.getPlayerPoints() - a.getPlayerPoints())
+    .map((player) => {
+      return {
+        name: player.getDisplayName(),
+        points: player.getPlayerPoints(),
+        kills: player.getKills(),
+        deaths: player.getPlayerDeaths(),
+      };
+    });
 
   entity.player.ui.sendData({
     type: UI_EVENT_TYPES.SHOW_PLAYER_LEADERBOARD,
@@ -220,10 +219,9 @@ function showLeaderboard(entity: PlayerEntity, teamManager: TeamManager) {
 }
 
 function handleClassSelection(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   input: "1" | "2" | "3" | "4",
-  playerInput: PlayerInput,
-  playerDataManager: PlayerDataManager
+  playerInput: PlayerInput
 ) {
   const classMap = {
     "1": PlayerClass.RUNNER,
@@ -234,7 +232,7 @@ function handleClassSelection(
 
   const selectedClass = classMap[input];
   if (selectedClass) {
-    playerDataManager.setPlayerClass(entity.player.id, selectedClass);
+    entity.setPlayerClass(selectedClass);
     entity.player.ui.sendData({
       type: UI_EVENT_TYPES.GAME_UI,
       playerClass: selectedClass,

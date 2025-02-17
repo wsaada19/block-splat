@@ -1160,13 +1160,13 @@
         const redLeaderboard = data.redLeaderboard
         document.getElementById('red-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
         redLeaderboard.forEach(player => {
-          document.getElementById('red-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
+          document.getElementById('red-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.points}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
 
         const blueLeaderboard = data.blueLeaderboard
         document.getElementById('blue-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
         blueLeaderboard.forEach(player => {
-          document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.playerPoints}</span><span class="leaderboard-kills">${player.kills}</span></div>`
+          document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.points}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
       } else {
         document.getElementById('player-leaderboard').style.display = 'none'
