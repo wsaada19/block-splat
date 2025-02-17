@@ -182,6 +182,8 @@ export function onPlayerJoin(
   messages.forEach((message) => {
     world.chatManager.sendPlayerMessage(player, message);
   });
+
+  game.checkPlayerCount();
 }
 
 export function onPlayerLeave(

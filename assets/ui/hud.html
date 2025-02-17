@@ -535,7 +535,7 @@
     position: fixed;
     top: 16px;
     height: 40px;
-    width: 15%;
+    width: 13%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -548,7 +548,7 @@
   }
 
   .team-banner.red {
-    left: 25%;
+    left: 20%;
     background: linear-gradient(to right,
         rgba(200, 30, 30, 0.95),
         rgba(120, 20, 20, 0.85));
@@ -556,7 +556,7 @@
   }
 
   .team-banner.blue {
-    right: 25%;
+    right: 20%;
     background: linear-gradient(to left,
         rgba(30, 30, 200, 0.95),
         rgba(20, 20, 120, 0.85));
@@ -673,17 +673,19 @@
         rgba(25, 25, 25, 0.92));
     border: 1px solid rgba(237, 235, 235, 0.4);
     border-radius: 12px;
-    padding: 14px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     backdrop-filter: blur(4px);
+    justify-content: center;
   }
 
   .time-label {
     color: #ffffff;
     font-family: 'Trebuchet MS', 'Arial', sans-serif;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
+    text-align: center;
   }
 
   .my-game-message {
@@ -814,6 +816,28 @@
     color: #ff4444;
     text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
   }
+
+  .waiting-text {
+    color: #ffaa00;
+    animation: pulse 2s infinite;
+  }
+
+  .countdown-text {
+    color: #00ff00;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.7;
+    }
+  }
 </style>
   
 <div class="crosshair" id="crosshair"></div>
@@ -824,7 +848,7 @@
 </div>
 
 <div class="time-display">
-  <span class="panel-value time-value" id="time-left">4:00</span>
+  <span class="panel-value time-value" id="time-left">Waiting for players...</span>
 </div>
 
 <div class="hud-panel">
@@ -1099,6 +1123,7 @@
       document.getElementById(
         'winner-text'
       ).textContent = `${data.winner} Wins!`
+      document.getElementById('time-left').textContent = 'Waiting for players...'
       // Hide game over message after 5 seconds
       setTimeout(() => {
         document.querySelector('.game-over').style.display = 'none'

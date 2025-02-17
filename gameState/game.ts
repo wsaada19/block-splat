@@ -18,6 +18,8 @@ export default class Game {
   private gameTimer: Timer | null = null;
   private uiTimer: Timer | null = null;
   private boostTimer: Timer | null = null;
+  private gameCountdownTimer: number = 30;
+  private gameCountdownTimerInterval: Timer | null = null;
   private blockStateMap: Map<string, BLOCK_STATE>;
   private timeRemaining: number;
   private timeLimit: number;
@@ -33,6 +35,7 @@ export default class Game {
     {x: 34, y: 10, z: -3},
     {x: 6, y: 11, z: 35}
   ];
+  private isWaitingForPlayers: boolean = true;
 
   constructor(
     world: World,
@@ -59,16 +62,24 @@ export default class Game {
 
   checkPlayerCount() {
     const players = PlayerManager.instance.getConnectedPlayers();
-    if (players.length >= 4 && !this.isGameRunning) {
-      // start game in 20 seconds
+    if (players.length >= 1 && !this.isGameRunning && !this.gameCountdownTimerInterval) {
+      // start game in 30 seconds
       this.world.chatManager.sendBroadcastMessage(
-        "Game starting in 20 seconds!",
+        "Game starting in " + this.gameCountdownTimer + " seconds!",
         "FFFF00"
       );
-      setTimeout(() => {
-        this.startGame();
-      }, 20 * 1000);
+      this.gameCountdownTimer = 30;
+      this.gameCountdownTimerInterval = setInterval(() => {
+        this.gameCountdownTimer--;
+        this.updateAllPlayersUI();
+        if (this.gameCountdownTimer <= 0 && this.gameCountdownTimerInterval) {
+          clearInterval(this.gameCountdownTimerInterval);
+          this.gameCountdownTimerInterval = null;
+          this.startGame();
+        }
+      }, 1000);
     }
+    this.updateAllPlayersUI();
   }
   
   clearMapThenStartGame() {
@@ -126,6 +137,8 @@ export default class Game {
     this.teamManager.spawnPlayers(this.world);
     this.resetScores();
     this.updateAllPlayersUI();
+
+    this.isWaitingForPlayers = false;
   }
 
   restartGame() {
@@ -157,9 +170,18 @@ export default class Game {
   }
 
   private updatePlayerUI(player: Player) {
-    const minutes = Math.floor(this.timeRemaining / 60);
-    const seconds = this.timeRemaining % 60;
-    const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    let timeStr: string;
+    
+    if (this.isGameRunning) {
+      const minutes = Math.floor(this.timeRemaining / 60);
+      const seconds = this.timeRemaining % 60;
+      timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    } else if (this.gameCountdownTimerInterval) {
+      timeStr = `Starting in ${this.gameCountdownTimer}`;
+    } else {
+      const players = PlayerManager.instance.getConnectedPlayers();
+      timeStr = `Waiting for players (${players.length}/2)`;
+    }
 
     const scoreStr = Array.from(this.scores.entries())
       .map(
@@ -245,5 +267,9 @@ export default class Game {
 
     // send all players to lobby
     this.teamManager.sendAllPlayersToLobby(this.world);
+
+    this.isWaitingForPlayers = true;
+    this.gameCountdownTimer = 30;
+    this.checkPlayerCount();
   }
 }

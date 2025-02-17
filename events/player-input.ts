@@ -56,8 +56,6 @@ export function onTickWithPlayerInput(
     );
   } else if (input.mr || input.q) {
     handleMeleeAttack(entity, input, playerDataManager, world);
-  } else if (input.sp) {
-    handleJump(entity, input);
   } else if (input.sh) {
     handleSprint(entity, input, playerDataManager);
   } else if (input.e) {
@@ -162,7 +160,7 @@ function handleMeleeAttack(
   entity.startModelOneshotAnimations(["simple_interact"]);
   entity.applyImpulse({
     x: direction.x * PUNCH_PLAYER_FORCE,
-    y: 0.1,
+    y: 0.1 * PUNCH_VERTICAL_FORCE,
     z: direction.z * PUNCH_PLAYER_FORCE,
   });
 
@@ -185,8 +183,10 @@ function handleMeleeAttack(
 function handleJump(entity: PlayerEntity, input: PlayerInput) {
   const lastJump = lastJumpMap.get(entity.player.id);
   if (lastJump && Date.now() - lastJump < JUMP_COOLDOWN) {
+    console.log("not enough time");
     input.sp = false;
   } else {
+    console.log("jump");
     lastJumpMap.set(entity.player.id, Date.now());
   }
 }

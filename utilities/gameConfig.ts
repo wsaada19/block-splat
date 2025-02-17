@@ -54,8 +54,8 @@ export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
 export const PUNCH_FORCE = 12;
-export const PUNCH_PLAYER_FORCE = 10;
-export const PUNCH_VERTICAL_FORCE = 15;
+export const PUNCH_PLAYER_FORCE = 12;
+export const PUNCH_VERTICAL_FORCE = 10;
 
 // projectiles
 export type ProjectileType = 'BLOB' | 'SLINGSHOT' | 'SNIPER'
