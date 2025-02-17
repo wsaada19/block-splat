@@ -44,11 +44,10 @@ export function onTickWithPlayerInput(
   teamManager: TeamManager,
   world: World
 ) {
-  if (!entity.world) return;
-
   if (input.ml) {
     handleShooting(entity, input, cameraOrientation, teamManager, world);
-  } else if (input.mr || input.q) {
+  } 
+   if (input.mr || input.q) {
     handleMeleeAttack(entity, input, world);
   } else if (input.sp) {
     handleJump(entity, input);

@@ -87,6 +87,7 @@ export function createEnergyBoost(world: World) {
       boostsSpawned.delete(locationString(entity.position));
       entity.despawn();
     } else {
+      console.log("despawning projectile");
       otherEntity.despawn(); // despawn projectile if it hits the boost
     }
   };

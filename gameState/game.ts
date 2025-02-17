@@ -168,6 +168,7 @@ export default class Game {
       .join(" | ");
 
     const playerStats = globalState.getPlayerEntity(player.id);
+    console.log(playerStats);
 
     const playerStamina = playerStats.getStamina();
     const maxStamina = playerStats.getMaxStamina();
