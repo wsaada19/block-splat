@@ -34,7 +34,7 @@ export const BOOST_PROBABILITIES = [
 export const SPRINT_ENERGY_COST = 1;
 export const PUNCH_ENERGY_COST = 20;
 
-export const STAMINA_REGEN_RATE = 9;
+export const STAMINA_REGEN_RATE = 10;
 
 // class max staminas
 export const MAX_STAMINA = {

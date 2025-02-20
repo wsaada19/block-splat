@@ -14,13 +14,13 @@ export function knockBackCollisionHandler(
   teams: TeamManager
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
+  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.username === tag || otherEntity.position.y > 40)
     return;
-  const playerStats = playerDataManager.getPlayer(otherEntity.player.id);
+  const playerStats = playerDataManager.getPlayer(otherEntity.player.username);
   if (
     playerStats.invincible ||
     (FRIENDLY_FIRE_DISABLED &&
-      teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
+      teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.username))
   ) {
     // despawn projectile if it's a friendly fire or the player is invincible so it doesn't bounce off them
     projectile.despawn();

@@ -83,7 +83,7 @@ function handleShooting(
   teamManager: TeamManager,
   world: World
 ) {
-  const playerData = playerDataManager.getPlayer(entity.player.id);
+  const playerData = playerDataManager.getPlayer(entity.player.username);
 
   if (
     !playerData ||
@@ -94,12 +94,12 @@ function handleShooting(
     return;
   }
 
-  const lastShoot = lastShootMap.get(entity.player.id);
+  const lastShoot = lastShootMap.get(entity.player.username);
   if (lastShoot && Date.now() - lastShoot < SHOOTING_COOLDOWN) {
     input.ml = false;
     return;
   }
-  lastShootMap.set(entity.player.id, Date.now());
+  lastShootMap.set(entity.player.username, Date.now());
 
   const direction = calculateShootingDirection(entity, cameraOrientation);
   const bulletOrigin = calculateBulletOrigin(entity, direction);
@@ -123,7 +123,7 @@ function handleShooting(
       world,
       bulletOrigin,
       direction,
-      entity.player.id,
+      entity.player.username,
       teamManager,
       type as ProjectileType,
       playerDataManager
@@ -146,14 +146,14 @@ function handleMeleeAttack(
     MELEE_HIT_DISTANCE,
     { filterExcludeRigidBody: entity.rawRigidBody }
   );
-  const lastPunch = lastPunchMap.get(entity.player.id);
+  const lastPunch = lastPunchMap.get(entity.player.username);
   if (lastPunch && Date.now() - lastPunch < PUNCH_COOLDOWN) {
     input.mr = false;
     return;
   }
-  lastPunchMap.set(entity.player.id, Date.now());
+  lastPunchMap.set(entity.player.username, Date.now());
   let multiplier = 1;
-  if (playerDataManager.isStrengthBoostActive(entity.player.id)) {
+  if (playerDataManager.isStrengthBoostActive(entity.player.username)) {
     multiplier = STRENGTH_BOOST_MULTIPLIER;
   }
 
@@ -171,23 +171,21 @@ function handleMeleeAttack(
       y: verticalForce,
       z: direction.z * PUNCH_FORCE * multiplier,
     });
-    playerDataManager.updateStamina(entity.player.id, -PUNCH_ENERGY_COST);
+    playerDataManager.updateStamina(entity.player.username, -PUNCH_ENERGY_COST);
     playerDataManager.setLastHitBy(
-      raycastResult.hitEntity.player.id,
-      entity.player.id
+      raycastResult.hitEntity.player.username,
+      entity.player.username
     );
   }
   input.mr = false;
 }
 
 function handleJump(entity: PlayerEntity, input: PlayerInput) {
-  const lastJump = lastJumpMap.get(entity.player.id);
+  const lastJump = lastJumpMap.get(entity.player.username);
   if (lastJump && Date.now() - lastJump < JUMP_COOLDOWN) {
-    console.log("not enough time");
     input.sp = false;
   } else {
-    console.log("jump");
-    lastJumpMap.set(entity.player.id, Date.now());
+    lastJumpMap.set(entity.player.username, Date.now());
   }
 }
 
@@ -196,7 +194,7 @@ function handleSprint(
   input: PlayerInput,
   playerDataManager: PlayerDataManager
 ) {
-  const player = playerDataManager.getPlayer(entity.player.id);
+  const player = playerDataManager.getPlayer(entity.player.username);
   if (player.stamina > SPRINT_ENERGY_COST) {
     player.stamina -= SPRINT_ENERGY_COST;
   } else {
@@ -234,7 +232,7 @@ function handleClassSelection(
 
   const selectedClass = classMap[input];
   if (selectedClass) {
-    playerDataManager.setPlayerClass(entity.player.id, selectedClass);
+    playerDataManager.setPlayerClass(entity.player.username, selectedClass);
     entity.player.ui.sendData({
       type: UI_EVENT_TYPES.GAME_UI,
       playerClass: selectedClass,

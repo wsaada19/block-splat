@@ -189,7 +189,7 @@ export default class Game {
       )
       .join(" | ");
 
-    const playerStats = this.playerDataManager.getPlayer(player.id);
+    const playerStats = this.playerDataManager.getPlayer(player.username);
 
     if (!playerStats) return;
     const playerStamina = playerStats.stamina;
@@ -198,7 +198,7 @@ export default class Game {
     const playerKills = playerStats.kills;
 
     const playerTeam = this.teamManager.getTeamName(
-      this.teamManager.getPlayerTeam(player.id) ?? 1
+      this.teamManager.getPlayerTeam(player.username) ?? 1
     );
     player.ui.sendData({
       type: UI_EVENT_TYPES.GAME_UI,
@@ -245,7 +245,7 @@ export default class Game {
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       const playerTeam = this.teamManager.getTeamName(
-        this.teamManager.getPlayerTeam(player.id) ?? 1
+        this.teamManager.getPlayerTeam(player.username) ?? 1
       );
       if (playerTeam === winningTeamName) {
         player.ui.sendData({
