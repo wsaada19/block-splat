@@ -12,7 +12,7 @@ export const ParticleFX = {
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 1.3,
+            size: 1,
             sizeRandomness: 0.3, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blooddrop.gltf',
@@ -31,7 +31,7 @@ export const ParticleFX = {
         },
         particleOptions: {
             color: { r: 0, g: 0, b: 255 },
-            size: 1.3,
+            size: 1,
             sizeRandomness: 0.3, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blue-blob.gltf',

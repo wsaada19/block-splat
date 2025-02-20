@@ -49,7 +49,7 @@ export default class TeamManager {
   spawnPlayers(world: World) {
     const players = world.entityManager.getAllPlayerEntities();
     for(const player of players) {
-      const team = this.getPlayerTeam(player.player.id);
+      const team = this.getPlayerTeam(player.player.username);
       const spawn = team ? this.getTeamSpawn(team) : undefined;
       if (spawn) {
         const randomPosition = {

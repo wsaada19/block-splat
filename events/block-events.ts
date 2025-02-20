@@ -154,9 +154,9 @@ export function onBlockHit(
 
   if (entity instanceof PlayerEntity && started && blockIds.includes(type.id)) {
     const player = entity.player;
-    const playerEntity = globalState.getPlayerEntity(player.id);
+    const playerEntity = globalState.getPlayerEntity(player.username);
     if (playerEntity.getPlayerClass() === PlayerClass.RUNNER) {
-      const teamColor = teamManager.getPlayerColor(player.id);
+      const teamColor = teamManager.getPlayerColor(player.username);
       const position = entity.position;
       const blockPos = {
         x: Math.floor(position.x),

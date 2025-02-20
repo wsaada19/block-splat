@@ -167,8 +167,7 @@ export default class Game {
       )
       .join(" | ");
 
-    const playerStats = globalState.getPlayerEntity(player.id);
-    console.log(playerStats);
+    const playerStats = globalState.getPlayerEntity(player.username);
 
     const playerStamina = playerStats.getStamina();
     const maxStamina = playerStats.getMaxStamina();
@@ -176,7 +175,7 @@ export default class Game {
     const playerKills = playerStats.getKills();
 
     const playerTeam = this.teamManager.getTeamName(
-      this.teamManager.getPlayerTeam(player.id) ?? 1
+      this.teamManager.getPlayerTeam(player.username) ?? 1
     );
     player.ui.sendData({
       type: UI_EVENT_TYPES.GAME_UI,
@@ -223,7 +222,7 @@ export default class Game {
 
     for (const player of PlayerManager.instance.getConnectedPlayers()) {
       const playerTeam = this.teamManager.getTeamName(
-        this.teamManager.getPlayerTeam(player.id) ?? 1
+        this.teamManager.getPlayerTeam(player.username) ?? 1
       );
       if (playerTeam === winningTeamName) {
         player.ui.sendData({

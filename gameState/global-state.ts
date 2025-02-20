@@ -34,7 +34,7 @@ export class GlobalState {
   }
 
   getPlayerEntity(playerId: string): CustomPlayerEntity {
-    return this.world.entityManager.getAllPlayerEntities().find(entity => entity.player.id === playerId) as CustomPlayerEntity;
+    return this.world.entityManager.getAllPlayerEntities().find(entity => entity.player.username === playerId) as CustomPlayerEntity;
   }
 }
 

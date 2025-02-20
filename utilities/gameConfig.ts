@@ -1,6 +1,6 @@
  import { PlayerClass } from "../gameState/player-data";
 
-export const USE_PARTICLES = false;
+export const USE_PARTICLES = true;
 
 // game time in seconds
 export const GAME_TIME = 4 * 60;
@@ -20,15 +20,15 @@ export const INVINCIBILITY_BOOST_DURATION = 10000;
 export const BOOST_PROBABILITIES = [
   {
     type: "energy",
-    spawnProbability: 0.50,
+    spawnProbability: 0.70,
   },
-  {
+{
     type: "strength",
-    spawnProbability: 0.25,
+    spawnProbability: 0.15,
   },
   {
     type: "invincibility",
-    spawnProbability: 0.25,
+    spawnProbability: 0.15,
   }
 ];
 

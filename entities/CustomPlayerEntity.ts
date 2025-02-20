@@ -29,6 +29,7 @@ class CustomPlayerEntity extends PlayerEntity {
     });
     this.displayName = player.username;
     this.team = team;
+    this.stamina = 0;
   }
 
   public getKills(): number {
@@ -124,11 +125,11 @@ class CustomPlayerEntity extends PlayerEntity {
     setTimeout(() => {
       this.invincible = false;
     }, RESPAWN_INVINCIBILITY_TIME);
-    // if (invincible) {
-    //   this.setOpacity(0.3);
-    // } else {
-    //   this.setOpacity(1);
-    // }
+    if (invincible) {
+      this.setOpacity(0.5);
+    } else {
+      this.setOpacity(1);
+    }
   }
 
   public setStrengthBoostActive(strengthBoostActive: boolean): void {

@@ -102,19 +102,19 @@ startServer((world) => {
 
   world.chatManager.registerCommand("/set-name", (player, [name]) => {
     if(!name && name.length < 1) return;
-    const playerEntity = globalState.getPlayerEntity(player.id);
+    const playerEntity = globalState.getPlayerEntity(player.username);
     playerEntity.setDisplayName(name);
     world.chatManager.sendPlayerMessage(player, `Name set to ${name}`);
     player.ui.sendData({ type: "set-name", name });
   });
 
   world.chatManager.registerCommand("/change-team", (player, args) => {
-    teamManager.switchTeam(player.id);
+    teamManager.switchTeam(player.username);
     world.chatManager.sendPlayerMessage(player, "Team changed!");
   });
 
   world.chatManager.registerCommand("/stuck", (player) => {
-    const playerEntity = world.entityManager.getAllPlayerEntities().find(p => p.player.id === player.id);
+    const playerEntity = world.entityManager.getAllPlayerEntities().find(p => p.player.username === player.username);
 
     if(playerEntity) {
       playerEntity.setPosition({ x: 0, y: -8, z: 0 });

@@ -137,7 +137,7 @@ export class ParticleEmitter extends Entity {
         // Update and remove dead particles
         this.particles = this.particles.filter(particle => {
             particle.update(deltaTime);
-            if (particle.age >= particle.lifetime) {
+            if (particle.age >= particle.lifetime && particle.isSpawned) {
                 particle.despawn();
                 return false;
             }

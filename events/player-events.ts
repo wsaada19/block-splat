@@ -34,10 +34,11 @@ export function onPlayerJoin(
   game: Game,
   map: GameMap
 ) {
-  teamManager.addPlayerToMinTeam(player.id);
+  teamManager.addPlayerToMinTeam(player.username);
 
-  const team = teamManager.getPlayerTeam(player.id);
+  const team = teamManager.getPlayerTeam(player.username);
   const playerEntity = new CustomPlayerEntity(player, team || 0);
+  playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
 
   if (game.isGameRunning) {
     playerEntity.spawn(
@@ -60,9 +61,8 @@ export function onPlayerJoin(
     parent: playerEntity,
     parentNodeName: "hand_right_weapon_anchor",
   });
-  paintBrush.spawn(world, { x: 0, y: 0, z: 0 });
+  paintBrush.spawn(world, { x: 0, y: 0.1, z: 0 });
   paintBrush.setRotation({ x: 0, y: 0, z: 20, w: 1 });
-  playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
   playerEntity.setDisplayName(player.username);
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
@@ -101,7 +101,7 @@ export function onPlayerJoin(
   const usernameSceneUI = new SceneUI({
     templateId: "name-indicator",
     attachedToEntity: playerEntity,
-    state: { message: player.username, playerId: player.id },
+    state: { message: player.username, playerId: player.username },
     offset: { x: 0, y: 1.1, z: 0 },
   });
 
@@ -119,8 +119,8 @@ export function onPlayerJoin(
       playerEntity.setDisplayName(data.name);
       usernameSceneUI.setState({
         playerName: data.name,
-        color: teamManager.getPlayerColor(playerUI.player.id),
-        playerId: playerUI.player.id,
+        color: teamManager.getPlayerColor(playerUI.player.username),
+        playerId: playerUI.player.username,
       });
     }
 
@@ -128,9 +128,9 @@ export function onPlayerJoin(
       playerUI.player.camera.setAttachedToEntity(playerEntity);
 
       if (data.team === "Red") {
-        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.RED);
+        teamManager.addPlayerToTeam(playerUI.player.username, TEAM_COLORS.RED);
       } else if (data.team === "Blue") {
-        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.BLUE);
+        teamManager.addPlayerToTeam(playerUI.player.username, TEAM_COLORS.BLUE);
         playerUI.player.camera.setAttachedToEntity(playerEntity);
       }
     }
@@ -138,7 +138,7 @@ export function onPlayerJoin(
     if (!data.button) return;
 
     if (data.button === UI_BUTTONS.SWITCH_TEAM) {
-      teamManager.switchTeam(playerUI.player.id);
+      teamManager.switchTeam(playerUI.player.username);
     } else if (data.button === UI_BUTTONS.RESTART_GAME) {
       game.restartGame();
     } else if (data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
@@ -151,13 +151,13 @@ export function onPlayerJoin(
   // we store the player id in the local storage so we can use it to hide the player's own name bar
   player.ui.sendData({
     type: UI_EVENT_TYPES.PLAYER_ID,
-    playerId: player.id,
+    playerId: player.username,
   });
 
   usernameSceneUI.setState({
     playerName: playerEntity.getDisplayName(),
-    color: teamManager.getPlayerColor(player.id),
-    playerId: player.id,
+    color: teamManager.getPlayerColor(player.username),
+    playerId: player.username,
   });
 
   usernameSceneUI.load(world);
@@ -184,7 +184,7 @@ export function onPlayerLeave(
   world: World,
   teamManager: TeamManager,
 ) {
-  teamManager.removePlayer(player.id);
+  teamManager.removePlayer(player.username);
   world.entityManager
     .getPlayerEntitiesByPlayer(player)
     .forEach((entity) => entity.despawn());
@@ -236,7 +236,7 @@ export function respawnPlayer(
   // Get team spawn point
   if (!entity.isSpawned) return;
 
-  const team = teamManager.getPlayerTeam(entity.player.id);
+  const team = teamManager.getPlayerTeam(entity.player.username);
   const spawn = teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN;
   entity.rawRigidBody?.setEnabled(true);
 

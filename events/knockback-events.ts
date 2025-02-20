@@ -1,6 +1,9 @@
 // Handles player - projectile collisions applying knockback to the player when applicable
 import { type Entity, Audio } from "hytopia";
-import { PROJECTILES, STRENGTH_BOOST_MULTIPLIER } from "../utilities/gameConfig";
+import {
+  PROJECTILES,
+  STRENGTH_BOOST_MULTIPLIER,
+} from "../utilities/gameConfig";
 import type TeamManager from "../gameState/team";
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
@@ -14,12 +17,18 @@ export function knockBackCollisionHandler(
   teams: TeamManager
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (!(otherEntity instanceof CustomPlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
+  if (
+    !(otherEntity instanceof CustomPlayerEntity) ||
+    otherEntity.player.username === tag ||
+    otherEntity.position.y > 40 ||
+    !started
+  )
     return;
   if (
     otherEntity.isInvincible() ||
     (FRIENDLY_FIRE_DISABLED &&
-      teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
+      teams.getPlayerTeam(tag) ===
+        teams.getPlayerTeam(otherEntity.player.username))
   ) {
     // despawn projectile if it's a friendly fire or the player is invincible so it doesn't bounce off them
     projectile.despawn();
@@ -32,7 +41,7 @@ export function knockBackCollisionHandler(
     const shootingEntity = globalState.getPlayerEntity(tag);
 
     let multiplier = 1;
-    if(shootingEntity.isStrengthBoostActive()) {
+    if (shootingEntity.isStrengthBoostActive()) {
       multiplier = STRENGTH_BOOST_MULTIPLIER;
     }
 

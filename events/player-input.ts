@@ -85,12 +85,12 @@ function handleShooting(
     return;
   }
 
-  const lastShoot = lastShootMap.get(entity.player.id);
+  const lastShoot = lastShootMap.get(entity.player.username);
   if (lastShoot && Date.now() - lastShoot < SHOOTING_COOLDOWN) {
     input.ml = false;
     return;
   }
-  lastShootMap.set(entity.player.id, Date.now());
+  lastShootMap.set(entity.player.username, Date.now());
 
   const direction = calculateShootingDirection(entity, cameraOrientation);
   const bulletOrigin = calculateBulletOrigin(entity, direction);
@@ -114,7 +114,7 @@ function handleShooting(
       world,
       bulletOrigin,
       direction,
-      entity.player.id,
+      entity.player.username,
       teamManager,
       type as ProjectileType
     );
@@ -135,12 +135,12 @@ function handleMeleeAttack(
     MELEE_HIT_DISTANCE,
     { filterExcludeRigidBody: entity.rawRigidBody }
   );
-  const lastPunch = lastPunchMap.get(entity.player.id);
+  const lastPunch = lastPunchMap.get(entity.player.username);
   if (lastPunch && Date.now() - lastPunch < PUNCH_COOLDOWN) {
     input.mr = false;
     return;
   }
-  lastPunchMap.set(entity.player.id, Date.now());
+  lastPunchMap.set(entity.player.username, Date.now());
   let multiplier = 1;
   if (entity.isStrengthBoostActive()) {
     multiplier = STRENGTH_BOOST_MULTIPLIER;
@@ -162,18 +162,18 @@ function handleMeleeAttack(
     });
     entity.setStamina(PUNCH_ENERGY_COST);
     globalState
-      .getPlayerEntity(raycastResult.hitEntity.player.id)
-      .setLastHitBy(entity.player.id);
+      .getPlayerEntity(raycastResult.hitEntity.player.username)
+      .setLastHitBy(entity.player.username);
   }
   input.mr = false;
 }
 
 function handleJump(entity: PlayerEntity, input: PlayerInput) {
-  const lastJump = lastJumpMap.get(entity.player.id);
+  const lastJump = lastJumpMap.get(entity.player.username);
   if (lastJump && Date.now() - lastJump < JUMP_COOLDOWN) {
     input.sp = false;
   } else {
-    lastJumpMap.set(entity.player.id, Date.now());
+    lastJumpMap.set(entity.player.username, Date.now());
   }
 }
 
