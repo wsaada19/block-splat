@@ -69,7 +69,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 2,
     SPEED: 30,
     KNOCKBACK: 14,
-    ENERGY: -28
+    ENERGY: -30
   },
   SLINGSHOT: {
     NAME: 'SLINGSHOT',
@@ -77,7 +77,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 40,
     KNOCKBACK: 11,
-    ENERGY: -34
+    ENERGY: -35
   },
   SNIPER: {
     NAME: 'SNIPER',
@@ -85,7 +85,7 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 60,
     KNOCKBACK: 10,
-    ENERGY: -22
+    ENERGY: -24
   }
 }
 

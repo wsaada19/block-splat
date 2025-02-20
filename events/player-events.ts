@@ -56,15 +56,21 @@ export function onPlayerJoin(
     playerEntity.spawn(world, randomLobbySpawn);
     game.checkPlayerCount();
   }
+  
+  let paintModelUri = "models/items/paint-brush.gltf";
+  if(teamManager.getPlayerTeam(player.username) === TEAM_COLORS.RED) {
+    paintModelUri = "models/items/paint-brush-red.gltf";
+  }
+
   const paintBrush = new Entity({
     name: "Paint Brush",
-    modelUri: "models/items/paint-brush.gltf",
+    modelUri: paintModelUri,
     modelScale: 1.5,
     parent: playerEntity,
     parentNodeName: "hand_right_weapon_anchor",
   });
-  paintBrush.spawn(world, { x: 0, y: 0.1, z: 0 });
-  paintBrush.setRotation({ x: 0, y: 0, z: 20, w: 1 });
+  paintBrush.spawn(world, { x: 0, y: .15, z: .15 });
+  paintBrush.setRotation({ x: 0, y: 0, z: 45, w: 1 });
   playerEntity.setDisplayName(player.username);
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
