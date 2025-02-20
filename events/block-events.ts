@@ -148,7 +148,9 @@ export function onBlockHit(
         loop: false,
       }).play(world);
 
-      entity.despawn();
+      if(entity.isSpawned) {
+        entity.despawn();
+      }
     }
   }
 

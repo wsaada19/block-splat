@@ -164,7 +164,7 @@ function createInvincibilityBoost(world: World) {
     colliderHandleB
   ) => {
     if (started && otherEntity instanceof CustomPlayerEntity) {
-      otherEntity.setInvincible(true);
+      otherEntity.setInvincible();
       world.chatManager.sendPlayerMessage(
         otherEntity.player,
         `You're invincible! You won't be impacted by knockback for ${
@@ -172,14 +172,6 @@ function createInvincibilityBoost(world: World) {
         } seconds!`,
         "FFFF00"
       );
-      setTimeout(() => {
-        otherEntity.setInvincible(false);
-        world.chatManager.sendPlayerMessage(
-          otherEntity.player,
-          `Your invincibility has expired!`,
-          "FFFF00"
-        );
-      }, INVINCIBILITY_BOOST_DURATION);
       boostsSpawned.delete(locationString(entity.position));
       new Audio({
         uri: "audio/sfx/player/eat.mp3",

@@ -120,16 +120,13 @@ class CustomPlayerEntity extends PlayerEntity {
     }
   }
 
-  public setInvincible(invincible: boolean): void {
-    this.invincible = invincible;
+  public setInvincible(): void {
+    this.invincible = true;
     setTimeout(() => {
       this.invincible = false;
-    }, RESPAWN_INVINCIBILITY_TIME);
-    if (invincible) {
-      this.setOpacity(0.5);
-    } else {
       this.setOpacity(1);
-    }
+    }, RESPAWN_INVINCIBILITY_TIME);
+    this.setOpacity(0.5);
   }
 
   public setStrengthBoostActive(strengthBoostActive: boolean): void {

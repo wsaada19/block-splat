@@ -45,6 +45,8 @@ export function onPlayerJoin(
       world,
       teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN
     );
+    playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
+    playerEntity.setStamina(playerEntity.getMaxStamina());
   } else {
     const randomLobbySpawn = {
       x: LOBBY_SPAWN.x + (Math.random() * 3 - 1),
@@ -177,12 +179,14 @@ export function onPlayerJoin(
   messages.forEach((message) => {
     world.chatManager.sendPlayerMessage(player, message);
   });
+
+  game.checkPlayerCount();
 }
 
 export function onPlayerLeave(
   player: Player,
   world: World,
-  teamManager: TeamManager,
+  teamManager: TeamManager
 ) {
   teamManager.removePlayer(player.username);
   world.entityManager
@@ -207,13 +211,13 @@ export function handlePlayerDeath(
   if (entity.getLastHitBy()) {
     const killer = globalState.getPlayerEntity(entity.getLastHitBy());
     chatManager.sendBroadcastMessage(
-      getKillingMessage(killer.name, entity.name),
+      getKillingMessage(killer.getDisplayName(), entity.getDisplayName()),
       "FF0000"
     );
     killer.incrementKills();
     entity.setLastHitBy("");
   } else {
-    chatManager.sendBroadcastMessage(getFallingMessage(entity.name), "FF0000");
+    chatManager.sendBroadcastMessage(getFallingMessage(entity.getDisplayName()), "FF0000");
   }
 
   // Make player spectator during respawn
@@ -245,5 +249,5 @@ export function respawnPlayer(
   } else {
     entity.setPosition(LOBBY_SPAWN);
   }
-  entity.setInvincible(true);
+  entity.setInvincible();
 }

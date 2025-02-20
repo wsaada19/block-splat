@@ -27,7 +27,7 @@ import {
   MELEE_HIT_DISTANCE,
   SHOOTING_COOLDOWN,
 } from "../utilities/gameConfig";
-import type CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
 
 // maps used to add cooldowns on player input
@@ -149,18 +149,18 @@ function handleMeleeAttack(
   entity.startModelOneshotAnimations(["simple_interact"]);
   entity.applyImpulse({
     x: direction.x * PUNCH_PLAYER_FORCE,
-    y: 0.1,
+    y: 0.1 * PUNCH_VERTICAL_FORCE,
     z: direction.z * PUNCH_PLAYER_FORCE,
   });
 
-  if (raycastResult?.hitEntity instanceof PlayerEntity) {
+  if (raycastResult?.hitEntity instanceof CustomPlayerEntity && !raycastResult.hitEntity.isInvincible()) {
     const verticalForce = Math.max(direction.y, 0.7) * PUNCH_VERTICAL_FORCE;
     raycastResult.hitEntity.applyImpulse({
       x: direction.x * PUNCH_FORCE * multiplier,
       y: verticalForce,
       z: direction.z * PUNCH_FORCE * multiplier,
     });
-    entity.setStamina(PUNCH_ENERGY_COST);
+    entity.setStamina(-PUNCH_ENERGY_COST);
     globalState
       .getPlayerEntity(raycastResult.hitEntity.player.username)
       .setLastHitBy(entity.player.username);

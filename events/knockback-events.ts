@@ -59,7 +59,7 @@ export function knockBackCollisionHandler(
     // Calculate impact force based on relative velocity
     const impactForce =
       PROJECTILES[projectile.name as keyof typeof PROJECTILES].KNOCKBACK;
-    const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.8;
+    const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.9;
 
     // Add some jitter to the knockback to make it more chaotic
     // const jitter = 0.5 + (Math.random() * 0.1 - 0.1);

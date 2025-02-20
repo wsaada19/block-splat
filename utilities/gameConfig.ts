@@ -56,8 +56,8 @@ export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
 export const PUNCH_FORCE = 12;
-export const PUNCH_PLAYER_FORCE = 10;
-export const PUNCH_VERTICAL_FORCE = 15;
+export const PUNCH_PLAYER_FORCE = 12;
+export const PUNCH_VERTICAL_FORCE = 10;
 
 // projectiles
 export type ProjectileType = 'BLOB' | 'SLINGSHOT' | 'SNIPER'
@@ -69,15 +69,15 @@ export const PROJECTILES = {
     MODEL_SCALE: 2,
     SPEED: 30,
     KNOCKBACK: 14,
-    ENERGY: -30
+    ENERGY: -28
   },
   SLINGSHOT: {
     NAME: 'SLINGSHOT',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
-    KNOCKBACK: 12,
-    ENERGY: -35
+    KNOCKBACK: 11,
+    ENERGY: -34
   },
   SNIPER: {
     NAME: 'SNIPER',

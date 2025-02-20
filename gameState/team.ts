@@ -65,7 +65,8 @@ export default class TeamManager {
   sendAllPlayersToLobby(world: World) {
     const players = world.entityManager.getAllPlayerEntities();
     for(const player of players) {
-      player.setPosition(LOBBY_SPAWN);
+      const randomLobbyPosition = { x: LOBBY_SPAWN.x + (Math.random() * 3 - 1.5), y: LOBBY_SPAWN.y, z: LOBBY_SPAWN.z + (Math.random() * 3 - 1.5) };
+      player.setPosition(randomLobbyPosition);
     }
   }
 
