@@ -1,8 +1,8 @@
 import { type EmitterOptions } from "./particle-emmitter";
 
 export const ParticleFX = {
-    BLOODHIT: {
-        count: 6,
+    RED_PAINT: {
+        count: 4,
         speed: 1.5,
         spawnOptions: {
             radius: 0.2,
@@ -20,8 +20,8 @@ export const ParticleFX = {
         }
     } satisfies EmitterOptions,
 
-    BLUE_BLOODHIT: {
-        count: 6,
+    BLUE_PAINT: {
+        count: 4,
         speed: 1.5,
         spawnOptions: {
             radius: 0.2,

@@ -1,4 +1,4 @@
- import { PlayerClass } from "../gameState/player-data";
+import { PlayerClass } from "./playerTypes";
 
 export const USE_PARTICLES = true;
 
@@ -6,8 +6,7 @@ export const USE_PARTICLES = true;
 export const GAME_TIME = 4 * 60;
 
 // cooldowns
-export const SHOOTING_COOLDOWN = 250;
-export const JUMP_COOLDOWN = 0;
+export const SHOOTING_COOLDOWN = 400;
 export const PUNCH_COOLDOWN = 500;
 
 // boost spawn interval
@@ -55,9 +54,9 @@ export const RESPAWN_HEIGHT = 45;
 export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
-export const PUNCH_FORCE = 12;
-export const PUNCH_PLAYER_FORCE = 12;
-export const PUNCH_VERTICAL_FORCE = 10;
+export const PUNCH_FORCE = 5;
+export const PUNCH_PLAYER_FORCE = 14;
+export const PUNCH_VERTICAL_FORCE = 2;
 
 // projectiles
 export type ProjectileType = 'BLOB' | 'SLINGSHOT' | 'SNIPER'
@@ -91,7 +90,7 @@ export const PROJECTILES = {
 
 export const SLINGSHOT_OFFSET = 19;
 export const SLINGSHOT_SPEED_OFFSET = -5;
-export const MELEE_HIT_DISTANCE = 3.5;
+export const MELEE_HIT_DISTANCE = 2.5;
 
 // UI Events
 export const UI_EVENT_TYPES = {

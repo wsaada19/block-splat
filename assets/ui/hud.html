@@ -1,3 +1,7 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jolly+Lodger&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <style>
   .hud-panel {
     position: fixed;
@@ -66,8 +70,10 @@
   }
 
   .time-value {
-    color: #fff;
-    font-size: 18px;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: bold;
+    font-family: 'Trebuchet MS', 'Arial', sans-serif;
   }
 
   .red-score {
@@ -310,7 +316,6 @@
     display: none;
     padding: 24px;
     top: 20%;
-    gap: 14px;
     width: 60%;
     position: fixed;
     justify-content: space-around;
@@ -318,20 +323,20 @@
     top: 30%;
     opacity: 1;
     transform: translate(-50%, -50%);
+    z-index: 1000;
   }
 
   .leaderboard {
-    border-radius: 8px;
     padding: 8px;
     width: 100%;
   }
 
   .leaderboard#red-leaderboard {
-    background: rgba(255, 68, 68);
+    background: rgba(200, 30, 30);
   }
 
   .leaderboard#blue-leaderboard {
-    background: rgba(68, 68, 255);
+    background: rgba(30, 30, 200);
   }
 
   .leaderboard-title {
@@ -444,9 +449,10 @@
     width: 220px;
     height: 22px;
     background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 5px;
     overflow: hidden;
+    padding: 2px;
   }
 
   .stamina-bar {
@@ -454,6 +460,8 @@
     width: 100%;
     background: linear-gradient(to right, #2ecc71, #27ae60);
     transition: width 0.3s ease;
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
   }
 
   div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
@@ -532,49 +540,34 @@
   }
 
   .team-banner {
-    position: fixed;
-    top: 16px;
-    height: 40px;
-    width: 13%;
+    position: static;
+    min-width: 80px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 15px;
     color: white;
     font-family: 'Trebuchet MS', 'Arial', sans-serif;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .team-banner.red {
-    left: 20%;
-    background: linear-gradient(to right,
-        rgba(200, 30, 30, 0.95),
-        rgba(120, 20, 20, 0.85));
+    background: rgba(200, 30, 30, 0.95);
     border: 2px solid rgba(255, 68, 68, 0.6);
   }
 
   .team-banner.blue {
-    right: 20%;
-    background: linear-gradient(to left,
-        rgba(30, 30, 200, 0.95),
-        rgba(20, 20, 120, 0.85));
+    background: rgba(30, 30, 200, 0.95);
     border: 2px solid rgba(68, 68, 255, 0.6);
   }
 
-  .team-banner.your-team {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-  }
-
   .team-name {
-    font-size: 18px;
-    font-weight: bold;
+    display: none;
   }
 
   .team-score {
-    font-size: 24px;
+    font-size: 28px;
+    font-family: "Roboto", serif;
     font-weight: bold;
   }
 
@@ -604,7 +597,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     border-radius: 12px;
     padding: 12px;
-    width: 160px;
+    width: 140px;
     backdrop-filter: blur(4px);
   }
 
@@ -622,62 +615,62 @@
 
   .death-count {
     color: #ff4444;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
     font-size: 16px;
   }
 
   .points-count {
     color: #44ff44;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
     font-size: 16px;
   }
 
   .kills-count {
     color: #44ff44;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
     font-size: 16px;
   }
 
   .current-class {
     color: #ffffff;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
     font-size: 16px;
   }
 
   .stat-label {
     font-weight: bold;
+    font-family: "Roboto", serif;
   }
 
   .stat-value {
-    font-size: 24px;
+    font-size: 22px;
     color: #ffffff;
-    font-family: 'Georgia', serif;
+    font-family: "Roboto", serif;
   }
 
   .player-name {
     color: #ffffff;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-family: "Roboto", serif;
     font-size: 16px;
     text-align: center;
     font-weight: bold;
     padding-bottom: 6px;
   }
 
-  .time-display {
+  .score-time-container {
     position: fixed;
-    top: 16px;
+    top: 0px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(to bottom,
-        rgba(40, 40, 40, 0.92),
-        rgba(25, 25, 25, 0.92));
-    border: 1px solid rgba(237, 235, 235, 0.4);
-    border-radius: 12px;
-    padding: 12px 16px;
+    display: flex;
+    align-items: stretch;
+    height: 48px;
+    background: rgba(40, 40, 40, 0.92);
+  }
+
+  .time-display {
+    position: static;
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    backdrop-filter: blur(4px);
-    justify-content: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .time-label {
@@ -726,6 +719,12 @@
     pointer-events: none;
   }
 
+  .instructions-title {
+    font-family: 'Jolly Lodger', serif;
+    font-size: 64px;
+    color: #ffffff;
+  }
+
   .instructions-panel {
     background: rgba(0, 0, 0, 0.85);
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -738,10 +737,8 @@
 
   .instructions h2 {
     text-align: center;
-    color: #1c971c;
+    color: #ffffff;
     margin: 0 0 15px 0;
-    font-size: 26px;
-    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
   }
 
   .instruction-section {
@@ -789,7 +786,7 @@
 
   .victory-message {
     font-size: 48px;
-    font-family: 'Trebuchet MS', 'Arial', sans-serif;
+    font-family: "Jolly Lodger", serif;
     font-weight: bold;
     color: #1c971c;
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
@@ -838,8 +835,16 @@
       opacity: 0.7;
     }
   }
+
+  @font-face {
+
+font-family: 'JollyLodger'; /* Give your font a name */
+
+src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /* Specify the font file path and format */
+
+}
+
 </style>
-  
 <div class="crosshair" id="crosshair"></div>
 
 <div class="stamina-container">
@@ -847,16 +852,26 @@
   <div class="stamina-text" id="stamina-text">100/100</div>
 </div>
 
-<div class="time-display">
-  <span class="panel-value time-value" id="time-left">Waiting for players...</span>
+<div class="score-time-container">
+  <div class="team-banner red" id="red-banner">
+    <div class="team-name">Red Raiders</div>
+    <div class="team-score" id="red-score">0</div>
+  </div>
+  <div class="time-display">
+    <span class="panel-value time-value" id="time-left">Waiting...</span>
+  </div>
+  <div class="team-banner blue" id="blue-banner">
+    <div class="team-name">Blue Bandits</div>
+    <div class="team-score" id="blue-score">0</div>
+  </div>
 </div>
 
-<div class="hud-panel">
+<!-- <div class="hud-panel"> -->
   <!-- <button class="team-button" id="switch-team">Switch Team</button> -->
   <!-- <button class="class-button" id="switch-map">Switch Map</button> -->
   <!-- <button class="restart-button" id="restart-game">Restart Game</button> -->
-  <button class="class-button" id="change-class">Change Class (e)</button>
-</div>
+  <!-- <button class="class-button" id="change-class">Change Class (e)</button> -->
+<!-- </div> -->
 
 <div class="game-over">
   <div class="game-over-content">
@@ -886,7 +901,7 @@
     </div>
     <div class="class-stats">
       <div class="stat pro">+ Leave a trail of paint by walking</div>
-      <div class="stat pro">+ Punch players off the map</div>
+      <div class="stat pro">+ Tackle players to knock them off the map</div>
       <div class="stat con">- No projectiles</div>
     </div>
   </div>
@@ -955,30 +970,20 @@
   </div>
 </div>
 
-<div class="team-banner red" id="red-banner">
-  <div class="team-name">Red Raiders</div>
-  <div class="team-score" id="red-score">0</div>
-</div>
-
-<div class="team-banner blue" id="blue-banner">
-  <div class="team-name">Blue Bandits</div>
-  <div class="team-score" id="blue-score">0</div>
-</div>
-
 <div class="player-stats">
   <div class="player-name" id="player-name">Player</div>
   <div class="stats-row">
-    <div class="stat-counter death-count">
-      <span class="stat-label">Deaths</span>
-      <span class="stat-value" id="death-count">0</span>
-    </div>
     <div class="stat-counter points-count">
       <span class="stat-label">Points</span>
       <span class="stat-value" id="points-count">0</span>
     </div>
     <div class="stat-counter kills-count">
-      <span class="stat-label">Kills</span>
+      <span class="stat-label">Knockouts</span>
       <span class="stat-value" id="kills-count">0</span>
+    </div>
+    <div class="stat-counter death-count">
+      <span class="stat-label">Deaths</span>
+      <span class="stat-value" id="death-count">0</span>
     </div>
     <div class="stat-counter current-class">
       <span class="stat-label">Class </span>
@@ -996,7 +1001,7 @@
 <template id="game-instructions-template">
   <div class="instructions">
     <div class="instructions-panel">
-      <h2>Block Splat Instructions</h2>
+      <h2 class="instructions-title">Block Splat</h2>
       <div class="instruction-section">
         <h3>Movement</h3>
         <ul>
@@ -1022,7 +1027,7 @@
           <li><strong>3</strong> - Change to Sniper</li>
           <li><strong>4</strong> - Change to Slingshot</li>
           <li></strong>Left Click</strong> - Shoot</li>
-          <li><strong>Q or Right Click</strong> - Punch</li>
+          <li><strong>Q or Right Click</strong> - Tackle</li>
           <li><strong>E</strong> - Change Class</li>
           <li><strong>R</strong> - View Leaderboard</li>
         </ul>
@@ -1030,7 +1035,7 @@
       <div class="instruction-section">
         <h3>Objective</h3>
         <p>Color more blocks than the enemy team before time runs out! 
-          Shoot paint balls that color blocks and push players off the map, to rack up kills! 
+          Shoot paint balls that color blocks and push players off the map, to rack up Knockouts! 
           Steal points from the other team by throwing paint at their colored blocks. 
           Look out for power ups throughout the map to gain temporary boosts and increased stamina.</p>
       </div>
@@ -1100,10 +1105,10 @@
       scores.forEach((score) => {
         if (score.includes('Blue')) {
           document.getElementById('blue-score').textContent =
-            score.split(': ')[1]
+            score.split(': ')[1].toLocaleString()
         } else if (score.includes('Red')) {
           document.getElementById('red-score').textContent =
-            score.split(': ')[1]
+            score.split(': ')[1].toLocaleString()
         }
       })
 
@@ -1123,7 +1128,7 @@
       document.getElementById(
         'winner-text'
       ).textContent = `${data.winner} Wins!`
-      document.getElementById('time-left').textContent = 'Waiting for players...'
+      document.getElementById('time-left').textContent = 'Waiting...'
       // Hide game over message after 5 seconds
       setTimeout(() => {
         document.querySelector('.game-over').style.display = 'none'
@@ -1183,13 +1188,13 @@
       if (document.getElementById('player-leaderboard').style.display === 'none') {
         document.getElementById('player-leaderboard').style.display = 'flex'
         const redLeaderboard = data.redLeaderboard
-        document.getElementById('red-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
+        document.getElementById('red-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Knockouts</span></div>'
         redLeaderboard.forEach(player => {
           document.getElementById('red-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.points}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
 
         const blueLeaderboard = data.blueLeaderboard
-        document.getElementById('blue-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Kills</span></div>'
+        document.getElementById('blue-leaderboard').innerHTML = '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Knockouts</span></div>'
         blueLeaderboard.forEach(player => {
           document.getElementById('blue-leaderboard').innerHTML += `<div class="leaderboard-entry"><span class="leaderboard-name">${player.name}</span><span class="leaderboard-points">${player.points}</span><span class="leaderboard-kills">${player.kills}</span></div>`
         })
@@ -1265,14 +1270,14 @@
   //   document.getElementById('start-menu').style.display = 'none'
   // })
 
-  document.getElementById('change-class').addEventListener('click', () => {
-    const select = document.getElementById('class-select')
-    if (select.style.display === 'none') {
-      select.style.display = 'flex'
-    } else {
-      select.style.display = 'none'
-    }
-  })
+  // document.getElementById('change-class').addEventListener('click', () => {
+  //   const select = document.getElementById('class-select')
+  //   if (select.style.display === 'none') {
+  //     select.style.display = 'flex'
+  //   } else {
+  //     select.style.display = 'none'
+  //   }
+  // })
 
   hytopia.registerSceneUITemplate('name-indicator', (id, onState) => {
     const template = document.getElementById('my-game-message-template');

@@ -4,14 +4,12 @@ import {
   World,
   PlayerEntity,
   Entity,
-  PlayerEntityController,
   PlayerUI,
   SceneUI,
   ChatManager,
 } from "hytopia";
-import { onTickWithPlayerInput } from "./player-input";
 import type Game from "../gameState/game";
-import { PlayerClass } from "../gameState/player-data";
+import { PlayerClass } from "../utilities/playerTypes";
 import type TeamManager from "../gameState/team";
 import type GameMap from "../gameState/map";
 import { TEAM_COLORS } from "../gameState/team";
@@ -37,7 +35,7 @@ export function onPlayerJoin(
   teamManager.addPlayerToMinTeam(player.username);
 
   const team = teamManager.getPlayerTeam(player.username);
-  const playerEntity = new CustomPlayerEntity(player, team || 0);
+  const playerEntity = new CustomPlayerEntity(player, team || 0, teamManager);
   playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
 
   if (game.isGameRunning) {
@@ -71,7 +69,6 @@ export function onPlayerJoin(
   });
   paintBrush.spawn(world, { x: 0, y: .15, z: .15 });
   paintBrush.setRotation({ x: 0, y: 0, z: 45, w: 1 });
-  playerEntity.setDisplayName(player.username);
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
@@ -82,25 +79,6 @@ export function onPlayerJoin(
         teamManager,
         world.chatManager,
         game
-      );
-    }
-  };
-
-  playerEntity.controller!.onTickWithPlayerInput = function (
-    entity,
-    input,
-    cameraOrientation,
-    deltaTimeMs
-  ) {
-    if (playerEntity?.controller instanceof PlayerEntityController) {
-      onTickWithPlayerInput.call(
-        playerEntity.controller,
-        entity as CustomPlayerEntity,
-        input,
-        cameraOrientation,
-        deltaTimeMs,
-        teamManager,
-        world
       );
     }
   };
@@ -123,15 +101,6 @@ export function onPlayerJoin(
       team?: string;
     }
   ) => {
-    if (data.type === "set-name" && data.name) {
-      playerEntity.setDisplayName(data.name);
-      usernameSceneUI.setState({
-        playerName: data.name,
-        color: teamManager.getPlayerColor(playerUI.player.username),
-        playerId: playerUI.player.username,
-      });
-    }
-
     if (data.button === "select-team" && data.team) {
       playerUI.player.camera.setAttachedToEntity(playerEntity);
 
@@ -176,10 +145,9 @@ export function onPlayerJoin(
     "If you get stuck, use /stuck to respawn",
     "Hold shift to sprint.",
     "Press left mouse button to shoot.",
-    "Press Q or left mouse to punch.",
+    "Press Q or right mouse to tackle.",
     "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.",
     "Press R to view the leaderboard.",
-    "Type /set-name to set your name.",
   ];
 
   messages.forEach((message) => {

@@ -18,9 +18,9 @@ Block Splat is a fast paced PVP game where players compete to cover the majority
 
 When joining the game you will be spawned in a glass lobby above the map. Type /start to begin the game. Currently player's are assigned to a team when they join the game, with the goal of keeping teams as balanced as possible. I chose not to add team selection for the purposes of keeping this demo simple.
 
-When the game starts player's can run around and shoot projectiles and punch other players, if they're smart they will focus on coloring as many blocks as possible to score points for their team and steal points from other teams. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time theyre hit with a paintball of a different color.
+When the game starts player's can run around and shoot projectiles and tackle other players, if they're smart they will focus on coloring as many blocks as possible to score points for their team and steal points from other teams. Blocks can be colored by running around the map or by shooting projectiles. Blocks colors are overwritted each time theyre hit with a paintball of a different color.
 
-To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and punch force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
+To encourage more movement, boosts spawn around the map and can be picked up to gain power ups during the game. Strength increases knockback and tackle force for the specified time interval while the energy drink increases your stamina. The invincibility boost allows you to be immune to knockback for the specified time interval.
 
 ## Demo
 
@@ -57,8 +57,6 @@ bun --watch index.ts
 ## Commands
 
 - `/start` - Start the game - a current limitation is that anyone can start the game. I decided to leave it like this to make things easier to test. However, I will ultimately setup an automated system for handling the game lobby and when to start a new game based on player count.
-
-- `/set-name <name>` - Sets your name on the leaderboard and the indicator above your head
 
 - `/change-team` - Change your team - this will not update a player model to match their new team color and was put in place mainly for testing purposes.
 

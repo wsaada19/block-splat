@@ -1,7 +1,16 @@
-import { Player, PlayerEntity } from "hytopia";
+import { Entity, Player, PlayerEntity } from "hytopia";
 import { TEAM_COLORS } from "../gameState/team";
-import { MAX_STAMINA, RESPAWN_INVINCIBILITY_TIME } from "../utilities/gameConfig";
-import { PlayerClass } from "../gameState/player-data";
+import {
+  MAX_STAMINA,
+  PUNCH_FORCE,
+  PUNCH_VERTICAL_FORCE,
+  RESPAWN_INVINCIBILITY_TIME,
+  STRENGTH_BOOST_MULTIPLIER,
+} from "../utilities/gameConfig";
+import { PlayerClass } from "../utilities/playerTypes";
+import CustomPlayerController from "../controllers/CustomPlayerController";
+import { globalState } from "../gameState/global-state";
+import type TeamManager from "../gameState/team";
 
 class CustomPlayerEntity extends PlayerEntity {
   private playerClass: PlayerClass = PlayerClass.RUNNER;
@@ -13,10 +22,10 @@ class CustomPlayerEntity extends PlayerEntity {
   private maxStamina: number = 0;
   private invincible: boolean = false;
   private strengthBoostActive: boolean = false;
-  private displayName: string = "";
   private team: number = 0;
+  private isTackling: boolean = false;
 
-  constructor(player: Player, team: number) {
+  constructor(player: Player, team: number, teamManager: TeamManager) {
     super({
       player,
       name: "Player",
@@ -27,9 +36,43 @@ class CustomPlayerEntity extends PlayerEntity {
       modelLoopedAnimations: ["idle"],
       modelScale: 0.5,
     });
-    this.displayName = player.username;
     this.team = team;
     this.stamina = 0;
+
+    // Set the custom controller
+    const world = globalState.world;
+    this.setController(new CustomPlayerController({
+      teamManager: teamManager,
+      world: world,
+    }));
+
+    this.onEntityCollision = (
+      entity: Entity,
+      otherEntity: Entity,
+      started: boolean
+    ) => {
+      if (
+        otherEntity instanceof CustomPlayerEntity &&
+        entity instanceof CustomPlayerEntity && 
+        this.isPlayerTackling() &&
+        started
+      ) {
+        const direction = this.controller instanceof CustomPlayerController 
+          ? this.controller.getDirectionFromRotation(entity.rotation)
+          : { x: 0, y: 0, z: 0 };
+        const verticalForce = Math.max(direction.y, 0.7) * PUNCH_VERTICAL_FORCE;
+        let multiplier = 1;
+        if (entity.isStrengthBoostActive()) {
+          multiplier = STRENGTH_BOOST_MULTIPLIER;
+        }
+        otherEntity.applyImpulse({
+          x: direction.x * PUNCH_FORCE * multiplier,
+          y: verticalForce,
+          z: direction.z * PUNCH_FORCE * multiplier,
+        });
+        otherEntity.setLastHitBy(entity.player.username);
+      }
+    };
   }
 
   public getKills(): number {
@@ -45,11 +88,7 @@ class CustomPlayerEntity extends PlayerEntity {
   }
 
   public getDisplayName(): string {
-    return this.displayName;
-  }
-
-  public setDisplayName(displayName: string): void {
-    this.displayName = displayName;
+    return this.player.username;
   }
 
   public setPlayerClass(playerClass: PlayerClass): void {
@@ -113,7 +152,7 @@ class CustomPlayerEntity extends PlayerEntity {
   }
 
   public setStamina(stamina: number): void {
-    if(stamina + this.stamina > this.maxStamina) {
+    if (stamina + this.stamina > this.maxStamina) {
       this.stamina = this.maxStamina;
     } else {
       this.stamina += stamina;
@@ -131,6 +170,17 @@ class CustomPlayerEntity extends PlayerEntity {
 
   public setStrengthBoostActive(strengthBoostActive: boolean): void {
     this.strengthBoostActive = strengthBoostActive;
+  }
+
+  public tackle() {
+    this.isTackling = true;
+    setTimeout(() => {
+      this.isTackling = false;
+    }, 1500);
+  }
+
+  public isPlayerTackling(): boolean {
+    return this.isTackling;
   }
 }
 

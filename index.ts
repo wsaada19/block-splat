@@ -4,7 +4,7 @@ import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
 import Teams from "./gameState/team";
-import { onPlayerJoin, onPlayerLeave, respawnPlayer } from "./events/player-events";
+import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
@@ -98,14 +98,6 @@ startServer((world) => {
     }
     world.chatManager.sendBroadcastMessage("Starting game...");
     game.clearMapThenStartGame();
-  });
-
-  world.chatManager.registerCommand("/set-name", (player, [name]) => {
-    if(!name && name.length < 1) return;
-    const playerEntity = globalState.getPlayerEntity(player.username);
-    playerEntity.setDisplayName(name);
-    world.chatManager.sendPlayerMessage(player, `Name set to ${name}`);
-    player.ui.sendData({ type: "set-name", name });
   });
 
   world.chatManager.registerCommand("/change-team", (player, args) => {
