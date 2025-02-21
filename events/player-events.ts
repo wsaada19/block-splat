@@ -112,16 +112,8 @@ export function onPlayerJoin(
       }
     }
 
-    if (!data.button) return;
-
-    if (data.button === UI_BUTTONS.SWITCH_TEAM) {
-      teamManager.switchTeam(playerUI.player.username);
-    } else if (data.button === UI_BUTTONS.RESTART_GAME) {
-      game.restartGame();
-    } else if (data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
+    if (data.button && data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
       playerEntity.setPlayerClass(data.class as PlayerClass);
-    } else if (data.button === UI_BUTTONS.SWITCH_MAP) {
-      map.switchMap();
     }
   };
 
