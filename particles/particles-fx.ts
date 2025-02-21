@@ -2,7 +2,7 @@ import { type EmitterOptions } from "./particle-emmitter";
 
 export const ParticleFX = {
     RED_PAINT: {
-        count: 4,
+        count: 1,
         speed: 1.5,
         spawnOptions: {
             radius: 0.2,
@@ -13,7 +13,7 @@ export const ParticleFX = {
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
             size: 1,
-            sizeRandomness: 0.3, // 30% size variation
+            sizeRandomness: 1, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blooddrop.gltf',
             gravityScale: 0.6
@@ -21,7 +21,7 @@ export const ParticleFX = {
     } satisfies EmitterOptions,
 
     BLUE_PAINT: {
-        count: 4,
+        count: 1,
         speed: 1.5,
         spawnOptions: {
             radius: 0.2,
@@ -32,7 +32,7 @@ export const ParticleFX = {
         particleOptions: {
             color: { r: 0, g: 0, b: 255 },
             size: 1,
-            sizeRandomness: 0.3, // 30% size variation
+            sizeRandomness: 1, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blue-blob.gltf',
             gravityScale: 0.6

@@ -14,8 +14,8 @@ import {
   World
 } from 'hytopia';
 import { spawnProjectile } from "../utilities/projectiles";
-import { PlayerClass } from "../utilities/playerTypes";
-import TeamManager from "../gameState/team";
+import { PlayerClass } from "../entities/player-types";
+import TeamManager, { TEAM_COLORS } from "../gameState/team";
 import {
   PUNCH_ENERGY_COST,
   SPRINT_ENERGY_COST,
@@ -23,7 +23,6 @@ import {
   type ProjectileType,
   PUNCH_PLAYER_FORCE,
   PUNCH_VERTICAL_FORCE,
-  RESPAWN_HEIGHT,
   UI_EVENT_TYPES,
   SHOOTING_COOLDOWN,
 } from "../utilities/gameConfig";
@@ -161,8 +160,8 @@ export default class CustomPlayerController extends BaseEntityController {
     });
   }
 
-  private handleShooting(entity: CustomPlayerEntity, input: PlayerInput, cameraOrientation: PlayerCameraOrientation) {
-    if (entity.getPlayerClass() === PlayerClass.RUNNER || entity.position.y === RESPAWN_HEIGHT) {
+  private handleShooting(entity: CustomPlayerEntity, cameraOrientation: PlayerCameraOrientation) {
+    if (entity.getPlayerClass() === PlayerClass.RUNNER) {
       return;
     }
 
@@ -205,13 +204,17 @@ export default class CustomPlayerController extends BaseEntityController {
     if(entity.isPlayerTackling() || entity.getStamina() < PUNCH_ENERGY_COST) {
       return;
     }
+    let multiplier = 1;
+    if (entity.getPlayerClass() === PlayerClass.RUNNER) {
+      multiplier = 1.2;
+    }
     
     const direction = this.getDirectionFromRotation(entity.rotation);
     entity.startModelOneshotAnimations(["tackle"]);
     entity.applyImpulse({
-      x: direction.x * PUNCH_PLAYER_FORCE,
+      x: direction.x * PUNCH_PLAYER_FORCE * multiplier,
       y: PUNCH_VERTICAL_FORCE,
-      z: direction.z * PUNCH_PLAYER_FORCE,
+      z: direction.z * PUNCH_PLAYER_FORCE * multiplier,
     });
     entity.setStamina(-PUNCH_ENERGY_COST);
     entity.tackle();
@@ -226,8 +229,7 @@ export default class CustomPlayerController extends BaseEntityController {
   }
 
   private showLeaderboard(entity: CustomPlayerEntity) {
-
-    const teams = [0, 1]
+    const teams = [TEAM_COLORS.RED, TEAM_COLORS.BLUE]
     const leaderboards = teams.map((team) => {
       return globalState.getPlayersOnTeam(team)
         .sort((a, b) => b.getPlayerPoints() - a.getPlayerPoints())
@@ -293,10 +295,6 @@ export default class CustomPlayerController extends BaseEntityController {
   }
 
   public tickWithPlayerInput(entity: PlayerEntity, input: PlayerInput, cameraOrientation: PlayerCameraOrientation, deltaTimeMs: number) {
-    if (!entity.isSpawned || !entity.world) return;
-
-    super.tickWithPlayerInput(entity, input, cameraOrientation, deltaTimeMs);
-
     const customEntity = entity as CustomPlayerEntity;
     const { w, a, s, d, sp, sh, ml, mr, q, e, r } = input;
     const { yaw } = cameraOrientation;
@@ -317,7 +315,7 @@ export default class CustomPlayerController extends BaseEntityController {
         this._stepAudio?.setPlaybackRate(0.55);
       }
 
-      this._stepAudio?.play(entity.world, !this._stepAudio?.isPlaying);
+      this._stepAudio?.play(entity.world as World, !this._stepAudio?.isPlaying);
     } else {
       this._stepAudio?.pause();
       const idleAnimations = [ 'idle_upper', 'idle_lower' ];
@@ -327,7 +325,7 @@ export default class CustomPlayerController extends BaseEntityController {
 
     // Handle custom input actions
     if (ml) {
-      this.handleShooting(customEntity, input, cameraOrientation);
+      this.handleShooting(customEntity, cameraOrientation);
     }
     if (mr || q) {
       this.handleMeleeAttack(customEntity, input);

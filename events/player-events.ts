@@ -9,7 +9,7 @@ import {
   ChatManager,
 } from "hytopia";
 import type Game from "../gameState/game";
-import { PlayerClass } from "../utilities/playerTypes";
+import { PlayerClass } from "../entities/player-types";
 import type TeamManager from "../gameState/team";
 import type GameMap from "../gameState/map";
 import { TEAM_COLORS } from "../gameState/team";

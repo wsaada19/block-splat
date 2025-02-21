@@ -1,4 +1,4 @@
-import { PlayerClass } from "./playerTypes";
+import { PlayerClass } from "../entities/player-types";
 
 export const USE_PARTICLES = true;
 
@@ -55,7 +55,7 @@ export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
 export const PUNCH_FORCE = 5;
-export const PUNCH_PLAYER_FORCE = 14;
+export const PUNCH_PLAYER_FORCE = 12;
 export const PUNCH_VERTICAL_FORCE = 2;
 
 // projectiles
@@ -104,8 +104,5 @@ export const UI_EVENT_TYPES = {
   };
 
   export const UI_BUTTONS = {
-    SWITCH_TEAM: "switch-team",
-    RESTART_GAME: "restart-game",
     SELECT_CLASS: "select-class",
-    SWITCH_MAP: "switch-map"
   }

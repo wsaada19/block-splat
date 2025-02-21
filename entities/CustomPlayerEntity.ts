@@ -7,7 +7,7 @@ import {
   RESPAWN_INVINCIBILITY_TIME,
   STRENGTH_BOOST_MULTIPLIER,
 } from "../utilities/gameConfig";
-import { PlayerClass } from "../utilities/playerTypes";
+import { PlayerClass } from "./player-types";
 import CustomPlayerController from "../controllers/CustomPlayerController";
 import { globalState } from "../gameState/global-state";
 import type TeamManager from "../gameState/team";
