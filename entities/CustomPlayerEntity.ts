@@ -11,9 +11,11 @@ import { PlayerClass } from "./player-types";
 import CustomPlayerController from "../controllers/CustomPlayerController";
 import { globalState } from "../gameState/global-state";
 import type TeamManager from "../gameState/team";
+import { ParticleEmitter } from "../particles/particle-emmitter";
+import { ParticleFX } from "../particles/particles-fx";
 
 class CustomPlayerEntity extends PlayerEntity {
-  private playerClass: PlayerClass = PlayerClass.RUNNER;
+  private playerClass: PlayerClass = PlayerClass.SLINGSHOT;
   private kills: number = 0;
   private playerDeaths: number = 0;
   private playerPoints: number = 0;
@@ -24,6 +26,8 @@ class CustomPlayerEntity extends PlayerEntity {
   private strengthBoostActive: boolean = false;
   private team: number = 0;
   private isTackling: boolean = false;
+  private strengthBoostEmitter: ParticleEmitter | null = null;
+  private strengthBoostInterval: number | null = null;
 
   constructor(player: Player, team: number, teamManager: TeamManager) {
     super({
@@ -37,7 +41,7 @@ class CustomPlayerEntity extends PlayerEntity {
       modelScale: 0.5,
     });
     this.team = team;
-    this.stamina = 0;
+    this.stamina = MAX_STAMINA[this.playerClass];
 
     // Set the custom controller
     const world = globalState.world;
@@ -170,13 +174,54 @@ class CustomPlayerEntity extends PlayerEntity {
 
   public setStrengthBoostActive(strengthBoostActive: boolean): void {
     this.strengthBoostActive = strengthBoostActive;
+    
+    // Clear any existing particle effects
+    if (this.strengthBoostInterval) {
+      clearInterval(this.strengthBoostInterval);
+      this.strengthBoostInterval = null;
+    }
+    if (this.strengthBoostEmitter) {
+      this.strengthBoostEmitter.destroy();
+      this.strengthBoostEmitter = null;
+    }
+
+    // If boost is being activated, start the particle effect
+    if (strengthBoostActive && this.isSpawned && this.world) {
+      // Choose particle effect based on team
+      const effectType = this.team === TEAM_COLORS.RED ? 
+        ParticleFX.RED_STRENGTH_BOOST : 
+        ParticleFX.BLUE_STRENGTH_BOOST;
+
+      this.strengthBoostEmitter = new ParticleEmitter(effectType, this.world);
+      this.strengthBoostEmitter.spawn(this.world, this.position);
+      
+      // Continuously emit particles while boost is active
+      this.strengthBoostInterval = setInterval(() => {
+        if (this.strengthBoostEmitter && this.isSpawned) {
+          this.strengthBoostEmitter.setPosition(this.position);
+          this.strengthBoostEmitter.burst();
+        }
+      }, 100) as unknown as number; // Emit particles every 100ms
+    }
+  }
+
+  public despawn(): void {
+    if (this.strengthBoostInterval) {
+      clearInterval(this.strengthBoostInterval);
+      this.strengthBoostInterval = null;
+    }
+    if (this.strengthBoostEmitter) {
+      this.strengthBoostEmitter.destroy();
+      this.strengthBoostEmitter = null;
+    }
+    super.despawn();
   }
 
   public tackle() {
     this.isTackling = true;
     setTimeout(() => {
       this.isTackling = false;
-    }, 1500);
+    }, 1000);
   }
 
   public isPlayerTackling(): boolean {

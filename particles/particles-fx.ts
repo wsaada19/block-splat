@@ -2,17 +2,17 @@ import { type EmitterOptions } from "./particle-emmitter";
 
 export const ParticleFX = {
     RED_PAINT: {
-        count: 1,
+        count: 2,
         speed: 1.5,
         spawnOptions: {
-            radius: 0.2,
+            radius: 0.8,
             shellOnly: false,
             useSpawnDirectionForVelocity: false,
             velocityRandomness: 0.8 // 30% randomness
         },
         particleOptions: {
             color: { r: 255, g: 0, b: 0 },
-            size: 1,
+            size: 0.8,
             sizeRandomness: 1, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blooddrop.gltf',
@@ -20,18 +20,81 @@ export const ParticleFX = {
         }
     } satisfies EmitterOptions,
 
+    RED_STRENGTH_BOOST: {
+        count: 10,
+        speed: 2,
+        spawnOptions: {
+            radius: 1.2,
+            shellOnly: true,
+            useSpawnDirectionForVelocity: true,
+            velocityRandomness: 0.3,
+            direction: { x: 0, y: 1, z: 0 }
+        },
+        particleOptions: {
+            color: { r: 255, g: 0, b: 0 },
+            size: 0.4,
+            sizeRandomness: 0.2,
+            lifetime: 0.8,
+            lifetimeRandomness: 0.2,
+            modelUri: 'models/particles/blooddrop.gltf',
+            gravityScale: 0.1
+        }
+    } satisfies EmitterOptions,
+
+    BLUE_STRENGTH_BOOST: {
+        count: 10,
+        speed: 2,
+        spawnOptions: {
+            radius: 1.2,
+            shellOnly: true,
+            useSpawnDirectionForVelocity: true,
+            velocityRandomness: 0.3,
+            direction: { x: 0, y: 1, z: 0 }
+        },
+        particleOptions: {
+            color: { r: 0, g: 0, b: 255 },
+            size: 0.4,
+            sizeRandomness: 0.2,
+            lifetime: 0.8,
+            lifetimeRandomness: 0.2,
+            modelUri: 'models/particles/blue-blob.gltf',
+            gravityScale: 0.1
+        }
+    } satisfies EmitterOptions,
+
+    STRENGTH_BOOST: {
+        count: 12,
+        speed: 2,
+        spawnOptions: {
+            radius: 1.2,
+            shellOnly: true,
+            useSpawnDirectionForVelocity: true,
+            velocityRandomness: 0.3,
+            direction: { x: 0, y: 1, z: 0 }
+        },
+        particleOptions: {
+            color: { r: 255, g: 215, b: 0 }, // Golden color
+            size: 0.4,
+            sizeRandomness: 0.2,
+            lifetime: 0.8,
+            lifetimeRandomness: 0.2,
+            modelUri: 'models/particles/ember.gltf',
+            gravityScale: 0.1
+        }
+    } satisfies EmitterOptions,
+
     BLUE_PAINT: {
-        count: 1,
+        count: 2,
         speed: 1.5,
         spawnOptions: {
-            radius: 0.2,
+            radius: 0.8,
             shellOnly: false,
             useSpawnDirectionForVelocity: false,
             velocityRandomness: 0.8 // 30% randomness
         },
         particleOptions: {
             color: { r: 0, g: 0, b: 255 },
-            size: 1,
+            size: 0.8,
             sizeRandomness: 1, // 30% size variation
             lifetime: 0.5,
             modelUri: 'models/particles/blue-blob.gltf',

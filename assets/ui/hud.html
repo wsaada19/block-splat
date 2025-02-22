@@ -443,25 +443,40 @@
 
   .stamina-container {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px;
-    height: 22px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 5px;
-    overflow: hidden;
-    padding: 2px;
+    bottom: 18px;
+    right: 4px;
+    width: 224px;
+    height: 200px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  .stamina-bar {
-    height: 100%;
+  .paint-splat-bg {
+    position: absolute;
     width: 100%;
-    background: linear-gradient(to right, #2ecc71, #27ae60);
-    transition: width 0.3s ease;
-    border-radius: 3px;
-    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    img {
+      object-fit: cover;
+      width: 100%;
+    }
+  }
+
+  .stamina-text {
+    position: absolute;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    padding-right: 6px;
+    padding-bottom: 8px;
+    font-weight: bold;
+    z-index: 3;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
 
   div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
@@ -553,12 +568,10 @@
 
   .team-banner.red {
     background: rgba(200, 30, 30, 0.95);
-    border: 2px solid rgba(255, 68, 68, 0.6);
   }
 
   .team-banner.blue {
     background: rgba(30, 30, 200, 0.95);
-    border: 2px solid rgba(68, 68, 255, 0.6);
   }
 
   .team-name {
@@ -691,17 +704,6 @@
     margin-bottom: 15px;
   }
 
-  /* .my-game-message:after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid rgba(11, 6, 117, 0.8);
-  } */
-
   .my-game-message p {
     font-family: Arial, sans-serif;
     user-select: none;
@@ -775,8 +777,9 @@
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
+    width: 50%;
     color: green;
+    background: rgba(0, 0, 0, 0.8);
   }
 
   .victory-content {
@@ -785,10 +788,19 @@
   }
 
   .victory-message {
-    font-size: 48px;
-    font-family: "Jolly Lodger", serif;
+    font-size: 58px;
+    font-family: "Roboto", serif;
     font-weight: bold;
     color: #1c971c;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+  }
+
+  .victory-team {
+    font-size: 40px;
+    font-family: "Roboto", serif;
+    font-weight: bold;
+    color: #1c971c;
+    margin-top: 20px;
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
   }
 
@@ -808,9 +820,19 @@
   }
 
   .defeat-message {
-    font-size: 48px;
+    font-size: 62px;
+    font-family: "Roboto", serif;
     font-weight: bold;
     color: #ff4444;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+  }
+
+  .defeat-team {
+    font-size: 42px;
+    font-family: "Roboto", serif;
+    font-weight: bold;
+    color: #ff4444;
+    margin-top: 20px;
     text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
   }
 
@@ -848,8 +870,8 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 <div class="crosshair" id="crosshair"></div>
 
 <div class="stamina-container">
-  <div class="stamina-bar" id="stamina-bar"></div>
-  <div class="stamina-text" id="stamina-text">100/100</div>
+  <div class="stamina-text" id="stamina-text">100</div>
+  <div class="paint-splat-bg"><img id="paint-image" src="{{CDN_ASSETS_URL}}/ui/logos/blue-paint.png" alt="paint-splat" class="paint-splat-image"></div>
 </div>
 
 <div class="score-time-container">
@@ -866,31 +888,11 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
   </div>
 </div>
 
-<!-- <div class="hud-panel"> -->
-  <!-- <button class="team-button" id="switch-team">Switch Team</button> -->
-  <!-- <button class="class-button" id="switch-map">Switch Map</button> -->
-  <!-- <button class="restart-button" id="restart-game">Restart Game</button> -->
-  <!-- <button class="class-button" id="change-class">Change Class (e)</button> -->
-<!-- </div> -->
-
 <div class="game-over">
   <div class="game-over-content">
     <div class="winner-text" id="winner-text">Red Team Wins!</div>
   </div>
 </div>
-
-<!-- <div class="start-menu" id="start-menu">
-  <img src="{{CDN_ASSETS_URL}}/ui/logos/background.jpeg" alt="start-menu" class="start-menu-image">
-  <div class="start-menu-content">
-    <div class="start-title">Block Splat</div>
-    <div class="start-selection">Select which team you'd like to join!</div>
-    <div class="team-selection">
-      <button class="team-select-button red" id="red-team-button">Red Team</button>
-      <button class="team-select-button blue" id="blue-team-button">Blue Team</button>
-    </div>
-  </div>
-</div> -->
-
 
 <div class="class-select" id="class-select">
   <div class="class-card" id="runner-class">
@@ -943,11 +945,8 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 
 <div id="player-leaderboard">
   <div id="red-leaderboard" class="leaderboard">
-
-    <!-- <div>Red Raiders</div> -->
   </div>
   <div id="blue-leaderboard" class="leaderboard">
-    <!-- <div>Blue Bandits</div> -->
   </div>
 </div>
 
@@ -960,13 +959,15 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 
 <div class="victory-screen" id="victory-screen">
   <div class="victory-content">
-    <div class="victory-message" id="victory-message">You won!</div>
+    <div class="victory-message">You win!</div>
+    <div class="victory-team" id="victory-team"></div>
   </div>
 </div>
 
 <div class="defeat-screen" id="defeat-screen">
   <div class="defeat-content">
-    <div class="defeat-message" id="defeat-message">You lost!</div>
+    <div class="defeat-message">You lose!</div>
+    <div class="defeat-team" id="defeat-team"></div>
   </div>
 </div>
 
@@ -1081,22 +1082,18 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
         document.getElementById('player-name').textContent = data.playerName
       }
 
-      // Update stamina bar
+      // Update stamina bar and paint image based on team
       if (data.playerStamina !== undefined) {
-        const staminaBar = document.getElementById('stamina-bar')
         const staminaText = document.getElementById('stamina-text')
+        const paintImage = document.getElementById('paint-image')
         const percentage = (data.playerStamina / data.maxStamina) * 100
-        staminaBar.style.width = `${percentage}%`
-        staminaText.textContent = `${Math.round(data.playerStamina)}/${data.maxStamina
-          }`
+        staminaText.textContent = `${Math.round(data.playerStamina)}`
 
-        // Update stamina bar color based on stamina level
-        if (percentage < 30) {
-          staminaBar.style.background =
-            'linear-gradient(to right, #e74c3c, #c0392b)'
-        } else {
-          staminaBar.style.background =
-            'linear-gradient(to right, #2ecc71, #27ae60)'
+        // Update paint image based on team
+        if (data.playerTeam === 'Red Raiders') {
+          paintImage.src = '{{CDN_ASSETS_URL}}/ui/logos/red-paint.png'
+        } else if (data.playerTeam === 'Blue Bandits') {
+          paintImage.src = '{{CDN_ASSETS_URL}}/ui/logos/blue-paint.png'
         }
       }
 
@@ -1163,6 +1160,7 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 
     if (data.type === 'victory') {
       document.querySelector('.victory-screen').style.display = 'block'
+      document.getElementById('victory-team').textContent = `${data.winner} Win!`
       setTimeout(() => {
         document.querySelector('.victory-screen').style.display = 'none'
       }, 5000)
@@ -1170,6 +1168,7 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 
     if (data.type === 'defeat') {
       document.querySelector('.defeat-screen').style.display = 'block'
+      document.getElementById('defeat-team').textContent = `${data.winner} Win!`
       setTimeout(() => {
         document.querySelector('.defeat-screen').style.display = 'none'
       }, 5000)
@@ -1218,18 +1217,6 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
     }
   })
 
-  // document.getElementById('switch-team').addEventListener('click', () => {
-  //   hytopia.sendData({ button: 'switch-team' })
-  // })
-
-  // document.getElementById('restart-game').addEventListener('click', () => {
-  //   hytopia.sendData({ button: 'restart-game' })
-  // })
-
-  // document.getElementById('switch-map').addEventListener('click', () => {
-  //   hytopia.sendData({ button: 'switch-map' })
-  // })
-
   let selectedClass = null
 
   function selectClass(className) {
@@ -1259,25 +1246,6 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
   document
     .getElementById('grenader-class')
     .addEventListener('click', () => selectClass('grenader'))
-
-  // document.getElementById('red-team-button').addEventListener('click', () => {
-  //   hytopia.sendData({ button: 'select-team', team: 'Red' })
-  //   document.getElementById('start-menu').style.display = 'none'
-  // })
-
-  // document.getElementById('blue-team-button').addEventListener('click', () => {
-  //   hytopia.sendData({ button: 'select-team', team: 'Blue' })
-  //   document.getElementById('start-menu').style.display = 'none'
-  // })
-
-  // document.getElementById('change-class').addEventListener('click', () => {
-  //   const select = document.getElementById('class-select')
-  //   if (select.style.display === 'none') {
-  //     select.style.display = 'flex'
-  //   } else {
-  //     select.style.display = 'none'
-  //   }
-  // })
 
   hytopia.registerSceneUITemplate('name-indicator', (id, onState) => {
     const template = document.getElementById('my-game-message-template');

@@ -12,7 +12,6 @@ import { spawnRandomEnergyBoost } from "../utilities/boosts";
 import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
 import { globalState } from "./global-state";
 import NPCEntity from "../entities/NPCEntity";
-import { TEAM_COLORS } from "./team";
 import { LOBBY_SPAWN } from "../events/player-events";
 
 export default class Game {
@@ -36,7 +35,8 @@ export default class Game {
     { x: 0, y: 5.5, z: 10 },
     { x: 0, y: 5.5, z: -10 },
     {x: 34, y: 10, z: -3},
-    {x: 6, y: 11, z: 35}
+    {x: 6, y: 11, z: 35},
+    {x: -16.5, y: 7, z: 18}
   ];
   private npcs: NPCEntity[] = [];
   private isWaitingForPlayers: boolean = true;
@@ -60,6 +60,10 @@ export default class Game {
     for (let i = 1; i <= 2; i++) {
       this.scores.set(i, 0);
     }
+    this.uiTimer = setInterval(() => {
+      globalState.getAllPlayers().forEach(player => player.setStamina(STAMINA_REGEN_RATE));
+      this.updateAllPlayersUI();
+    }, 225);
   }
 
   checkPlayerCount() {
@@ -77,7 +81,7 @@ export default class Game {
         if (this.gameCountdownTimer <= 0 && this.gameCountdownTimerInterval) {
           clearInterval(this.gameCountdownTimerInterval);
           this.gameCountdownTimerInterval = null;
-          this.startGame();
+          this.clearMapThenStartGame();
         }
       }, 1000);
     }
@@ -88,7 +92,6 @@ export default class Game {
     if (this.blockStateMap.size > 0) {
       this.world.chatManager.sendBroadcastMessage('Game will begin once the map is reset!')
       clearBlockStates(this.blockStateMap, this.world).then(() => {
-        this
         this.startGame();
       });
     } else {
@@ -102,10 +105,6 @@ export default class Game {
     if (this.gameTimer) {
       clearInterval(this.gameTimer);
       this.gameTimer = null;
-    }
-    if (this.uiTimer) {
-      clearInterval(this.uiTimer);
-      this.uiTimer = null;
     }
 
     BACKGROUND_MUSIC.pause();
@@ -133,11 +132,6 @@ export default class Game {
         this.endGame();
       }
     }, 1000);
-
-    this.uiTimer = setInterval(() => {
-      globalState.getAllPlayers().forEach(player => player.setStamina(STAMINA_REGEN_RATE));
-      this.updateAllPlayersUI();
-    }, 225);
 
     this.teamManager.spawnPlayers(this.world);
     this.resetScores();
@@ -168,10 +162,7 @@ export default class Game {
       clearInterval(this.gameTimer);
       this.gameTimer = null;
     }
-    if (this.uiTimer) {
-      clearInterval(this.uiTimer);
-      this.uiTimer = null;
-    }
+
     this.scores = new Map();
     this.clearMapThenStartGame();
   }
@@ -202,7 +193,7 @@ export default class Game {
       timeStr = `Starting in ${this.gameCountdownTimer}`;
     } else {
       const players = PlayerManager.instance.getConnectedPlayers();
-      timeStr = `Waiting for players (${players.length}/2)`;
+      timeStr = `Waiting... (${players.length}/2)`;
     }
 
     const scoreStr = Array.from(this.scores.entries())
@@ -240,7 +231,6 @@ export default class Game {
     this.isGameRunning = false;
 
     if (this.gameTimer) clearInterval(this.gameTimer);
-    if (this.uiTimer) clearInterval(this.uiTimer);
     if (this.boostTimer) clearInterval(this.boostTimer);
 
     // Find winning team
@@ -271,10 +261,12 @@ export default class Game {
       if (playerTeam === winningTeamName) {
         player.ui.sendData({
           type: UI_EVENT_TYPES.VICTORY,
+          winner: winningTeamName
         });
       } else {
         player.ui.sendData({
           type: UI_EVENT_TYPES.DEFEAT,
+          winner: winningTeamName
         });
       }
     }

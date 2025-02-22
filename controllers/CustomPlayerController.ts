@@ -17,7 +17,7 @@ import { spawnProjectile } from "../utilities/projectiles";
 import { PlayerClass } from "../entities/player-types";
 import TeamManager, { TEAM_COLORS } from "../gameState/team";
 import {
-  PUNCH_ENERGY_COST,
+  TACKLE_ENERGY_COST,
   SPRINT_ENERGY_COST,
   PROJECTILES,
   type ProjectileType,
@@ -185,7 +185,6 @@ export default class CustomPlayerController extends BaseEntityController {
 
     const { type, energy } = projectileConfig;
     if (entity.getStamina() >= Math.abs(energy)) {
-      entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !["chuck"].includes(v)));
       entity.startModelOneshotAnimations(["chuck"]);
       const projectile = spawnProjectile(
         this._world,
@@ -201,12 +200,14 @@ export default class CustomPlayerController extends BaseEntityController {
   }
 
   private handleMeleeAttack(entity: CustomPlayerEntity, input: PlayerInput) {
-    if(entity.isPlayerTackling() || entity.getStamina() < PUNCH_ENERGY_COST) {
+    if(entity.isPlayerTackling() || entity.getStamina() < TACKLE_ENERGY_COST) {
       return;
     }
     let multiplier = 1;
     if (entity.getPlayerClass() === PlayerClass.RUNNER) {
-      multiplier = 1.2;
+      multiplier = 1.4;
+    } else if (entity.getPlayerClass() === PlayerClass.GRENADER) {
+      multiplier = 1.1;
     }
     
     const direction = this.getDirectionFromRotation(entity.rotation);
@@ -216,7 +217,7 @@ export default class CustomPlayerController extends BaseEntityController {
       y: PUNCH_VERTICAL_FORCE,
       z: direction.z * PUNCH_PLAYER_FORCE * multiplier,
     });
-    entity.setStamina(-PUNCH_ENERGY_COST);
+    entity.setStamina(-TACKLE_ENERGY_COST);
     entity.tackle();
   }
 
