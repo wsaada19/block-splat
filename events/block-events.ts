@@ -4,7 +4,6 @@ import type { Entity } from "hytopia";
 import type { BlockType } from "hytopia";
 import type Game from "../gameState/game";
 import { PlayerClass} from "../entities/player-types";
-import type TeamManager from "../gameState/team";
 import {
   BLOCK_STATE,
   blockIds,
@@ -18,6 +17,7 @@ import { ParticleEmitter } from "../particles/particle-emmitter";
 import { ParticleFX } from "../particles/particles-fx";
 import { globalState } from "../gameState/global-state";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import NPCEntity from "../entities/NPCEntity";
 const BLOB_CHECK_PATTERN = [
   [0, 0, 0], // Center block
   [0, 1, 0], // Above
@@ -74,16 +74,15 @@ export function onBlockHit(
   colliderHandleB: number,
   world: World,
   game: Game,
-  teamManager: TeamManager,
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
   // Early exit conditions
-  if (!started || !blockIds.includes(type.id) || !game.isGameRunning) return;
+  if (!started || !blockIds.includes(type.id) || !game.isGameRunning || entity instanceof NPCEntity) return;
 
   if (!(entity instanceof PlayerEntity)) {
     handleProjectileHit(entity, colliderHandleA, colliderHandleB, world, game, blockStateMap);
   } else {
-    handlePlayerHit(entity, world, game, teamManager, blockStateMap);
+    handlePlayerHit(entity, world, game, blockStateMap);
   }
 }
 
@@ -96,10 +95,18 @@ function handleProjectileHit(
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
   if (!entity.tag) return;
-
   const playerEntity = globalState.getPlayerEntity(entity.tag);
-  const teamColor = playerEntity.getTeam() === TEAM_COLORS.BLUE ? "BLUE" : "RED";
-  const colorData = BLOCK_COLORS[teamColor];
+  let teamColor = "BLUE";
+  let colorData = BLOCK_COLORS.BLUE;
+  if(!playerEntity) {
+    // check Bot_1 for team id
+    const teamId = entity.tag.split("_")[1];
+    teamColor = teamId === "1" ? "BLUE" : "RED";
+    colorData = BLOCK_COLORS[teamColor as keyof typeof BLOCK_COLORS];
+  } else {
+    teamColor = playerEntity.getTeam() === TEAM_COLORS.BLUE ? "BLUE" : "RED";
+    colorData = BLOCK_COLORS[teamColor as keyof typeof BLOCK_COLORS];
+  }
   
   const contactPoint = getContactPoint(world, colliderHandleA, colliderHandleB);
   if (!contactPoint) return;
@@ -127,7 +134,7 @@ function handleProjectileHit(
 
   if (blocksColored > 0) {
     handleEffects(position, colorData, world);
-    playerEntity.incrementPlayerPoints(blocksColored);
+    playerEntity?.incrementPlayerPoints(blocksColored);
   }
 
   if (entity.isSpawned) {
@@ -139,13 +146,12 @@ function handlePlayerHit(
   entity: PlayerEntity,
   world: World,
   game: Game,
-  teamManager: TeamManager,
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
   const playerEntity = globalState.getPlayerEntity(entity.player.username);
-  if (playerEntity.getPlayerClass() !== PlayerClass.RUNNER) return;
+  if (playerEntity?.getPlayerClass() !== PlayerClass.RUNNER) return;
 
-  const teamColor = teamManager.getPlayerColor(entity.player.username);
+  const teamColor = playerEntity?.getTeam() === TEAM_COLORS.BLUE ? "BLUE" : "RED";
   const colorData = BLOCK_COLORS[teamColor as keyof typeof BLOCK_COLORS];
   const position = entity.position;
 
@@ -236,7 +242,7 @@ function handleEffects(position: Vector3Like, colorData: typeof BLOCK_COLORS.BLU
     uri: "audio/sfx/liquid/splash-01.mp3",
     playbackRate: 2,
     volume: 0.4,
-    referenceDistance: 8,
+    referenceDistance: 6,
     position: position,
     loop: false,
   }).play(world);

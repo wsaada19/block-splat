@@ -21,14 +21,14 @@ export function spawnProjectile(
   coordinate: Vector3Like,
   direction: Vector3Like,
   tag: string,
-  teamManager: TeamManager,
+  color: string,
   type: ProjectileType
 ) {
   // Spawn a projectileEntity when the player shoots.
   const projectileEntity = createProjectileEntity(
     direction,
     tag,
-    teamManager,
+    color,
     type
   );
 
@@ -40,14 +40,14 @@ export function spawnProjectile(
     const leftOrb = createProjectileEntity(
       leftDirection,
       tag,
-      teamManager,
+      color,
       PROJECTILES.SLINGSHOT.NAME as ProjectileType,
       SLINGSHOT_SPEED_OFFSET
     );
     const rightOrb = createProjectileEntity(
       rightDirection,
       tag,
-      teamManager,
+      color,
       PROJECTILES.SLINGSHOT.NAME as ProjectileType,
       SLINGSHOT_SPEED_OFFSET
     );
@@ -65,7 +65,7 @@ export function spawnProjectile(
         otherEntity,
         started,
         tag,
-        teamManager
+        color
       );
     };
   });
@@ -128,12 +128,11 @@ function getRotationFromDirection(direction: Vector3Like): QuaternionLike {
 function createProjectileEntity(
   direction: Vector3Like,
   tag: string,
-  teamManager: TeamManager,
+  color: string,
   type: ProjectileType,
   speedOffset: number = 0
 ) {
   const projectile = PROJECTILES[type];
-  const color = teamManager.getPlayerColor(tag);
 
   const projectileEntity = new Entity({
     name: projectile.NAME,
@@ -151,6 +150,7 @@ function createProjectileEntity(
         z: direction.z * (projectile.SPEED + speedOffset),
       },
       rotation: getRotationFromDirection(direction),
+      ccdEnabled: projectile.CCD_ENABLED,
     },
     tag: tag,
   });

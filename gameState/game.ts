@@ -5,14 +5,13 @@ import {
   type Vector3Like,
   PlayerEntity,
 } from "hytopia";
-import TeamManager from "./team";
+import TeamManager, { TEAM_COLORS } from "./team";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
 import { BOOST_SPAWN_INTERVAL, STAMINA_REGEN_RATE, UI_EVENT_TYPES } from "../utilities/gameConfig";
-import { spawnRandomEnergyBoost } from "../utilities/boosts";
+import { spawnRandomBoost } from "../utilities/boosts";
 import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
 import { globalState } from "./global-state";
 import NPCEntity from "../entities/NPCEntity";
-import { LOBBY_SPAWN } from "../events/player-events";
 
 export default class Game {
   private world: World;
@@ -118,10 +117,10 @@ export default class Game {
     this.isGameRunning = true;
     this.timeRemaining = this.timeLimit;
 
-    spawnRandomEnergyBoost(this.world, this.energySpawnLocations);
+    spawnRandomBoost(this.world, this.energySpawnLocations);
 
     this.boostTimer = setInterval(() => {
-      spawnRandomEnergyBoost(this.world, this.energySpawnLocations);
+      spawnRandomBoost(this.world, this.energySpawnLocations);
     }, BOOST_SPAWN_INTERVAL * 1000);
 
     // Start main game timer
@@ -143,18 +142,16 @@ export default class Game {
     this.npcs.forEach(npc => npc.despawn());
     this.npcs = [];
 
-    // Create and spawn NPCs for each team
-    // this.addNPC(TEAM_COLORS.BLUE);
-    // this.addNPC(TEAM_COLORS.RED);
+    /// Spawn new NPCs using the static method
+    // const redTeamPlayers = this.teamManager.getTeamPlayers(TEAM_COLORS.RED);
+    // if(redTeamPlayers && redTeamPlayers.size < 2) {
+    //   this.npcs.push(...NPCEntity.spawnNPCsForTeam(this.world, TEAM_COLORS.RED, this.teamManager, 2 - redTeamPlayers.size));
+    // }
 
-    // Start NPC movement after a short delay
-    // setTimeout(() => {
-    //   console.log("Starting all NPC movements");
-    //   this.npcs.forEach(npc => {
-    //     console.log("Starting movement for NPC:", npc.name);
-    //     npc.startMoving();
-    //   });
-    // }, 2000);
+    // const blueTeamPlayers = this.teamManager.getTeamPlayers(TEAM_COLORS.BLUE);
+    // if(blueTeamPlayers && blueTeamPlayers.size < 2) {
+    //   this.npcs.push(...NPCEntity.spawnNPCsForTeam(this.world, TEAM_COLORS.BLUE, this.teamManager, 2 - blueTeamPlayers.size));
+    // }
   }
 
   restartGame() {
@@ -271,7 +268,7 @@ export default class Game {
       }
     }
 
-    // clear all entities
+    // clear all non-player entities
     this.world.entityManager.getAllEntities().forEach((entity) => {
       if (!(entity instanceof PlayerEntity)) {
         entity.despawn();
@@ -284,29 +281,5 @@ export default class Game {
     this.isWaitingForPlayers = true;
     this.gameCountdownTimer = 30;
     this.checkPlayerCount();
-
-    // Send NPCs back to lobby
-    this.npcs.forEach(npc => {
-      npc.setPosition(LOBBY_SPAWN);
-    });
-  }
-
-  private addNPC(team: number) {
-    const npc = new NPCEntity(this.world, team);
-    const spawnPoint = this.teamManager.getTeamSpawn(team);
-    
-    if (spawnPoint) {
-      // Ensure spawn point is slightly above ground to prevent stuck states
-      const adjustedSpawn = {
-        x: spawnPoint.x,
-        y: spawnPoint.y + 1,
-        z: spawnPoint.z
-      };
-      console.log(`Creating NPC for team ${team} at`, adjustedSpawn);
-      npc.spawn(this.world, adjustedSpawn);
-      this.npcs.push(npc);
-    } else {
-      console.warn("No valid spawn point found for team", team);
-    }
   }
 }

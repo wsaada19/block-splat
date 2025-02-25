@@ -6,6 +6,7 @@ import {
   PUNCH_VERTICAL_FORCE,
   RESPAWN_INVINCIBILITY_TIME,
   STRENGTH_BOOST_MULTIPLIER,
+  STRENGTH_BOOST_DURATION,
 } from "../utilities/gameConfig";
 import { PlayerClass } from "./player-types";
 import CustomPlayerController from "../controllers/CustomPlayerController";
@@ -13,7 +14,8 @@ import { globalState } from "../gameState/global-state";
 import type TeamManager from "../gameState/team";
 import { ParticleEmitter } from "../particles/particle-emmitter";
 import { ParticleFX } from "../particles/particles-fx";
-
+import NPCEntity from "./NPCEntity";
+import { getDirectionFromRotation } from "../utilities/math";
 class CustomPlayerEntity extends PlayerEntity {
   private playerClass: PlayerClass = PlayerClass.SLINGSHOT;
   private kills: number = 0;
@@ -28,6 +30,16 @@ class CustomPlayerEntity extends PlayerEntity {
   private isTackling: boolean = false;
   private strengthBoostEmitter: ParticleEmitter | null = null;
   private strengthBoostInterval: number | null = null;
+  private isRespawning: boolean = false;
+  private activeBoosts: {
+    strength: { count: number; timeouts: number[]; remainingTime: number };
+    invincibility: { count: number; timeouts: number[]; remainingTime: number };
+  } = {
+    strength: { count: 0, timeouts: [], remainingTime: 0 },
+    invincibility: { count: 0, timeouts: [], remainingTime: 0 }
+  };
+  private _lastInvincibilityUpdate: number | null = null;
+  private _lastStrengthUpdate: number | null = null;
 
   constructor(player: Player, team: number, teamManager: TeamManager) {
     super({
@@ -49,6 +61,7 @@ class CustomPlayerEntity extends PlayerEntity {
       teamManager: teamManager,
       world: world,
     }));
+    this.player.camera.setOffset({x: 0, y: 0.8, z: 0});
 
     this.onEntityCollision = (
       entity: Entity,
@@ -56,22 +69,23 @@ class CustomPlayerEntity extends PlayerEntity {
       started: boolean
     ) => {
       if (
-        otherEntity instanceof CustomPlayerEntity &&
+        (otherEntity instanceof CustomPlayerEntity || otherEntity instanceof NPCEntity) &&
         entity instanceof CustomPlayerEntity && 
         this.isPlayerTackling() &&
         started
       ) {
-        const direction = this.controller instanceof CustomPlayerController 
-          ? this.controller.getDirectionFromRotation(entity.rotation)
-          : { x: 0, y: 0, z: 0 };
+        const direction = getDirectionFromRotation(entity.rotation)
         const verticalForce = Math.max(direction.y, 0.7) * PUNCH_VERTICAL_FORCE;
         let multiplier = 1;
         if (entity.isStrengthBoostActive()) {
           multiplier = STRENGTH_BOOST_MULTIPLIER;
+          if(otherEntity instanceof NPCEntity) {
+            multiplier = 5;
+          }
         }
         otherEntity.applyImpulse({
           x: direction.x * PUNCH_FORCE * multiplier,
-          y: verticalForce,
+          y: verticalForce * multiplier,
           z: direction.z * PUNCH_FORCE * multiplier,
         });
         otherEntity.setLastHitBy(entity.player.username);
@@ -110,6 +124,14 @@ class CustomPlayerEntity extends PlayerEntity {
 
   public getLastHitBy(): string {
     return this.lastHitBy;
+  }
+
+  public getIsRespawning(): boolean {
+    return this.isRespawning;
+  }
+
+  public setIsRespawning(isRespawning: boolean): void {
+    this.isRespawning = isRespawning;
   }
 
   public getStamina(): number {
@@ -164,48 +186,125 @@ class CustomPlayerEntity extends PlayerEntity {
   }
 
   public setInvincible(): void {
+    // Clear any existing timeouts
+    this.activeBoosts.invincibility.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.activeBoosts.invincibility.timeouts = [];
+    
+    // Calculate new remaining time
+    const currentTime = Date.now();
+    this.activeBoosts.invincibility.remainingTime = RESPAWN_INVINCIBILITY_TIME;
+    if (this._lastInvincibilityUpdate) {
+      const elapsedTime = currentTime - this._lastInvincibilityUpdate;
+      const previousRemainingTime = Math.max(0, this.activeBoosts.invincibility.remainingTime - elapsedTime);
+      this.activeBoosts.invincibility.remainingTime += previousRemainingTime;
+    }
+    this._lastInvincibilityUpdate = currentTime;
+
+    // Set invincibility active
     this.invincible = true;
-    setTimeout(() => {
+    this.setOpacity(0.5);
+
+    // Add new timeout for total remaining time
+    const timeout = setTimeout(() => {
       this.invincible = false;
       this.setOpacity(1);
-    }, RESPAWN_INVINCIBILITY_TIME);
-    this.setOpacity(0.5);
+      this.activeBoosts.invincibility.remainingTime = 0;
+      this._lastInvincibilityUpdate = null;
+    }, this.activeBoosts.invincibility.remainingTime) as unknown as number;
+
+    // Store the timeout
+    this.activeBoosts.invincibility.timeouts = [timeout];
   }
 
   public setStrengthBoostActive(strengthBoostActive: boolean): void {
-    this.strengthBoostActive = strengthBoostActive;
-    
-    // Clear any existing particle effects
-    if (this.strengthBoostInterval) {
-      clearInterval(this.strengthBoostInterval);
-      this.strengthBoostInterval = null;
-    }
-    if (this.strengthBoostEmitter) {
-      this.strengthBoostEmitter.destroy();
-      this.strengthBoostEmitter = null;
-    }
+    if (strengthBoostActive) {
+      // Clear any existing timeouts
+      this.activeBoosts.strength.timeouts.forEach(timeout => clearTimeout(timeout));
+      this.activeBoosts.strength.timeouts = [];
 
-    // If boost is being activated, start the particle effect
-    if (strengthBoostActive && this.isSpawned && this.world) {
-      // Choose particle effect based on team
-      const effectType = this.team === TEAM_COLORS.RED ? 
-        ParticleFX.RED_STRENGTH_BOOST : 
-        ParticleFX.BLUE_STRENGTH_BOOST;
+      // Calculate new remaining time
+      const currentTime = Date.now();
+      this.activeBoosts.strength.remainingTime = STRENGTH_BOOST_DURATION;
+      if (this._lastStrengthUpdate) {
+        const elapsedTime = currentTime - this._lastStrengthUpdate;
+        const previousRemainingTime = Math.max(0, this.activeBoosts.strength.remainingTime - elapsedTime);
+        this.activeBoosts.strength.remainingTime += previousRemainingTime;
+      }
+      this._lastStrengthUpdate = currentTime;
 
-      this.strengthBoostEmitter = new ParticleEmitter(effectType, this.world);
-      this.strengthBoostEmitter.spawn(this.world, this.position);
-      
-      // Continuously emit particles while boost is active
-      this.strengthBoostInterval = setInterval(() => {
-        if (this.strengthBoostEmitter && this.isSpawned) {
-          this.strengthBoostEmitter.setPosition(this.position);
-          this.strengthBoostEmitter.burst();
+      // Set strength boost active
+      this.strengthBoostActive = true;
+
+      // Start particle effect if not already active
+      if (!this.strengthBoostEmitter && this.isSpawned && this.world) {
+        const effectType = this.team === TEAM_COLORS.RED ? 
+          ParticleFX.RED_STRENGTH_BOOST : 
+          ParticleFX.BLUE_STRENGTH_BOOST;
+
+        this.strengthBoostEmitter = new ParticleEmitter(effectType, this.world);
+        this.strengthBoostEmitter.spawn(this.world, this.position);
+        
+        // Start particle emission if not already running
+        if (!this.strengthBoostInterval) {
+          this.strengthBoostInterval = setInterval(() => {
+            if (this.strengthBoostEmitter && this.isSpawned) {
+              this.strengthBoostEmitter.setPosition(this.position);
+              this.strengthBoostEmitter.burst();
+            }
+          }, 100) as unknown as number;
         }
-      }, 100) as unknown as number; // Emit particles every 100ms
+      }
+
+      // Add new timeout for total remaining time
+      const timeout = setTimeout(() => {
+        this.strengthBoostActive = false;
+        this.activeBoosts.strength.remainingTime = 0;
+        this._lastStrengthUpdate = null;
+        
+        // Clean up particle effects
+        if (this.strengthBoostInterval) {
+          clearInterval(this.strengthBoostInterval);
+          this.strengthBoostInterval = null;
+        }
+        if (this.strengthBoostEmitter) {
+          this.strengthBoostEmitter.destroy();
+          this.strengthBoostEmitter = null;
+        }
+      }, this.activeBoosts.strength.remainingTime) as unknown as number;
+
+      // Store the timeout
+      this.activeBoosts.strength.timeouts = [timeout];
+
+    } else {
+      // Force remove all strength boosts
+      this.activeBoosts.strength.timeouts.forEach(timeout => clearTimeout(timeout));
+      this.activeBoosts.strength = { count: 0, timeouts: [], remainingTime: 0 };
+      this._lastStrengthUpdate = null;
+      this.strengthBoostActive = false;
+      
+      // Clean up particle effects
+      if (this.strengthBoostInterval) {
+        clearInterval(this.strengthBoostInterval);
+        this.strengthBoostInterval = null;
+      }
+      if (this.strengthBoostEmitter) {
+        this.strengthBoostEmitter.destroy();
+        this.strengthBoostEmitter = null;
+      }
     }
   }
 
   public despawn(): void {
+    // Clear all boost timeouts
+    this.activeBoosts.strength.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.activeBoosts.invincibility.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.activeBoosts = {
+      strength: { count: 0, timeouts: [], remainingTime: 0 },
+      invincibility: { count: 0, timeouts: [], remainingTime: 0 }
+    };
+    this._lastInvincibilityUpdate = null;
+    this._lastStrengthUpdate = null;
+
     if (this.strengthBoostInterval) {
       clearInterval(this.strengthBoostInterval);
       this.strengthBoostInterval = null;

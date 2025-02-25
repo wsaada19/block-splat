@@ -9,6 +9,19 @@ export const GAME_TIME = 4 * 60;
 export const SHOOTING_COOLDOWN = 400;
 export const PUNCH_COOLDOWN = 500;
 
+export const SEARCH_POINTS = {
+  [1]: [
+    { x: -17, y: 6, z: 20 },
+    { x: 17, y: 6, z: 20 },
+    { x: -17, y: 6, z: -20 },
+  ],
+  [2]: [
+    { x: 17, y: 6, z: 20 },
+    { x: 17, y: 6, z: -20 },
+    { x: -17, y: 6, z: 20 },
+  ],
+};
+
 // boost spawn interval
 export const BOOST_SPAWN_INTERVAL = 10;
 export const STRENGTH_BOOST_DURATION = 10000;
@@ -23,11 +36,11 @@ export const BOOST_PROBABILITIES = [
   },
 {
     type: "strength",
-    spawnProbability: 0.15,
+    spawnProbability: 0.10,
   },
   {
     type: "invincibility",
-    spawnProbability: 0.15,
+    spawnProbability: 0.20,
   }
 ];
 
@@ -67,8 +80,9 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 2,
     SPEED: 30,
-    KNOCKBACK: 14,
-    ENERGY: -28
+    KNOCKBACK: 13,
+    ENERGY: -28,
+    CCD_ENABLED: false
   },
   SLINGSHOT: {
     NAME: 'SLINGSHOT',
@@ -76,15 +90,17 @@ export const PROJECTILES = {
     MODEL_SCALE: 0.8,
     SPEED: 40,
     KNOCKBACK: 11,
-    ENERGY: -30
+    ENERGY: -30,
+    CCD_ENABLED: false
   },
   SNIPER: {
     NAME: 'SNIPER',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 60,
-    KNOCKBACK: 10,
-    ENERGY: -22
+    KNOCKBACK: 11,
+    ENERGY: -22,
+    CCD_ENABLED: true
   }
 }
 

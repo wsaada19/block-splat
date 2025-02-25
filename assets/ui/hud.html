@@ -461,9 +461,11 @@
     background-repeat: no-repeat;
     background-position: center;
     z-index: 1;
+    transition: filter 0.3s ease;
     img {
       object-fit: cover;
       width: 100%;
+      transition: opacity 0.3s ease, filter 0.3s ease;
     }
   }
 
@@ -471,7 +473,7 @@
     position: absolute;
     color: white;
     font-family: Arial, sans-serif;
-    font-size: 24px;
+    font-size: 22px;
     padding-right: 6px;
     padding-bottom: 8px;
     font-weight: bold;
@@ -479,9 +481,9 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
+  /* div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
     display: none !important;
-  }
+  } */
 
   .crosshair {
     position: fixed;
@@ -779,7 +781,6 @@
     transform: translate(-50%, -50%);
     width: 50%;
     color: green;
-    background: rgba(0, 0, 0, 0.8);
   }
 
   .victory-content {
@@ -1087,7 +1088,11 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
         const staminaText = document.getElementById('stamina-text')
         const paintImage = document.getElementById('paint-image')
         const percentage = (data.playerStamina / data.maxStamina) * 100
-        staminaText.textContent = `${Math.round(data.playerStamina)}`
+        staminaText.textContent = `${Math.round(percentage)}%`
+
+        // Update paint image opacity and brightness based on percentage
+        const opacity = Math.max(0.3, percentage / 100)
+        paintImage.style.opacity = opacity
 
         // Update paint image based on team
         if (data.playerTeam === 'Red Raiders') {

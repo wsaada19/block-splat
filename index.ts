@@ -74,7 +74,6 @@ startServer((world) => {
         colliderHandleB,
         world,
         game,
-        teamManager,
         blockStateMap
       );
   });

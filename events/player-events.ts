@@ -176,11 +176,15 @@ export function handlePlayerDeath(
   entity.incrementPlayerDeaths();
   if (entity.getLastHitBy()) {
     const killer = globalState.getPlayerEntity(entity.getLastHitBy());
-    chatManager.sendBroadcastMessage(
-      getKillingMessage(killer.getDisplayName(), entity.getDisplayName()),
-      "FF0000"
-    );
-    killer.incrementKills();
+    if (killer) {
+      chatManager.sendBroadcastMessage(
+        getKillingMessage(killer.getDisplayName(), entity.getDisplayName()),
+        "FF0000"
+      );
+      killer.incrementKills();
+    } else {
+      chatManager.sendBroadcastMessage("You were killed by a bot lmfao", "FF0000");
+    }
     entity.setLastHitBy("");
   } else {
     chatManager.sendBroadcastMessage(getFallingMessage(entity.getDisplayName()), "FF0000");
@@ -192,7 +196,7 @@ export function handlePlayerDeath(
     entity.rawRigidBody.setEnabled(false);
   }
   entity.setLinearVelocity({ x: 0, y: 0, z: 0 });
-
+  entity.setIsRespawning(true);
   setTimeout(() => {
     respawnPlayer(entity, teamManager, game);
   }, RESPAWN_TIME);
@@ -206,7 +210,7 @@ export function respawnPlayer(
   // Get team spawn point
   if (!entity.isSpawned) return;
 
-  const team = teamManager.getPlayerTeam(entity.player.username);
+  const team = entity.getTeam();
   const spawn = teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN;
   entity.rawRigidBody?.setEnabled(true);
 
@@ -216,4 +220,5 @@ export function respawnPlayer(
     entity.setPosition(LOBBY_SPAWN);
   }
   entity.setInvincible();
+  entity.setIsRespawning(false);
 }

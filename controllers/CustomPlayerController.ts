@@ -6,7 +6,7 @@ import {
   CollisionGroup, 
   CoefficientCombineRule, 
   BlockType, 
-  PlayerEntity, 
+  PlayerEntity,
   type PlayerInput, 
   type PlayerCameraOrientation,
   Vector3,
@@ -15,7 +15,7 @@ import {
 } from 'hytopia';
 import { spawnProjectile } from "../utilities/projectiles";
 import { PlayerClass } from "../entities/player-types";
-import TeamManager, { TEAM_COLORS } from "../gameState/team";
+import TeamManager, { TEAM_COLORS, TEAM_COLOR_STRINGS } from "../gameState/team";
 import {
   TACKLE_ENERGY_COST,
   SPRINT_ENERGY_COST,
@@ -28,6 +28,7 @@ import {
 } from "../utilities/gameConfig";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
+import { getDirectionFromRotation } from '../utilities/math';
 
 /** Options for creating a PlayerEntityController instance. @public */
 export interface PlayerEntityControllerOptions {
@@ -161,7 +162,7 @@ export default class CustomPlayerController extends BaseEntityController {
   }
 
   private handleShooting(entity: CustomPlayerEntity, cameraOrientation: PlayerCameraOrientation) {
-    if (entity.getPlayerClass() === PlayerClass.RUNNER) {
+    if (entity.getPlayerClass() === PlayerClass.RUNNER || entity.getIsRespawning()) {
       return;
     }
 
@@ -182,7 +183,6 @@ export default class CustomPlayerController extends BaseEntityController {
 
     const projectileConfig = projectileMap[entity.getPlayerClass()];
     if (!projectileConfig) return;
-
     const { type, energy } = projectileConfig;
     if (entity.getStamina() >= Math.abs(energy)) {
       entity.startModelOneshotAnimations(["chuck"]);
@@ -191,7 +191,7 @@ export default class CustomPlayerController extends BaseEntityController {
         bulletOrigin,
         direction,
         entity.player.username,
-        this._teamManager,
+        TEAM_COLOR_STRINGS[entity.getTeam()],
         type as ProjectileType
       );
       entity.setStamina(energy);
@@ -199,7 +199,7 @@ export default class CustomPlayerController extends BaseEntityController {
     }
   }
 
-  private handleMeleeAttack(entity: CustomPlayerEntity, input: PlayerInput) {
+  private handleMeleeAttack(entity: CustomPlayerEntity) {
     if(entity.isPlayerTackling() || entity.getStamina() < TACKLE_ENERGY_COST) {
       return;
     }
@@ -210,7 +210,7 @@ export default class CustomPlayerController extends BaseEntityController {
       multiplier = 1.1;
     }
     
-    const direction = this.getDirectionFromRotation(entity.rotation);
+    const direction = getDirectionFromRotation(entity.rotation);
     entity.startModelOneshotAnimations(["tackle"]);
     entity.applyImpulse({
       x: direction.x * PUNCH_PLAYER_FORCE * multiplier,
@@ -219,6 +219,11 @@ export default class CustomPlayerController extends BaseEntityController {
     });
     entity.setStamina(-TACKLE_ENERGY_COST);
     entity.tackle();
+    new Audio({
+      uri: 'audio/sfx/player/tackle.mp3',
+      attachedToEntity: entity,
+      volume: 0.5,
+    }).play(entity.world as World);
   }
 
   private handleSprint(entity: CustomPlayerEntity, input: PlayerInput) {
@@ -286,15 +291,6 @@ export default class CustomPlayerController extends BaseEntityController {
     return bulletOrigin;
   }
 
-  public getDirectionFromRotation(rotation: { x: number, y: number, z: number, w: number }): Vector3Like {
-    const angle = 2 * Math.atan2(rotation.y, rotation.w);
-    return {
-      x: Math.sin(angle) * -1,
-      y: 0,
-      z: Math.cos(angle) * -1,
-    };
-  }
-
   public tickWithPlayerInput(entity: PlayerEntity, input: PlayerInput, cameraOrientation: PlayerCameraOrientation, deltaTimeMs: number) {
     const customEntity = entity as CustomPlayerEntity;
     const { w, a, s, d, sp, sh, ml, mr, q, e, r } = input;
@@ -329,7 +325,7 @@ export default class CustomPlayerController extends BaseEntityController {
       this.handleShooting(customEntity, cameraOrientation);
     }
     if (mr || q) {
-      this.handleMeleeAttack(customEntity, input);
+      this.handleMeleeAttack(customEntity);
     } else if (sh) {
       this.handleSprint(customEntity, input);
     } else if (e) {

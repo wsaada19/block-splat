@@ -1,319 +1,399 @@
-import { Entity, RigidBodyType, PathfindingEntityController, Vector3, World, type Vector3Like, ColliderShape } from "hytopia";
-import { TEAM_COLORS } from "../gameState/team";
+import {
+  Entity,
+  RigidBodyType,
+  PathfindingEntityController,
+  World,
+  type Vector3Like,
+  ColliderShape,
+  Audio,
+} from "hytopia";
+import { TEAM_COLOR_STRINGS, TEAM_COLORS } from "../gameState/team";
+import { globalState } from "../gameState/global-state";
 import { spawnProjectile } from "../utilities/projectiles";
-import { PROJECTILES } from "../utilities/gameConfig";
+import { getKillingMessage } from "../utilities/language";
+import type TeamManager from "../gameState/team";
+import { SEARCH_POINTS } from "../utilities/gameConfig";
+import { getDirectionFromRotation } from "../utilities/math";
+
+const speed = 4.5;
+
+enum NPC_STATE {
+  IDLE,
+  FOLLOWING_ENEMIES,
+  LOOKING_FOR_ENEMIES,
+  RESPAWNING,
+}
 
 class NPCEntity extends Entity {
-  private lastShootTime: number = 0;
-  private shootInterval: number = 2000;
-  private moveSpeed: number = 3;
-  private team: number;
-  private stamina: number = 100;
-  private points: number = 0;
   private pathfindController: PathfindingEntityController;
-  private targetWaypointIndex: number = 0;
-  private isPatrolling: boolean = false;
-  private pathMarkers: Entity[] = [];
-  private spawnPosition: Vector3Like | null = null;  // Store spawn position
-  private waypoints: Vector3Like[] = [];  // Initialize empty, will set after spawn
-  private isDescending: boolean = false;  // Track if we're in initial descent
-  private groundY: number = 6.5;  // Target ground level
-  
-  constructor(world: World, team: number) {
+  private currentTarget: Vector3Like | null = null;
+  private team: number;
+  private updateInterval: ReturnType<typeof setInterval> | null = null;
+  private shootInterval: ReturnType<typeof setInterval> | null = null;
+  private lastHitBy: string = "";
+  private respawnTimer: ReturnType<typeof setTimeout> | null = null;
+  private teamManager: TeamManager;
+  private searchPoints: Vector3Like[] = [];
+  private currentSearchPointIndex: number = 0;
+  private currentState: NPC_STATE = NPC_STATE.IDLE;
+
+  constructor(
+    world: World,
+    team: number,
+    teamManager: TeamManager,
+    searchPoints: Vector3Like[]
+  ) {
     super({
       name: `Bot_${Math.floor(Math.random() * 1000)}`,
-      modelUri: team === TEAM_COLORS.BLUE ? 
-        "models/players/player-blue.gltf" : 
-        "models/players/player-red.gltf",
+      modelUri:
+        team === TEAM_COLORS.BLUE
+          ? "models/players/player-blue.gltf"
+          : "models/players/player-red.gltf",
       modelScale: 0.5,
-      modelLoopedAnimations: ["idle", "walk"],
-      tag: "npc",
+      modelLoopedAnimations: ["idle_upper", "idle_lower"],
+      controller: new PathfindingEntityController(),
       rigidBodyOptions: {
-        enabledRotations: { x: false, y: true, z: false },
+        enabledRotations: { x: false, y: false, z: false },
         ccdEnabled: true,
         type: RigidBodyType.DYNAMIC,
+        colliders: [
+          {
+            mass: 1.1,
+            shape: ColliderShape.CAPSULE,
+            halfHeight: 0.5,
+            radius: 0.3,
+          },
+        ],
       },
-      controller: new PathfindingEntityController()
+      tag: "npc",
     });
 
     this.team = team;
-    this.stamina = 100;
+    this.teamManager = teamManager;
     this.pathfindController = this.controller as PathfindingEntityController;
-    
-    // Start movement system
-    this.onTick = this.tick;
-    console.log("NPC Entity created with pathfinding controller:", this.pathfindController);
-  }
-
-  private clearPathMarkers() {
-    this.pathMarkers.forEach(marker => marker.despawn());
-    this.pathMarkers = [];
-  }
-
-  private spawnPathMarkers() {
-    this.clearPathMarkers();
-    
-    // Visualize the path with markers
-    if (this.pathfindController.waypoints) {
-      this.pathfindController.waypoints.forEach(waypoint => {
-        const pathMarker = new Entity({
-          modelUri: 'models/items/cookie.gltf',
-          modelScale: 0.3,
-          rigidBodyOptions: {
-            type: RigidBodyType.FIXED,
-            colliders: [
-              {
-                shape: ColliderShape.BLOCK,
-                halfExtents: { x: 0.2, y: 0.2, z: 0.2 },
-                isSensor: true,
-              },
-            ],
-          },
-        });
-        pathMarker.spawn(this.world!, waypoint);
-        this.pathMarkers.push(pathMarker);
-      });
-    }
-  }
-
-  public spawn(world: World, position: Vector3Like): void {
-    super.spawn(world, position);
-    console.log("NPC spawned at position:", position);
-    
-    // Store spawn position
-    this.spawnPosition = { ...position };
-    this.isDescending = true;  // Start in descending mode
-    
-    // Set ground-level waypoints for after descent
-    const groundPos = {
-      x: position.x,
-      y: this.groundY,
-      z: position.z
+    this.searchPoints = searchPoints;
+    // Set up despawn handler
+    this.onDespawn = () => {
+      this.stopFollowingEnemies();
+      this.stopShooting();
+      this.currentState = NPC_STATE.RESPAWNING;
+      if (this.respawnTimer) {
+        clearTimeout(this.respawnTimer);
+        this.respawnTimer = null;
+      }
     };
-    
-    this.waypoints = [
-      { ...groundPos },  // Start point on ground
-      { 
-        x: groundPos.x + 1,
-        y: this.groundY,
-        z: groundPos.z
-      },
-      { 
-        x: groundPos.x + 1,
-        y: this.groundY,
-        z: groundPos.z + 1
-      },
-      { 
-        x: groundPos.x,
-        y: this.groundY,
-        z: groundPos.z + 1
-      },
-      { ...groundPos }  // Back to start
-    ];
-    
-    console.log("Ground waypoints set:", this.waypoints);
+
+    this.onTick = () => {
+      if (this.position.y < -10 && this.isSpawned) {
+        const player = globalState.getPlayerEntity(this.lastHitBy);
+        if (player) {
+          player.incrementKills();
+          this.world?.chatManager.sendBroadcastMessage(
+            getKillingMessage(player.getDisplayName(), this.getDisplayName()),
+            "FF0000"
+          );
+        }
+        this.handleDeath();
+      }
+    };
   }
 
-  private tick = () => {
+  private handleDeath() {
+    this.stopFollowingEnemies();
+    this.stopShooting();
+
+    // Hide NPC during respawn
+    if (this.rawRigidBody) {
+      this.rawRigidBody.setEnabled(false);
+    }
+    this.setPosition({ x: 0, y: 100, z: 0 });
+    this.setLastHitBy("");
+    // Set up respawn timer
+    this.respawnTimer = setTimeout(() => {
+      this.respawn();
+      this.currentState = NPC_STATE.IDLE;
+    }, 5000);
+  }
+
+  private respawn() {
     if (!this.isSpawned || !this.world) return;
 
-    const now = Date.now();
-
-    // Handle initial descent
-    if (this.isDescending) {
-      if (this.position.y <= this.groundY + 0.1) {  // Close enough to ground
-        console.log("Reached ground level, starting patrol");
-        this.isDescending = false;
-        this.startMoving();  // Start normal movement
-        return;
-      }
-      
-      // Keep falling
-      this.setLinearVelocity({ x: 0, y: -2, z: 0 });  // Constant downward velocity
+    const spawnPoint = this.teamManager.getTeamSpawn(this.team);
+    if (!spawnPoint) {
+      console.warn("No valid spawn point found for team", this.team);
       return;
     }
 
-    // Regenerate stamina
-    this.stamina = Math.min(100, this.stamina + 0.5);
+    // Enable physics and move to spawn
+    if (this.rawRigidBody) {
+      this.rawRigidBody.setEnabled(true);
+    }
 
-    // Shoot periodically
-    if (now - this.lastShootTime > this.shootInterval) {
-      this.shoot();
-      this.lastShootTime = now;
-    }
-  };
+    const adjustedSpawn = {
+      x: spawnPoint.x,
+      y: spawnPoint.y + 1,
+      z: spawnPoint.z,
+    };
 
-  public startMoving() {
-    if (!this.isSpawned || !this.world || !this.spawnPosition) {
-      console.log("Cannot start moving - not spawned or no world");
-      return;
-    }
-    
-    if (this.isDescending) {
-      console.log("Still descending, waiting to reach ground");
-      return;
-    }
-    
-    if (this.isPatrolling) {
-      console.log("Already moving, skipping");
-      return;
-    }
-    
-    console.log("NPC starting ground movement");
-    console.log("Current position:", this.position);
-    console.log("Attempting to move to waypoint:", this.waypoints[this.targetWaypointIndex]);
-    
-    this.isPatrolling = true;
-    const targetWaypoint = this.waypoints[this.targetWaypointIndex];
-    
-    // Start walking animation
-    this.startModelLoopedAnimations(["walk"]);
-    this.stopModelAnimations(["idle"]);
-    
-    // Use pathfinding for ground movement
-    const succeeded = this.pathfindController.pathfind(targetWaypoint, 1, {
-      debug: true,
-      maxFall: 2,        // Minimal fall needed for ground movement
-      maxJump: 1,
-      maxOpenSetIterations: 1000,
-      verticalPenalty: 2,  // Discourage vertical movement during patrol
-      waypointTimeoutMs: 5000,
-      pathfindCompleteCallback: () => {
-        console.log(`Reached waypoint ${this.targetWaypointIndex}`);
-        console.log("Final position:", this.position);
-        console.log("Target was:", targetWaypoint);
-        
-        // Switch to idle animation
-        this.startModelLoopedAnimations(["idle"]);
-        this.stopModelAnimations(["walk"]);
-        
-        // Move to next waypoint
-        this.targetWaypointIndex = (this.targetWaypointIndex + 1) % this.waypoints.length;
-        
-        // Reset patrolling flag
-        this.isPatrolling = false;
-        
-        // Clear path markers
-        this.clearPathMarkers();
-        
-        // Schedule next movement after a delay
-        setTimeout(() => {
-          if (this.isSpawned && this.world) {
-            console.log("Starting next waypoint movement");
-            this.startMoving();
-          }
-        }, 2000);
-      },
-      waypointMoveCompleteCallback: () => {
-        console.log("Reached intermediate waypoint");
-        console.log("Current position:", this.position);
-      },
-      waypointMoveSkippedCallback: () => {
-        console.log("Skipped waypoint due to timeout");
-        console.log("Current position:", this.position);
-        console.log("Target was:", targetWaypoint);
-        // Try to recover by resetting state
-        this.isPatrolling = false;
-        this.clearPathMarkers();
-        setTimeout(() => this.startMoving(), 2000);
-      },
-      pathfindAbortCallback: () => {
-        console.log("Pathfinding aborted");
-        console.log("Current position:", this.position);
-        console.log("Target was:", targetWaypoint);
-        // Try to recover by resetting state
-        this.isPatrolling = false;
-        this.clearPathMarkers();
-        setTimeout(() => this.startMoving(), 2000);
-      },
-    });
-
-    if (succeeded) {
-      console.log("Path found successfully! Spawning markers...");
-      this.spawnPathMarkers();
-      
-      // Log the waypoints that were found
-      if (this.pathfindController.waypoints) {
-        console.log("Calculated waypoints:", this.pathfindController.waypoints);
-      }
-    } else {
-      console.log("Failed to find path to waypoint");
-      console.log("Start position:", this.position);
-      console.log("Target position:", targetWaypoint);
-      // Reset state and try again after a delay
-      this.isPatrolling = false;
-      setTimeout(() => this.startMoving(), 2000);
-    }
+    this.setPosition(adjustedSpawn);
+    this.startFollowingEnemies();
   }
 
-  private shoot() {
-    if (!this.world) return;
-    if (this.stamina < PROJECTILES.SLINGSHOT.ENERGY) return;
+  // Static method to create and spawn NPCs for a team
+  public static spawnNPCsForTeam(
+    world: World,
+    team: number,
+    teamManager: TeamManager,
+    count: number = 1
+  ): NPCEntity[] {
+    const npcs: NPCEntity[] = [];
 
-    // Shoot in random directions but with more purposeful targeting
-    const targetOffset = {
-      x: (Math.random() - 0.5) * 10, // More focused spread
-      y: 0.2 + Math.random() * 0.3,  // Slightly randomized upward angle
-      z: (Math.random() - 0.5) * 10
+    for (let i = 0; i < count; i++) {
+      const npc = new NPCEntity(
+        world,
+        team,
+        teamManager,
+        SEARCH_POINTS[team as keyof typeof SEARCH_POINTS]
+      );
+      const spawnPoint = teamManager.getTeamSpawn(team);
+
+      if (spawnPoint) {
+        const adjustedSpawn = {
+          x: spawnPoint.x,
+          y: spawnPoint.y + 1,
+          z: spawnPoint.z,
+        };
+        npc.spawn(world, adjustedSpawn);
+        npcs.push(npc);
+        npc.startFollowingEnemies();
+      } else {
+        console.warn("No valid spawn point found for team", team);
+      }
+    }
+
+    // Start NPC behavior after a short delay
+    // setTimeout(() => {
+    //   npcs.forEach(npc => npc.startFollowingEnemies());
+    // }, 2000);
+
+    return npcs;
+  }
+
+  public startFollowingEnemies() {
+    if (this.updateInterval) return;
+
+    this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+    // Update target every 2 seconds
+    this.updateInterval = setInterval(() => {
+      if (!this.isSpawned || !this.world) return;
+
+      if (
+        this.currentState === NPC_STATE.FOLLOWING_ENEMIES ||
+        this.currentState === NPC_STATE.IDLE
+      ) {
+        console.log("Starting following enemies");
+        this.startModelLoopedAnimations(["walk_upper", "walk_lower"]);
+
+        const enemyTeam =
+          this.team === TEAM_COLORS.BLUE ? TEAM_COLORS.RED : TEAM_COLORS.BLUE;
+        let enemies: Entity[] = globalState.getPlayersOnTeam(enemyTeam);
+
+        if (enemies.length === 0) {
+          console.log("No players found, looking for npcs on the other team");
+          // if no players look for npcs on the other team
+          const otherTeamNPCs = globalState
+            .getAllNPCs()
+            .filter((npc) => npc.team === enemyTeam)
+            .filter((npc) => npc instanceof NPCEntity && npc.getCurrentState() != NPC_STATE.RESPAWNING);
+          if (otherTeamNPCs.length > 0) {
+            console.log("Found npcs on the other team, using them as enemies");
+            enemies = otherTeamNPCs as Entity[];
+          } else {
+            console.log("No npcs found on the other team, returning");
+            return;
+          }
+        }
+
+        // Find the nearest enemy
+        let nearestEnemy = enemies[0];
+        let nearestDistance = this.getDistanceTo(nearestEnemy.position);
+        for (const enemy of enemies) {
+          const distance = this.getDistanceTo(enemy.position);
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestEnemy = enemy;
+          }
+        }
+
+        this.shootAt(nearestEnemy.position);
+        try {
+          this.moveToPosition(nearestEnemy.position);
+        } catch (error) {
+          console.log("Pathfinding error!");
+          this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+        }
+      } else if(this.currentState != NPC_STATE.RESPAWNING) {
+        console.log(this.currentState);
+        this.shootAt(getDirectionFromRotation(this.rotation));
+      }
+    }, 2000);
+
+    // Start shooting interval
+    //this.startShooting();
+  }
+
+  public getCurrentState() {
+    return this.currentState;
+  }
+
+  private shootAt(targetPos: Vector3Like) {
+    if (!this.isSpawned || !this.world || this.currentState == NPC_STATE.RESPAWNING) return;
+
+    // Calculate direction to target
+    const direction = {
+      x: targetPos.x - this.position.x,
+      y: targetPos.y + 1 - (this.position.y + 1), // Adjust for height
+      z: targetPos.z - this.position.z,
     };
 
-    const shootTarget = {
-      x: this.position.x + targetOffset.x,
-      y: this.position.y + targetOffset.y,
-      z: this.position.z + targetOffset.z
-    };
+    // Normalize direction
+    const length = Math.sqrt(
+      direction.x * direction.x +
+        direction.y * direction.y +
+        direction.z * direction.z
+    );
+    direction.x /= length;
+    direction.y /= length;
+    direction.z /= length;
 
-    // Face the shooting target
-    const direction = new Vector3(
-      targetOffset.x,
-      targetOffset.y,
-      targetOffset.z
-    ).normalize();
+    // Add some randomness to make it less accurate
+    direction.x += (Math.random() - 0.5) * 0.2;
+    direction.y += (Math.random() - 0.5) * 0.1;
+    direction.z += (Math.random() - 0.5) * 0.2;
 
-    // Update rotation to face target
-    const angle = Math.atan2(direction.x, direction.z);
-    this.setRotation({ x: 0, y: Math.sin(angle/2), z: 0, w: Math.cos(angle/2) });
-
+    // Calculate bullet origin (slightly in front of NPC)
     const bulletOrigin = {
-      x: this.position.x,
-      y: this.position.y + 1.4,
-      z: this.position.z
+      x: this.position.x + direction.x,
+      y: this.position.y + 1.2, // Adjust to match player height
+      z: this.position.z + direction.z,
     };
 
-    const projectile = spawnProjectile(
+    // Play shooting animation
+    this.startModelOneshotAnimations(["chuck"]);
+
+    // Spawn projectile
+    spawnProjectile(
       this.world,
       bulletOrigin,
       direction,
-      this.name,
-      { 
-        getPlayerTeam: () => this.team, 
-        getPlayerColor: () => this.team === TEAM_COLORS.BLUE ? TEAM_COLORS.BLUE : TEAM_COLORS.RED 
-      } as any,
+      `Bot_${this.team}`,
+      TEAM_COLOR_STRINGS[this.team],
       "SLINGSHOT"
     );
 
-    this.stamina -= PROJECTILES.SLINGSHOT.ENERGY;
-    setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
+    // Play shoot sound
+    new Audio({
+      uri: "audio/sfx/player/bow-shoot.mp3",
+      volume: 0.5,
+      playbackRate: 1.2,
+      position: this.position,
+      referenceDistance: 10,
+    }).play(this.world);
   }
 
-  public getTeam(): number {
+  private stopShooting() {
+    if (this.shootInterval) {
+      clearInterval(this.shootInterval);
+      this.shootInterval = null;
+    }
+  }
+
+  public setLastHitBy(lastHitBy: string) {
+    this.lastHitBy = lastHitBy;
+  }
+
+  public getLastHitBy() {
+    return this.lastHitBy;
+  }
+
+  public stopFollowingEnemies() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+    this.stopShooting();
+  }
+
+  private getDistanceTo(targetPos: Vector3Like): number {
+    const dx = targetPos.x - this.position.x;
+    const dy = targetPos.y - this.position.y;
+    const dz = targetPos.z - this.position.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  public moveToPosition(targetPos: Vector3Like) {
+    if (!this.isSpawned || !this.world) return;
+
+    this.currentTarget = targetPos;
+    // 17, 6, 20
+      const succeeded = this.pathfindController.pathfind(targetPos, speed, {
+        debug: false,
+        maxFall: 20,
+      maxJump: 5,
+      maxOpenSetIterations: 400,
+      verticalPenalty: 1,
+      waypointTimeoutMs: 2000,
+      pathfindCompleteCallback: () => {
+        console.log("Pathfinding complete");
+        this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+      },
+    });
+
+    console.log(`Pathfinding to target: ${succeeded}`);
+
+    if (!succeeded) {
+      // try // 17, 6, 20
+
+      const searchPointSucceeded = this.pathfindController.pathfind(
+        this.searchPoints[this.currentSearchPointIndex],
+        speed,
+        {
+          debug: false,
+          maxFall: 20,
+          maxJump: 5,
+          maxOpenSetIterations: 400,
+          verticalPenalty: 1,
+          pathfindCompleteCallback: () => {
+            // now try again to find player
+            this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+          },
+          pathfindAbortCallback: () => {
+            console.log("Failed to pathfind to search point, trying again");
+            this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+          },
+        }
+      );
+      this.currentSearchPointIndex =
+        (this.currentSearchPointIndex + 1) % this.searchPoints.length;
+      if (searchPointSucceeded) {
+        this.currentState = NPC_STATE.LOOKING_FOR_ENEMIES;
+      } else {
+        this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+      } 
+    } else {
+      this.currentState = NPC_STATE.FOLLOWING_ENEMIES;
+    }
+
+    // console.log(`Path found successfully?: ${succeeded}`);
+  }
+
+  public getDisplayName() {
+    return this.name;
+  }
+
+  public getTeam() {
     return this.team;
-  }
-
-  public resetData(): void {
-    this.stamina = 100;
-    this.points = 0;
-  }
-
-  public incrementPoints(amount: number): void {
-    this.points += amount;
-  }
-
-  public setPosition(position: Vector3Like): void {
-    super.setPosition(position);
-    // Reset velocity when repositioning
-    this.setLinearVelocity({ x: 0, y: 0, z: 0 });
   }
 }
 
-export default NPCEntity; 
+export default NPCEntity;
