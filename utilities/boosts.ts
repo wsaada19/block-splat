@@ -71,7 +71,7 @@ export function createEnergyBoost(
     colliderHandleA,
     colliderHandleB
   ) => {
-    if (started && otherEntity instanceof PlayerEntity) {
+    if (started && entity.isSpawned && otherEntity instanceof PlayerEntity) {
       const playerId = otherEntity.player.id;
       playerDataManager.updateStamina(playerId, ENERGY_BOOST_STAMINA_REGEN);
       new Audio({
@@ -88,7 +88,7 @@ export function createEnergyBoost(
       );
       boostsSpawned.delete(locationString(entity.position));
       entity.despawn();
-    } else {
+    } else if (started && !(otherEntity instanceof PlayerEntity)) {
       otherEntity.despawn(); // despawn projectile if it hits the boost
     }
   };
@@ -110,7 +110,7 @@ function createStrengthBoost (world: World, playerDataManager: PlayerDataManager
     }
   });
   strengthBoost.onEntityCollision = (entity, otherEntity, started, colliderHandleA, colliderHandleB) => {
-    if (started && otherEntity instanceof PlayerEntity) {
+    if (started && entity.isSpawned && otherEntity instanceof PlayerEntity) {
       const playerId = otherEntity.player.id;
       new Audio({
         uri: "audio/sfx/fire/fire-ignite-2.mp3",
@@ -151,7 +151,7 @@ function createInvincibilityBoost (world: World, playerDataManager: PlayerDataMa
     }
   });
   invincibilityBoost.onEntityCollision = (entity, otherEntity, started, colliderHandleA, colliderHandleB) => {
-    if (started && otherEntity instanceof PlayerEntity) {
+    if (started && entity.isSpawned && otherEntity instanceof PlayerEntity) {
       const playerId = otherEntity.player.id;
       playerDataManager.setPlayerInvincible(playerId, true);
       world.chatManager.sendPlayerMessage(
