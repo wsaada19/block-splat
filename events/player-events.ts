@@ -125,6 +125,7 @@ export function onPlayerJoin(
     "Press Q or right mouse to tackle.",
     "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.",
     "Press R to view the leaderboard.",
+    "Force game to start early with the /start command."
   ];
 
   messages.forEach((message) => {
