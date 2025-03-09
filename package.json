@@ -9,7 +9,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@hytopia.com/assets": "^0.2.5",
-    "hytopia": "^0.2.11"
+    "@hytopia.com/assets": "^0.2.6",
+    "hytopia": "^0.3.6"
   }
 }

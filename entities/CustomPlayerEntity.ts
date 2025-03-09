@@ -1,4 +1,4 @@
-import { Entity, Player, PlayerEntity } from "hytopia";
+import { Entity, EntityEvent, Player, PlayerEntity } from "hytopia";
 import { TEAM_COLORS } from "../gameState/team";
 import {
   MAX_STAMINA,
@@ -63,11 +63,7 @@ class CustomPlayerEntity extends PlayerEntity {
     }));
     this.player.camera.setOffset({x: 0, y: 0.8, z: 0});
 
-    this.onEntityCollision = (
-      entity: Entity,
-      otherEntity: Entity,
-      started: boolean
-    ) => {
+    this.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
       if (
         (otherEntity instanceof CustomPlayerEntity || otherEntity instanceof NPCEntity) &&
         entity instanceof CustomPlayerEntity && 
@@ -90,7 +86,7 @@ class CustomPlayerEntity extends PlayerEntity {
         });
         otherEntity.setLastHitBy(entity.player.username);
       }
-    };
+    });
   }
 
   public getKills(): number {

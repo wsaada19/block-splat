@@ -5,13 +5,13 @@ import {
   PlayerEntity,
   Entity,
   PlayerUI,
-  SceneUI,
   ChatManager,
+  EntityEvent,
+  PlayerUIEvent,
 } from "hytopia";
 import type Game from "../gameState/game";
 import { PlayerClass } from "../entities/player-types";
 import type TeamManager from "../gameState/team";
-import type GameMap from "../gameState/map";
 import { TEAM_COLORS } from "../gameState/team";
 import { getFallingMessage, getKillingMessage } from "../utilities/language";
 import {
@@ -29,8 +29,7 @@ export function onPlayerJoin(
   player: Player,
   world: World,
   teamManager: TeamManager,
-  game: Game,
-  map: GameMap
+  game: Game
 ) {
   teamManager.addPlayerToMinTeam(player.username);
 
@@ -54,9 +53,9 @@ export function onPlayerJoin(
     playerEntity.spawn(world, randomLobbySpawn);
     game.checkPlayerCount();
   }
-  
+
   let paintModelUri = "models/items/paint-brush.gltf";
-  if(teamManager.getPlayerTeam(player.username) === TEAM_COLORS.RED) {
+  if (teamManager.getPlayerTeam(player.username) === TEAM_COLORS.RED) {
     paintModelUri = "models/items/paint-brush-red.gltf";
   }
 
@@ -67,12 +66,12 @@ export function onPlayerJoin(
     parent: playerEntity,
     parentNodeName: "hand_right_weapon_anchor",
   });
-  paintBrush.spawn(world, { x: 0, y: .15, z: .15 });
+  paintBrush.spawn(world, { x: 0, y: 0.15, z: 0.15 });
   paintBrush.setRotation({ x: 0, y: 0, z: 45, w: 1 });
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
-  playerEntity.onTick = (entity: Entity) => {
+  playerEntity.on(EntityEvent.TICK, ({ entity }) => {
     if (entity instanceof PlayerEntity && entity.position.y < -8) {
       handlePlayerDeath(
         entity as CustomPlayerEntity,
@@ -81,26 +80,20 @@ export function onPlayerJoin(
         game
       );
     }
-  };
-
-  player.ui.load("ui/hud.html");
-  const usernameSceneUI = new SceneUI({
-    templateId: "name-indicator",
-    attachedToEntity: playerEntity,
-    state: { message: player.username, playerId: player.username },
-    offset: { x: 0, y: 1.1, z: 0 },
   });
 
-  player.ui.onData = (
-    playerUI: PlayerUI,
-    data: {
-      button?: string;
-      class?: string;
-      type?: string;
-      name?: string;
-      team?: string;
+  player.ui.load("ui/hud.html");
+
+  player.ui.on(PlayerUIEvent.DATA, ({ playerUI, data }) => {
+    if (data.button === "select-team" && data.team) {
+      teamManager.addPlayerToTeam(
+        playerUI.player.username,
+        TEAM_COLORS[data.team as keyof typeof TEAM_COLORS]
+      );
     }
-  ) => {
+  });
+
+  player.ui.on(PlayerUIEvent.DATA, ({ playerUI, data }) => {
     if (data.button === "select-team" && data.team) {
       playerUI.player.camera.setAttachedToEntity(playerEntity);
 
@@ -115,21 +108,13 @@ export function onPlayerJoin(
     if (data.button && data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
       playerEntity.setPlayerClass(data.class as PlayerClass);
     }
-  };
+  });
 
   // we store the player id in the local storage so we can use it to hide the player's own name bar
   player.ui.sendData({
     type: UI_EVENT_TYPES.PLAYER_ID,
     playerId: player.username,
   });
-
-  usernameSceneUI.setState({
-    playerName: playerEntity.getDisplayName(),
-    color: teamManager.getPlayerColor(player.username),
-    playerId: player.username,
-  });
-
-  usernameSceneUI.load(world);
 
   const messages = [
     "Welcome! Use WASD to move around.",
@@ -183,11 +168,17 @@ export function handlePlayerDeath(
       );
       killer.incrementKills();
     } else {
-      chatManager.sendBroadcastMessage("You were killed by a bot lmfao", "FF0000");
+      chatManager.sendBroadcastMessage(
+        "You were killed by a bot lmfao",
+        "FF0000"
+      );
     }
     entity.setLastHitBy("");
   } else {
-    chatManager.sendBroadcastMessage(getFallingMessage(entity.getDisplayName()), "FF0000");
+    chatManager.sendBroadcastMessage(
+      getFallingMessage(entity.getDisplayName()),
+      "FF0000"
+    );
   }
 
   // Make player spectator during respawn

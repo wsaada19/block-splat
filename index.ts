@@ -1,4 +1,4 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World } from "hytopia";
+import { startServer, Audio, Entity, BlockType, SceneUI, World, PlayerEvent, EntityEvent, BlockTypeEvent } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
@@ -44,13 +44,15 @@ startServer((world) => {
     blockStateMap
   );
 
-  const map = new GameMap(world);
+  // const map = new GameMap(world);
 
-  world.onPlayerJoin = (player) =>
-    onPlayerJoin(player, world, teamManager, game, map);
+  world.on(PlayerEvent.JOINED_WORLD, ({ player }) =>
+    onPlayerJoin(player, world, teamManager, game)
+  );
 
-  world.onPlayerLeave = (player) =>
-    onPlayerLeave(player, world, teamManager);
+  world.on(PlayerEvent.LEFT_WORLD, ({ player }) =>
+    onPlayerLeave(player, world, teamManager)
+  );
 
   coloredBlockData.forEach((blockData) => {
     const block = world.blockTypeRegistry.registerGenericBlockType({
@@ -59,15 +61,9 @@ startServer((world) => {
       name: blockData.name,
     });
 
-    block.onEntityCollision = (
-      type: BlockType,
-      entity: Entity,
-      started: boolean,
-      colliderHandleA: number,
-      colliderHandleB: number
-    ) =>
+    block.on(BlockTypeEvent.ENTITY_COLLISION, ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
       onBlockHit(
-        type,
+        blockType,
         entity,
         started,
         colliderHandleA,
@@ -75,7 +71,8 @@ startServer((world) => {
         world,
         game,
         blockStateMap
-      );
+      )
+    });
   });
 
   world.loadMap(worldMap);

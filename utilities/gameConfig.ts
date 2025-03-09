@@ -45,8 +45,8 @@ export const BOOST_PROBABILITIES = [
 ];
 
 // energy costs
-export const SPRINT_ENERGY_COST = 1;
-export const TACKLE_ENERGY_COST = 25;
+export const SPRINT_ENERGY_COST = 0.85;
+export const TACKLE_ENERGY_COST = 30;
 
 export const STAMINA_REGEN_RATE = 10;
 

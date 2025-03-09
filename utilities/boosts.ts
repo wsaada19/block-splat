@@ -1,5 +1,5 @@
 // Spawns stamina and strength boosts randomly across the map at a defined interval
-import { Entity, RigidBodyType, World, Audio, type Vector3Like } from "hytopia";
+import { Entity, RigidBodyType, World, Audio, type Vector3Like, EntityEvent } from "hytopia";
 import {
   STRENGTH_BOOST_DURATION,
   ENERGY_BOOST_STAMINA_REGEN,
@@ -18,7 +18,7 @@ const boostOptions = {
     modelScale: 0.7,
     animation: "",
     sfx: "audio/sfx/player/eat.mp3",
-    chatMessage: `Increased your paint bottle by ${ENERGY_BOOST_STAMINA_REGEN} milliliters!`,
+    chatMessage: `Your paint has been replenished!`,
     addBoost: (player: CustomPlayerEntity) => {
       player.setStamina(ENERGY_BOOST_STAMINA_REGEN);
     },
@@ -94,8 +94,6 @@ export function spawnRandomBoost(
   boostsSpawned.set(locationString(randomLocation), true);
   if (randomBoost) {
     randomBoost.spawn(world, randomLocation);
-  } else {
-    console.log("No boost spawned");
   }
 }
 
@@ -113,13 +111,7 @@ export function createBoost(
     },
   });
 
-  boost.onEntityCollision = (
-    entity,
-    otherEntity,
-    started,
-    colliderHandleA,
-    colliderHandleB
-  ) => {
+  boost.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started, colliderHandleA, colliderHandleB }) => {
     if (
       started &&
       otherEntity instanceof CustomPlayerEntity &&
@@ -147,7 +139,7 @@ export function createBoost(
       // NPCs dont get boost effects yet
       entity.despawn();
     }
-  };
+  });
   return boost;
 }
 

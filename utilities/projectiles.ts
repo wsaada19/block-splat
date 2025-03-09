@@ -7,14 +7,17 @@ import {
   RigidBodyType,
   BlockType,
   Audio,
+  EntityEvent,
 } from "hytopia";
 import { knockBackCollisionHandler } from "../events/knockback-events";
 import { blockIds } from "./block-utils";
-import TeamManager, {
-  TEAM_COLOR_STRINGS,
-  TEAM_COLORS,
-} from "../gameState/team";
-import { PROJECTILES, SLINGSHOT_OFFSET, SLINGSHOT_SPEED_OFFSET, type ProjectileType } from "./gameConfig";
+import { TEAM_COLOR_STRINGS, TEAM_COLORS } from "../gameState/team";
+import {
+  PROJECTILES,
+  SLINGSHOT_OFFSET,
+  SLINGSHOT_SPEED_OFFSET,
+  type ProjectileType,
+} from "./gameConfig";
 
 export function spawnProjectile(
   world: World,
@@ -25,12 +28,7 @@ export function spawnProjectile(
   type: ProjectileType
 ) {
   // Spawn a projectileEntity when the player shoots.
-  const projectileEntity = createProjectileEntity(
-    direction,
-    tag,
-    color,
-    type
-  );
+  const projectileEntity = createProjectileEntity(direction, tag, color, type);
 
   let projectiles = [projectileEntity];
   if (type === PROJECTILES.SLINGSHOT.NAME) {
@@ -55,32 +53,24 @@ export function spawnProjectile(
   }
 
   projectiles.forEach((projectile) => {
-    projectile.onEntityCollision = (
-      projectileEntity: Entity,
-      otherEntity: Entity,
-      started: boolean
-    ) => {
+    projectile.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
       knockBackCollisionHandler(
-        projectileEntity,
+        entity,
         otherEntity,
         started,
         tag,
         color
       );
-    };
+    });
   });
 
   projectiles.forEach((projectile) => {
-    projectile.onBlockCollision = (
-      projectileEntity: Entity,
-      block: BlockType,
-      started: boolean
-    ) => {
+    projectile.on(EntityEvent.BLOCK_COLLISION, ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
       // If the projectileEntity hits a block, despawn it
-      if (started && !blockIds.includes(block.id)) {
-        projectileEntity.despawn();
+      if (started && !blockIds.includes(blockType.id)) {
+        entity.despawn();
       }
-    };
+    });
   });
 
   projectiles.forEach((projectile) => {

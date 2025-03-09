@@ -994,12 +994,6 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
   </div>
 </div>
 
-<template id="my-game-message-template">
-  <div class="my-game-message">
-    <p class="message"></p>
-  </div>
-</template>
-
 <template id="game-instructions-template">
   <div class="instructions">
     <div class="instructions-panel">
@@ -1122,6 +1116,14 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
         document.getElementById('red-banner').classList.add('your-team')
       } else if (data.playerTeam === 'Blue Bandits') {
         document.getElementById('blue-banner').classList.add('your-team')
+      }
+
+      // Set team color for nametags
+      if (data.playerTeam !== undefined) {
+        const nametags = document.getElementsByClassName('hytopia-nametag-username')
+        Array.from(nametags).forEach(nametag => {
+          nametag.setAttribute('data-team', data.playerTeam)
+        })
       }
     }
 
@@ -1251,33 +1253,6 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
   document
     .getElementById('grenader-class')
     .addEventListener('click', () => selectClass('grenader'))
-
-  hytopia.registerSceneUITemplate('name-indicator', (id, onState) => {
-    const template = document.getElementById('my-game-message-template');
-    const clone = template.content.cloneNode(true);
-    
-    const messageElement = clone.querySelector('.message');
-    const backgroundElement = clone.querySelector('.my-game-message');
-
-    onState(state => {
-      const playerId = localStorage.getItem('playerId')
-
-      // hide player's own name bar
-      if (playerId === state.playerId) {
-        backgroundElement.style.display = 'none'
-        messageElement.style.display = 'none'
-      } else {
-        backgroundElement.style.display = 'block'
-        messageElement.style.display = 'block'
-      }
-
-      messageElement.textContent = state.playerName;
-      backgroundElement.style.backgroundColor = state.color;
-      backgroundElement.style.borderColor = state.color;
-    });
-    
-    return clone;
-  });
 
   hytopia.registerSceneUITemplate('game-instructions', (id, onState) => {
     const template = document.getElementById('game-instructions-template');
