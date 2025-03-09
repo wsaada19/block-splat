@@ -1,6 +1,5 @@
 // Manages active teams, their metadata and active players
 import type { Vector3Like, World } from "hytopia";
-import type { PlayerDataManager, PlayerStats } from "./player-data";
 import { LOBBY_SPAWN } from "../events/player-events";
 
 interface Team {
@@ -26,7 +25,6 @@ export const TEAM_COLOR_STRINGS: { [key: number]: string } = {
 
 export default class TeamManager {
   private teams: Map<number, Team>;
-  private playerDataManager: PlayerDataManager;
   
   // Will add support for multiple teams later
   // private maxTeams: number;
@@ -36,9 +34,8 @@ export default class TeamManager {
     return teamId ? TEAM_COLOR_STRINGS[teamId] ?? 'WHITE' : 'WHITE';
   }
 
-  constructor(teamNames: string[] = ["Blue Bandits", "Red Raiders"], spawns: Vector3Like[], playerDataManager: PlayerDataManager) {
+  constructor(teamNames: string[] = ["Blue Bandits", "Red Raiders"], spawns: Vector3Like[]) {
     this.teams = new Map();
-    this.playerDataManager = playerDataManager;
     for (let i = 1; i <= teamNames.length; i++) {
       this.teams.set(i, {
         id: i,
@@ -52,7 +49,7 @@ export default class TeamManager {
   spawnPlayers(world: World) {
     const players = world.entityManager.getAllPlayerEntities();
     for(const player of players) {
-      const team = this.getPlayerTeam(player.player.id);
+      const team = this.getPlayerTeam(player.player.username);
       const spawn = team ? this.getTeamSpawn(team) : undefined;
       if (spawn) {
         const randomPosition = {
@@ -68,21 +65,9 @@ export default class TeamManager {
   sendAllPlayersToLobby(world: World) {
     const players = world.entityManager.getAllPlayerEntities();
     for(const player of players) {
-      player.setPosition(LOBBY_SPAWN);
+      const randomLobbyPosition = { x: LOBBY_SPAWN.x + (Math.random() * 3 - 1.5), y: LOBBY_SPAWN.y, z: LOBBY_SPAWN.z + (Math.random() * 3 - 1.5) };
+      player.setPosition(randomLobbyPosition);
     }
-  }
-
-  getTeamPlayerData(teamId: number): PlayerStats[] {
-    const playerIds = Array.from(this.playerDataManager.getPlayerData().keys()).filter(player => {
-      const team = this.getPlayerTeam(player);
-      return team === teamId;
-    }).map(player => this.playerDataManager.getPlayer(player));
-
-    if(playerIds) {
-      return playerIds;
-    }
-
-    return [];
   }
 
   addPlayerToTeam(playerId: string, teamId: number) {

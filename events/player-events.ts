@@ -4,25 +4,24 @@ import {
   World,
   PlayerEntity,
   Entity,
-  PlayerEntityController,
   PlayerUI,
-  SceneUI,
   ChatManager,
+  EntityEvent,
+  PlayerUIEvent,
 } from "hytopia";
-import { onTickWithPlayerInput } from "./player-input";
 import type Game from "../gameState/game";
-import { type PlayerDataManager, PlayerClass } from "../gameState/player-data";
+import { PlayerClass } from "../entities/player-types";
 import type TeamManager from "../gameState/team";
-import type GameMap from "../gameState/map";
 import { TEAM_COLORS } from "../gameState/team";
 import { getFallingMessage, getKillingMessage } from "../utilities/language";
 import {
   RESPAWN_TIME,
-  RESPAWN_INVINCIBILITY_TIME,
   RESPAWN_HEIGHT,
   UI_BUTTONS,
   UI_EVENT_TYPES,
 } from "../utilities/gameConfig";
+import CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import { globalState } from "../gameState/global-state";
 
 export const LOBBY_SPAWN = { x: 0, y: 65, z: 0 };
 
@@ -30,29 +29,21 @@ export function onPlayerJoin(
   player: Player,
   world: World,
   teamManager: TeamManager,
-  game: Game,
-  playerDataManager: PlayerDataManager,
-  map: GameMap
+  game: Game
 ) {
-  teamManager.addPlayerToMinTeam(player.id);
+  teamManager.addPlayerToMinTeam(player.username);
 
-  const team = teamManager.getPlayerTeam(player.id);
-  const playerEntity = new PlayerEntity({
-    player,
-    name: "Player",
-    modelUri:
-      team === TEAM_COLORS.BLUE
-        ? "models/players/player-blue.gltf"
-        : "models/players/player-red.gltf",
-    modelLoopedAnimations: ["idle"],
-    modelScale: 0.5,
-  });
+  const team = teamManager.getPlayerTeam(player.username);
+  const playerEntity = new CustomPlayerEntity(player, team || 0, teamManager);
+  playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
 
   if (game.isGameRunning) {
     playerEntity.spawn(
       world,
       teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN
     );
+    playerEntity.setPlayerClass(PlayerClass.SLINGSHOT);
+    playerEntity.setStamina(playerEntity.getMaxStamina());
   } else {
     const randomLobbySpawn = {
       x: LOBBY_SPAWN.x + (Math.random() * 3 - 1),
@@ -60,112 +51,70 @@ export function onPlayerJoin(
       z: LOBBY_SPAWN.z + (Math.random() * 3 - 1),
     };
     playerEntity.spawn(world, randomLobbySpawn);
+    game.checkPlayerCount();
   }
-  playerDataManager.setPlayerClass(player.id, PlayerClass.SLINGSHOT);
-  playerDataManager.setPlayerName(player.id, player.username);
+
+  let paintModelUri = "models/items/paint-brush.gltf";
+  if (teamManager.getPlayerTeam(player.username) === TEAM_COLORS.RED) {
+    paintModelUri = "models/items/paint-brush-red.gltf";
+  }
+
+  const paintBrush = new Entity({
+    name: "Paint Brush",
+    modelUri: paintModelUri,
+    modelScale: 1.5,
+    parent: playerEntity,
+    parentNodeName: "hand_right_weapon_anchor",
+  });
+  paintBrush.spawn(world, { x: 0, y: 0.15, z: 0.15 });
+  paintBrush.setRotation({ x: 0, y: 0, z: 45, w: 1 });
   player.camera.setFov(80);
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
-  playerEntity.onTick = (entity: Entity) => {
+  playerEntity.on(EntityEvent.TICK, ({ entity }) => {
     if (entity instanceof PlayerEntity && entity.position.y < -8) {
       handlePlayerDeath(
-        entity as PlayerEntity,
+        entity as CustomPlayerEntity,
         teamManager,
-        playerDataManager,
         world.chatManager,
         game
       );
     }
-  };
-
-  playerEntity.controller!.onTickWithPlayerInput = function (
-    entity,
-    input,
-    cameraOrientation,
-    deltaTimeMs
-  ) {
-    if (playerEntity?.controller instanceof PlayerEntityController) {
-      onTickWithPlayerInput.call(
-        playerEntity.controller,
-        entity,
-        input,
-        cameraOrientation,
-        deltaTimeMs,
-        teamManager,
-        playerDataManager,
-        world
-      );
-    }
-  };
-
-  player.ui.load("ui/hud.html");
-  const usernameSceneUI = new SceneUI({
-    templateId: "name-indicator",
-    attachedToEntity: playerEntity,
-    state: { message: player.username, playerId: player.id },
-    offset: { x: 0, y: 1.1, z: 0 },
   });
 
-  player.ui.onData = (
-    playerUI: PlayerUI,
-    data: {
-      button?: string;
-      class?: string;
-      type?: string;
-      name?: string;
-      team?: string;
-    }
-  ) => {
-    if (data.type === "set-name" && data.name) {
-      playerDataManager.setPlayerName(playerUI.player.id, data.name);
-      usernameSceneUI.setState({
-        playerName: data.name,
-        color: teamManager.getPlayerColor(playerUI.player.id),
-        playerId: playerUI.player.id,
-      });
-    }
+  player.ui.load("ui/hud.html");
 
+  player.ui.on(PlayerUIEvent.DATA, ({ playerUI, data }) => {
+    if (data.button === "select-team" && data.team) {
+      teamManager.addPlayerToTeam(
+        playerUI.player.username,
+        TEAM_COLORS[data.team as keyof typeof TEAM_COLORS]
+      );
+    }
+  });
+
+  player.ui.on(PlayerUIEvent.DATA, ({ playerUI, data }) => {
     if (data.button === "select-team" && data.team) {
       playerUI.player.camera.setAttachedToEntity(playerEntity);
 
       if (data.team === "Red") {
-        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.RED);
+        teamManager.addPlayerToTeam(playerUI.player.username, TEAM_COLORS.RED);
       } else if (data.team === "Blue") {
-        teamManager.addPlayerToTeam(playerUI.player.id, TEAM_COLORS.BLUE);
+        teamManager.addPlayerToTeam(playerUI.player.username, TEAM_COLORS.BLUE);
         playerUI.player.camera.setAttachedToEntity(playerEntity);
       }
     }
 
-    if (!data.button) return;
-
-    if (data.button === UI_BUTTONS.SWITCH_TEAM) {
-      teamManager.switchTeam(playerUI.player.id);
-    } else if (data.button === UI_BUTTONS.RESTART_GAME) {
-      game.restartGame();
-    } else if (data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
-      playerDataManager.setPlayerClass(
-        playerUI.player.id,
-        data.class as PlayerClass
-      );
-    } else if (data.button === UI_BUTTONS.SWITCH_MAP) {
-      map.switchMap();
+    if (data.button && data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
+      playerEntity.setPlayerClass(data.class as PlayerClass);
     }
-  };
+  });
 
   // we store the player id in the local storage so we can use it to hide the player's own name bar
   player.ui.sendData({
     type: UI_EVENT_TYPES.PLAYER_ID,
-    playerId: player.id,
+    playerId: player.username,
   });
-
-  const playerName = playerDataManager.getPlayerName(player.id);
-  usernameSceneUI.setState({
-    playerName,
-    color: teamManager.getPlayerColor(player.id),
-    playerId: player.id,
-  });
-
-  usernameSceneUI.load(world);
 
   const messages = [
     "Welcome! Use WASD to move around.",
@@ -173,34 +122,32 @@ export function onPlayerJoin(
     "If you get stuck, use /stuck to respawn",
     "Hold shift to sprint.",
     "Press left mouse button to shoot.",
-    "Press Q or left mouse to punch.",
+    "Press Q or right mouse to tackle.",
     "Press E to open the class menu. Use 1, 2, 3, or 4 to change class quickly.",
     "Press R to view the leaderboard.",
-    "Type /set-name to set your name.",
   ];
 
   messages.forEach((message) => {
     world.chatManager.sendPlayerMessage(player, message);
   });
+
+  game.checkPlayerCount();
 }
 
 export function onPlayerLeave(
   player: Player,
   world: World,
-  teamManager: TeamManager,
-  playerDataManager: PlayerDataManager
+  teamManager: TeamManager
 ) {
-  teamManager.removePlayer(player.id);
-  playerDataManager.removePlayer(player.id);
+  teamManager.removePlayer(player.username);
   world.entityManager
     .getPlayerEntitiesByPlayer(player)
     .forEach((entity) => entity.despawn());
 }
 
 export function handlePlayerDeath(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   teamManager: TeamManager,
-  playerDataManager: PlayerDataManager,
   chatManager: ChatManager,
   game: Game
 ) {
@@ -210,23 +157,28 @@ export function handlePlayerDeath(
     message: "You fell off the map!",
     time: RESPAWN_TIME / 1000,
   });
-  const killed = playerDataManager.getPlayer(entity.player.id);
-  if (killed) {
-    killed.playerDeaths++;
-    if (killed.lastHitBy) {
-      const killer = playerDataManager.getPlayer(killed.lastHitBy);
+
+  entity.incrementPlayerDeaths();
+  if (entity.getLastHitBy()) {
+    const killer = globalState.getPlayerEntity(entity.getLastHitBy());
+    if (killer) {
       chatManager.sendBroadcastMessage(
-        getKillingMessage(killer.name, killed.name),
+        getKillingMessage(killer.getDisplayName(), entity.getDisplayName()),
         "FF0000"
       );
-      killer.kills++;
-      killed.lastHitBy = "";
+      killer.incrementKills();
     } else {
       chatManager.sendBroadcastMessage(
-        getFallingMessage(killed.name),
+        "You were killed by a bot lmfao",
         "FF0000"
       );
     }
+    entity.setLastHitBy("");
+  } else {
+    chatManager.sendBroadcastMessage(
+      getFallingMessage(entity.getDisplayName()),
+      "FF0000"
+    );
   }
 
   // Make player spectator during respawn
@@ -235,38 +187,29 @@ export function handlePlayerDeath(
     entity.rawRigidBody.setEnabled(false);
   }
   entity.setLinearVelocity({ x: 0, y: 0, z: 0 });
-
+  entity.setIsRespawning(true);
   setTimeout(() => {
-    respawnPlayer(entity as PlayerEntity, teamManager, playerDataManager, game);
+    respawnPlayer(entity, teamManager, game);
   }, RESPAWN_TIME);
 }
 
 export function respawnPlayer(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   teamManager: TeamManager,
-  playerDataManager: PlayerDataManager,
   game: Game
 ) {
   // Get team spawn point
   if (!entity.isSpawned) return;
 
-  const team = teamManager.getPlayerTeam(entity.player.id);
+  const team = entity.getTeam();
   const spawn = teamManager.getTeamSpawn(team ?? 0) ?? LOBBY_SPAWN;
   entity.rawRigidBody?.setEnabled(true);
-
-  // currently a bug with opacity dont use it now
-  // entity.setOpacity(0.3)
-  // setTimeout(() => {
-  //   entity.setOpacity(1)
-  // }, 3000)
 
   if (game.isGameRunning) {
     entity.setPosition(spawn);
   } else {
     entity.setPosition(LOBBY_SPAWN);
   }
-  playerDataManager.setPlayerInvincible(entity.player.id, true);
-  setTimeout(() => {
-    playerDataManager.setPlayerInvincible(entity.player.id, false);
-  }, RESPAWN_INVINCIBILITY_TIME);
+  entity.setInvincible();
+  entity.setIsRespawning(false);
 }

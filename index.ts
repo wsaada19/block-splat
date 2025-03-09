@@ -1,14 +1,14 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World, RigidBodyType, EntityManager } from "hytopia";
+import { startServer, Audio, Entity, BlockType, SceneUI, World, PlayerEvent, EntityEvent, BlockTypeEvent } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
 import worldMap from "./assets/maps/boilerplate.json";
-import { PlayerDataManager } from "./gameState/player-data";
 import Teams from "./gameState/team";
-import { onPlayerJoin, onPlayerLeave, respawnPlayer } from "./events/player-events";
+import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
 import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
+import { globalState } from "./gameState/global-state";
 
 export const TO_THE_DEATH_MUSIC = new Audio({
   uri: "audio/music/to-the-death.mp3",
@@ -26,31 +26,33 @@ const GLASS_BLOCK_ID = 21;
 const blockStateMap = new Map<string, BLOCK_STATE>();
 
 startServer((world) => {
-  const playerData = new PlayerDataManager();
+  // Initialize global state with world instance
+  globalState.setWorld(world);
+
 
   const teamManager = new Teams(
     ["Blue Bandits", "Red Raiders"],
     [
       { x: -31.5, y: 25, z: -4 },
       { x: 31.5, y: 20, z: 5 },
-    ],
-    playerData
+    ]
   );
   const game = new Game(
     world,
     teamManager,
-    playerData,
     GAME_TIME,
     blockStateMap
   );
 
-  const map = new GameMap(world);
+  // const map = new GameMap(world);
 
-  world.onPlayerJoin = (player) =>
-    onPlayerJoin(player, world, teamManager, game, playerData, map);
+  world.on(PlayerEvent.JOINED_WORLD, ({ player }) =>
+    onPlayerJoin(player, world, teamManager, game)
+  );
 
-  world.onPlayerLeave = (player) =>
-    onPlayerLeave(player, world, teamManager, playerData);
+  world.on(PlayerEvent.LEFT_WORLD, ({ player }) =>
+    onPlayerLeave(player, world, teamManager)
+  );
 
   coloredBlockData.forEach((blockData) => {
     const block = world.blockTypeRegistry.registerGenericBlockType({
@@ -59,25 +61,18 @@ startServer((world) => {
       name: blockData.name,
     });
 
-    block.onEntityCollision = (
-      type: BlockType,
-      entity: Entity,
-      started: boolean,
-      colliderHandleA: number,
-      colliderHandleB: number
-    ) =>
+    block.on(BlockTypeEvent.ENTITY_COLLISION, ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
       onBlockHit(
-        type,
+        blockType,
         entity,
         started,
         colliderHandleA,
         colliderHandleB,
         world,
         game,
-        playerData,
-        teamManager,
         blockStateMap
-      );
+      )
+    });
   });
 
   world.loadMap(worldMap);
@@ -101,20 +96,13 @@ startServer((world) => {
     game.clearMapThenStartGame();
   });
 
-  world.chatManager.registerCommand("/set-name", (player, [name]) => {
-    if(!name && name.length < 1) return;
-    playerData.setPlayerName(player.id, name);
-    world.chatManager.sendPlayerMessage(player, `Name set to ${name}`);
-    player.ui.sendData({ type: "set-name", name });
-  });
-
   world.chatManager.registerCommand("/change-team", (player, args) => {
-    teamManager.switchTeam(player.id);
+    teamManager.switchTeam(player.username);
     world.chatManager.sendPlayerMessage(player, "Team changed!");
   });
 
   world.chatManager.registerCommand("/stuck", (player) => {
-    const playerEntity = world.entityManager.getAllPlayerEntities().find(p => p.player.id === player.id);
+    const playerEntity = world.entityManager.getAllPlayerEntities().find(p => p.player.username === player.username);
 
     if(playerEntity) {
       playerEntity.setPosition({ x: 0, y: -8, z: 0 });

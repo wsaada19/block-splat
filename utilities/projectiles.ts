@@ -7,32 +7,28 @@ import {
   RigidBodyType,
   BlockType,
   Audio,
+  EntityEvent,
 } from "hytopia";
 import { knockBackCollisionHandler } from "../events/knockback-events";
 import { blockIds } from "./block-utils";
-import type { PlayerDataManager } from "../gameState/player-data";
-import TeamManager, {
-  TEAM_COLOR_STRINGS,
-  TEAM_COLORS,
-} from "../gameState/team";
-import { PROJECTILES, SLINGSHOT_OFFSET, SLINGSHOT_SPEED_OFFSET, type ProjectileType } from "./gameConfig";
+import { TEAM_COLOR_STRINGS, TEAM_COLORS } from "../gameState/team";
+import {
+  PROJECTILES,
+  SLINGSHOT_OFFSET,
+  SLINGSHOT_SPEED_OFFSET,
+  type ProjectileType,
+} from "./gameConfig";
 
 export function spawnProjectile(
   world: World,
   coordinate: Vector3Like,
   direction: Vector3Like,
   tag: string,
-  teamManager: TeamManager,
-  type: ProjectileType,
-  playerDataManager: PlayerDataManager
+  color: string,
+  type: ProjectileType
 ) {
   // Spawn a projectileEntity when the player shoots.
-  const projectileEntity = createProjectileEntity(
-    direction,
-    tag,
-    teamManager,
-    type
-  );
+  const projectileEntity = createProjectileEntity(direction, tag, color, type);
 
   let projectiles = [projectileEntity];
   if (type === PROJECTILES.SLINGSHOT.NAME) {
@@ -42,14 +38,14 @@ export function spawnProjectile(
     const leftOrb = createProjectileEntity(
       leftDirection,
       tag,
-      teamManager,
+      color,
       PROJECTILES.SLINGSHOT.NAME as ProjectileType,
       SLINGSHOT_SPEED_OFFSET
     );
     const rightOrb = createProjectileEntity(
       rightDirection,
       tag,
-      teamManager,
+      color,
       PROJECTILES.SLINGSHOT.NAME as ProjectileType,
       SLINGSHOT_SPEED_OFFSET
     );
@@ -57,33 +53,24 @@ export function spawnProjectile(
   }
 
   projectiles.forEach((projectile) => {
-    projectile.onEntityCollision = (
-      projectileEntity: Entity,
-      otherEntity: Entity,
-      started: boolean
-    ) => {
+    projectile.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
       knockBackCollisionHandler(
-        projectileEntity,
+        entity,
         otherEntity,
         started,
         tag,
-        playerDataManager,
-        teamManager
+        color
       );
-    };
+    });
   });
 
   projectiles.forEach((projectile) => {
-    projectile.onBlockCollision = (
-      projectileEntity: Entity,
-      block: BlockType,
-      started: boolean
-    ) => {
+    projectile.on(EntityEvent.BLOCK_COLLISION, ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
       // If the projectileEntity hits a block, despawn it
-      if (started && !blockIds.includes(block.id)) {
-        projectileEntity.despawn();
+      if (started && !blockIds.includes(blockType.id)) {
+        entity.despawn();
       }
-    };
+    });
   });
 
   projectiles.forEach((projectile) => {
@@ -131,12 +118,11 @@ function getRotationFromDirection(direction: Vector3Like): QuaternionLike {
 function createProjectileEntity(
   direction: Vector3Like,
   tag: string,
-  teamManager: TeamManager,
+  color: string,
   type: ProjectileType,
   speedOffset: number = 0
 ) {
   const projectile = PROJECTILES[type];
-  const color = teamManager.getPlayerColor(tag);
 
   const projectileEntity = new Entity({
     name: projectile.NAME,
@@ -154,6 +140,7 @@ function createProjectileEntity(
         z: direction.z * (projectile.SPEED + speedOffset),
       },
       rotation: getRotationFromDirection(direction),
+      ccdEnabled: projectile.CCD_ENABLED,
     },
     tag: tag,
   });

@@ -1,26 +1,42 @@
 // Handles player - projectile collisions applying knockback to the player when applicable
-import { PlayerEntity, type Entity, Audio } from "hytopia";
-import type { PlayerDataManager } from "../gameState/player-data";
-import { PROJECTILES, STRENGTH_BOOST_MULTIPLIER } from "../utilities/gameConfig";
-import type TeamManager from "../gameState/team";
+import { type Entity, Audio } from "hytopia";
+import {
+  PROJECTILES,
+  STRENGTH_BOOST_MULTIPLIER,
+} from "../utilities/gameConfig";
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
+import CustomPlayerEntity from "../entities/CustomPlayerEntity";
+import { globalState } from "../gameState/global-state";
+import NPCEntity from "../entities/NPCEntity";
+import { TEAM_COLOR_STRINGS } from "../gameState/team";
 
 export function knockBackCollisionHandler(
   projectile: Entity,
   otherEntity: Entity,
   started: boolean,
   tag: string,
-  playerDataManager: PlayerDataManager,
-  teams: TeamManager
+  color: string
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (!(otherEntity instanceof PlayerEntity) || otherEntity.player.id === tag || otherEntity.position.y > 40)
-    return;
-  const playerStats = playerDataManager.getPlayer(otherEntity.player.id);
+  if (otherEntity instanceof NPCEntity) {
+    const team = otherEntity.getTeam();
+    const colorString = TEAM_COLOR_STRINGS[team];
+    if (colorString !== color && FRIENDLY_FIRE_DISABLED) {
+      otherEntity.setLastHitBy(tag);
+      applyKnockbackToEntity(otherEntity, projectile, 1);
+    }
+  }
   if (
-    playerStats.invincible ||
+    !(otherEntity instanceof CustomPlayerEntity) ||
+    otherEntity.player.username === tag ||
+    otherEntity.position.y > 40 ||
+    !started
+  )
+    return;
+  if (
+    otherEntity.isInvincible() ||
     (FRIENDLY_FIRE_DISABLED &&
-      teams.getPlayerTeam(tag) === teams.getPlayerTeam(otherEntity.player.id))
+      color === TEAM_COLOR_STRINGS[otherEntity.getTeam()])
   ) {
     // despawn projectile if it's a friendly fire or the player is invincible so it doesn't bounce off them
     projectile.despawn();
@@ -29,55 +45,58 @@ export function knockBackCollisionHandler(
 
   if (started && projectile.isSpawned) {
     // tag player so we can reward kills
-    if (playerStats) {
-      playerStats.lastHitBy = tag;
-    }
+    otherEntity.setLastHitBy(tag);
+    const shootingEntity = globalState.getPlayerEntity(tag);
 
     let multiplier = 1;
-    if(playerDataManager.isStrengthBoostActive(tag)) {
+    if (shootingEntity && shootingEntity.isStrengthBoostActive()) {
       multiplier = STRENGTH_BOOST_MULTIPLIER;
     }
 
-    // Calculate direction from projectile to player
-    const dx = projectile.linearVelocity.x;
-    const dy = projectile.linearVelocity.y;
-    const dz = projectile.linearVelocity.z;
-
-    // Normalize the direction vector
-    const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-    const normalizedDx = dx / length;
-    const normalizedDy = dy / length;
-    const normalizedDz = dz / length;
-
-    // Calculate impact force based on relative velocity
-    const impactForce =
-      PROJECTILES[projectile.name as keyof typeof PROJECTILES].KNOCKBACK;
-    const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.8;
-
-    // Add some jitter to the knockback to make it more chaotic
-    // const jitter = 0.5 + (Math.random() * 0.1 - 0.1);
-    const jitter = 1.01;
-
-    otherEntity.applyImpulse({
-      x: normalizedDx * impactForce * multiplier,
-      y: verticalForce,
-      z: normalizedDz * impactForce * multiplier,
-    });
-
-    // immediately despawn slingshot projectiles
-    if (projectile.name === PROJECTILES.SLINGSHOT.NAME) {
-      projectile.despawn();
-    }
-
-    // Play hit sound
-    if (otherEntity.world) {
-      new Audio({
-        uri: "audio/sfx/player/bow-hit.mp3",
-        volume: 0.5,
-        playbackRate: 1.5,
-        position: otherEntity.position,
-        referenceDistance: 10,
-      }).play(otherEntity.world);
-    }
+    applyKnockbackToEntity(otherEntity, projectile, multiplier);
   }
 }
+
+const applyKnockbackToEntity = (
+  otherEntity: Entity,
+  projectile: Entity,
+  multiplier: number
+) => {
+  // Calculate direction from projectile to player
+  const dx = projectile.linearVelocity.x;
+  const dy = projectile.linearVelocity.y;
+  const dz = projectile.linearVelocity.z;
+
+  // Normalize the direction vector
+  const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  const normalizedDx = dx / length;
+  const normalizedDy = dy / length;
+  const normalizedDz = dz / length;
+
+  // Calculate impact force based on relative velocity
+  const impactForce =
+    PROJECTILES[projectile.name as keyof typeof PROJECTILES].KNOCKBACK;
+  const verticalForce = Math.max(normalizedDy, 0.5) * impactForce * 0.9;
+
+  otherEntity.applyImpulse({
+    x: normalizedDx * impactForce * multiplier,
+    y: verticalForce,
+    z: normalizedDz * impactForce * multiplier,
+  });
+
+  // immediately despawn slingshot projectiles
+  if (projectile.name === PROJECTILES.SLINGSHOT.NAME) {
+    projectile.despawn();
+  }
+
+  // Play hit sound
+  if (otherEntity.world) {
+    new Audio({
+      uri: "audio/sfx/player/bow-hit.mp3",
+      volume: 0.5,
+      playbackRate: 1.5,
+      position: otherEntity.position,
+      referenceDistance: 10,
+    }).play(otherEntity.world);
+  }
+};

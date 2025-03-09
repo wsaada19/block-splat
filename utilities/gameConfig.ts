@@ -1,40 +1,54 @@
- import { PlayerClass } from "../gameState/player-data";
+import { PlayerClass } from "../entities/player-types";
+
+export const USE_PARTICLES = true;
 
 // game time in seconds
 export const GAME_TIME = 4 * 60;
 
 // cooldowns
-export const SHOOTING_COOLDOWN = 250;
-export const JUMP_COOLDOWN = 0;
+export const SHOOTING_COOLDOWN = 400;
 export const PUNCH_COOLDOWN = 500;
+
+export const SEARCH_POINTS = {
+  [1]: [
+    { x: -17, y: 6, z: 20 },
+    { x: 17, y: 6, z: 20 },
+    { x: -17, y: 6, z: -20 },
+  ],
+  [2]: [
+    { x: 17, y: 6, z: 20 },
+    { x: 17, y: 6, z: -20 },
+    { x: -17, y: 6, z: 20 },
+  ],
+};
 
 // boost spawn interval
 export const BOOST_SPAWN_INTERVAL = 10;
 export const STRENGTH_BOOST_DURATION = 10000;
 export const STRENGTH_BOOST_MULTIPLIER = 5;
-export const ENERGY_BOOST_STAMINA_REGEN = 180;
+export const ENERGY_BOOST_STAMINA_REGEN = 220;
 export const INVINCIBILITY_BOOST_DURATION = 10000;
 
 export const BOOST_PROBABILITIES = [
   {
     type: "energy",
-    spawnProbability: 0.50,
+    spawnProbability: 0.70,
   },
-  {
+{
     type: "strength",
-    spawnProbability: 0.25,
+    spawnProbability: 0.10,
   },
   {
     type: "invincibility",
-    spawnProbability: 0.25,
+    spawnProbability: 0.20,
   }
 ];
 
 // energy costs
-export const SPRINT_ENERGY_COST = 1;
-export const PUNCH_ENERGY_COST = 20;
+export const SPRINT_ENERGY_COST = 0.85;
+export const TACKLE_ENERGY_COST = 30;
 
-export const STAMINA_REGEN_RATE = 9;
+export const STAMINA_REGEN_RATE = 10;
 
 // class max staminas
 export const MAX_STAMINA = {
@@ -53,9 +67,9 @@ export const RESPAWN_HEIGHT = 45;
 export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
-export const PUNCH_FORCE = 12;
+export const PUNCH_FORCE = 5;
 export const PUNCH_PLAYER_FORCE = 10;
-export const PUNCH_VERTICAL_FORCE = 15;
+export const PUNCH_VERTICAL_FORCE = 2;
 
 // projectiles
 export type ProjectileType = 'BLOB' | 'SLINGSHOT' | 'SNIPER'
@@ -66,30 +80,32 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 2,
     SPEED: 30,
-    KNOCKBACK: 14,
-    ENERGY: -30
+    KNOCKBACK: 13,
+    ENERGY: -28,
+    CCD_ENABLED: false
   },
   SLINGSHOT: {
     NAME: 'SLINGSHOT',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
-    KNOCKBACK: 12,
-    ENERGY: -35
+    KNOCKBACK: 11,
+    ENERGY: -30,
+    CCD_ENABLED: false
   },
   SNIPER: {
     NAME: 'SNIPER',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 60,
-    KNOCKBACK: 10,
-    ENERGY: -22
+    KNOCKBACK: 11,
+    ENERGY: -22,
+    CCD_ENABLED: true
   }
 }
 
 export const SLINGSHOT_OFFSET = 19;
-export const SLINGSHOT_SPEED_OFFSET = -5;
-export const MELEE_HIT_DISTANCE = 3.5;
+export const SLINGSHOT_SPEED_OFFSET = 0;
 
 // UI Events
 export const UI_EVENT_TYPES = {
@@ -103,8 +119,5 @@ export const UI_EVENT_TYPES = {
   };
 
   export const UI_BUTTONS = {
-    SWITCH_TEAM: "switch-team",
-    RESTART_GAME: "restart-game",
     SELECT_CLASS: "select-class",
-    SWITCH_MAP: "switch-map"
   }
