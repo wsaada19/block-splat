@@ -73,8 +73,10 @@ export default class CustomPlayerController extends BaseEntityController {
   private _groundContactCount: number = 0;
   private _platform: Entity | undefined;
   private _lastShootTime: Map<string, number> = new Map();
+  private _lastClassSelectTime: Map<string, number> = new Map();
   private _teamManager: TeamManager;
   private _world: World;
+  private readonly CLASS_SELECT_COOLDOWN = 500; // 500ms cooldown between class select UI toggles
 
   public constructor(options: PlayerEntityControllerOptions = {}) {
     super();
@@ -329,7 +331,12 @@ export default class CustomPlayerController extends BaseEntityController {
     } else if (sh) {
       this.handleSprint(customEntity, input);
     } else if (e) {
-      customEntity.player.ui.sendData({ type: UI_EVENT_TYPES.SHOW_CLASS_SELECT });
+      const lastClassSelect = this._lastClassSelectTime.get(customEntity.player.username) || 0;
+      const now = Date.now();
+      if (now - lastClassSelect >= this.CLASS_SELECT_COOLDOWN) {
+        this._lastClassSelectTime.set(customEntity.player.username, now);
+        customEntity.player.ui.sendData({ type: UI_EVENT_TYPES.SHOW_CLASS_SELECT });
+      }
     } else if (r) {
       this.showLeaderboard(customEntity);
       input.r = false;

@@ -4,7 +4,6 @@ import {
   World,
   PlayerEntity,
   Entity,
-  PlayerUI,
   ChatManager,
   EntityEvent,
   PlayerUIEvent,

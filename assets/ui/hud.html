@@ -304,12 +304,35 @@
     border: 3px solid rgba(180, 180, 180, 0.4);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
     border-radius: 12px;
-    padding: 20px;
+    padding: 28px;
     width: 700px;
     display: none;
     justify-content: space-around;
     gap: 20px;
     backdrop-filter: blur(8px);
+  }
+
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
   }
 
   #player-leaderboard {
@@ -896,6 +919,7 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
 </div>
 
 <div class="class-select" id="class-select">
+  <div class="close-button" id="close-class-select">×</div>
   <div class="class-card" id="runner-class">
     <div class="class-name">Runner</div>
     <img src="{{CDN_ASSETS_URL}}/ui/icons/runner.png" alt="Runner" class="class-icon">
@@ -1070,7 +1094,9 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
       }
 
       if (data.playerClass !== undefined) {
-        document.getElementById('current-class').textContent = data.playerClass
+        // capitalize the first letter of the class
+        var className = data.playerClass.charAt(0).toUpperCase() + data.playerClass.slice(1)
+        document.getElementById('current-class').textContent = className
       }
 
       if (data.playerName !== undefined) {
@@ -1254,6 +1280,13 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
     .getElementById('grenader-class')
     .addEventListener('click', () => selectClass('grenader'))
 
+  // Add click handler for close button
+  document
+    .getElementById('close-class-select')
+    .addEventListener('click', () => {
+      document.getElementById('class-select').style.display = 'none';
+    });
+
   hytopia.registerSceneUITemplate('game-instructions', (id, onState) => {
     const template = document.getElementById('game-instructions-template');
     const clone = template.content.cloneNode(true);
@@ -1269,13 +1302,9 @@ src: url('{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf') format('ttf'); /
   hytopia.registerSceneUITemplate('boost-instructions', (id, onState) => {
     const template = document.getElementById('boost-instructions');
     const clone = template.content.cloneNode(true);
-    console.log(clone)
     onState(state => {
       const titleElement = clone.querySelector('h3');
       const descriptionElement = clone.querySelector('p');
-      console.log(state)
-      console.log(titleElement)
-      console.log(descriptionElement)
       
       titleElement.textContent = state.title;
       descriptionElement.textContent = state.description;

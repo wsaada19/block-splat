@@ -6,7 +6,6 @@ import worldMap from "./assets/maps/boilerplate.json";
 import Teams from "./gameState/team";
 import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
-import GameMap from "./gameState/map";
 import { GAME_TIME } from "./utilities/gameConfig";
 import { globalState } from "./gameState/global-state";
 
