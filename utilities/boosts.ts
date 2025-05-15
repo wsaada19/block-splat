@@ -7,7 +7,6 @@ import {
   BOOST_PROBABILITIES,
 } from "./gameConfig";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
-import NPCEntity from "../entities/NPCEntity";
 
 const boostsSpawned = new Map<string, boolean>();
 
@@ -133,11 +132,8 @@ export function createBoost(
       boostsSpawned.delete(locationString(entity.position));
       entity.despawn();
     } 
-    else if (!(otherEntity instanceof CustomPlayerEntity) && !(otherEntity instanceof NPCEntity) && started) {
+    else if (!(otherEntity instanceof CustomPlayerEntity) && started) {
       otherEntity.despawn();
-    } else if (otherEntity instanceof NPCEntity && started) {
-      // NPCs dont get boost effects yet
-      entity.despawn();
     }
   });
   return boost;

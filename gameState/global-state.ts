@@ -1,6 +1,5 @@
 import { World } from "hytopia";
 import type CustomPlayerEntity from "../entities/CustomPlayerEntity";
-import type NPCEntity from "../entities/NPCEntity";
 
 export class GlobalState {
   private static instance: GlobalState;
@@ -38,9 +37,6 @@ export class GlobalState {
     return this.world.entityManager.getAllPlayerEntities().find(entity => entity.player.username === playerId) as CustomPlayerEntity;
   }
 
-  getAllNPCs(): NPCEntity[] {
-    return this.world.entityManager.getEntitiesByTag("npc") as NPCEntity[];
-  }
 }
 
 export const globalState = GlobalState.getInstance();

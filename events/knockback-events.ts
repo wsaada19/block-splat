@@ -7,7 +7,6 @@ import {
 import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
-import NPCEntity from "../entities/NPCEntity";
 import { TEAM_COLOR_STRINGS } from "../gameState/team";
 
 export function knockBackCollisionHandler(
@@ -18,14 +17,14 @@ export function knockBackCollisionHandler(
   color: string
 ) {
   // only allow if it's a different player who isn't respawning and the game is active
-  if (otherEntity instanceof NPCEntity) {
-    const team = otherEntity.getTeam();
-    const colorString = TEAM_COLOR_STRINGS[team];
-    if (colorString !== color && FRIENDLY_FIRE_DISABLED) {
-      otherEntity.setLastHitBy(tag);
-      applyKnockbackToEntity(otherEntity, projectile, 1);
-    }
-  }
+  // if (otherEntity instanceof NPCEntity) {
+  //   const team = otherEntity.getTeam();
+  //   const colorString = TEAM_COLOR_STRINGS[team];
+  //   if (colorString !== color && FRIENDLY_FIRE_DISABLED) {
+  //     otherEntity.setLastHitBy(tag);
+  //     applyKnockbackToEntity(otherEntity, projectile, 1);
+  //   }
+  // }
   if (
     !(otherEntity instanceof CustomPlayerEntity) ||
     otherEntity.player.username === tag ||

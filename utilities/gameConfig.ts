@@ -67,7 +67,7 @@ export const RESPAWN_HEIGHT = 45;
 export const FRIENDLY_FIRE_DISABLED = true;
 
 // punch force
-export const PUNCH_FORCE = 5;
+export const PUNCH_KNOCKBACK = 5;
 export const PUNCH_PLAYER_FORCE = 10;
 export const PUNCH_VERTICAL_FORCE = 2;
 
@@ -80,7 +80,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 2,
     SPEED: 30,
-    KNOCKBACK: 13,
+    KNOCKBACK: 12,
     ENERGY: -28,
     CCD_ENABLED: false
   },
@@ -89,7 +89,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 40,
-    KNOCKBACK: 11,
+    KNOCKBACK: 10,
     ENERGY: -30,
     CCD_ENABLED: false
   },
@@ -98,7 +98,7 @@ export const PROJECTILES = {
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 60,
-    KNOCKBACK: 11,
+    KNOCKBACK: 10,
     ENERGY: -22,
     CCD_ENABLED: true
   }

@@ -78,14 +78,6 @@ startServer((world) => {
 
   loadGameLobby(world)
 
-  const instructionsSceneUI = new SceneUI({
-    templateId: "game-instructions",
-    position: { x: 0, y: 65, z: 10 },
-    state: { visible: true },
-  });
-
-  instructionsSceneUI.load(world);
-
   world.chatManager.registerCommand("/start", () => {
     if (game.isGameRunning) {
       world.chatManager.sendBroadcastMessage("Game already running!");

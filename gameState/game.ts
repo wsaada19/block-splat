@@ -5,13 +5,12 @@ import {
   type Vector3Like,
   PlayerEntity,
 } from "hytopia";
-import TeamManager, { TEAM_COLORS } from "./team";
+import TeamManager from "./team";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
 import { BOOST_SPAWN_INTERVAL, STAMINA_REGEN_RATE, UI_EVENT_TYPES } from "../utilities/gameConfig";
 import { spawnRandomBoost } from "../utilities/boosts";
 import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
 import { globalState } from "./global-state";
-import NPCEntity from "../entities/NPCEntity";
 
 export default class Game {
   private world: World;
@@ -37,8 +36,6 @@ export default class Game {
     {x: 6, y: 11, z: 35},
     {x: -16.5, y: 7, z: 18}
   ];
-  private npcs: NPCEntity[] = [];
-  private isWaitingForPlayers: boolean = true;
 
   constructor(
     world: World,
@@ -135,23 +132,6 @@ export default class Game {
     this.teamManager.spawnPlayers(this.world);
     this.resetScores();
     this.updateAllPlayersUI();
-
-    this.isWaitingForPlayers = false;
-
-    // Clear any existing NPCs
-    this.npcs.forEach(npc => npc.despawn());
-    this.npcs = [];
-
-    /// Spawn new NPCs using the static method
-    // const redTeamPlayers = this.teamManager.getTeamPlayers(TEAM_COLORS.RED);
-    // if(redTeamPlayers && redTeamPlayers.size < 2) {
-    //   this.npcs.push(...NPCEntity.spawnNPCsForTeam(this.world, TEAM_COLORS.RED, this.teamManager, 2 - redTeamPlayers.size));
-    // }
-
-    // const blueTeamPlayers = this.teamManager.getTeamPlayers(TEAM_COLORS.BLUE);
-    // if(blueTeamPlayers && blueTeamPlayers.size < 2) {
-    //   this.npcs.push(...NPCEntity.spawnNPCsForTeam(this.world, TEAM_COLORS.BLUE, this.teamManager, 2 - blueTeamPlayers.size));
-    // }
   }
 
   restartGame() {
@@ -219,6 +199,7 @@ export default class Game {
       playerPoints: playerPoints,
       playerKills: playerKills,
       playerName: playerStats.getDisplayName(),
+      playerDeaths: playerStats.getPlayerDeaths(),
       playerClass: playerStats.getPlayerClass(),
     });
   }
@@ -278,7 +259,6 @@ export default class Game {
     // send all players to lobby
     this.teamManager.sendAllPlayersToLobby(this.world);
 
-    this.isWaitingForPlayers = true;
     this.gameCountdownTimer = 30;
     this.checkPlayerCount();
   }

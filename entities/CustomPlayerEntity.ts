@@ -1,8 +1,8 @@
-import { Entity, EntityEvent, Player, PlayerEntity } from "hytopia";
+import { EntityEvent, Player, PlayerEntity } from "hytopia";
 import { TEAM_COLORS } from "../gameState/team";
 import {
   MAX_STAMINA,
-  PUNCH_FORCE,
+  PUNCH_KNOCKBACK,
   PUNCH_VERTICAL_FORCE,
   RESPAWN_INVINCIBILITY_TIME,
   STRENGTH_BOOST_MULTIPLIER,
@@ -14,7 +14,6 @@ import { globalState } from "../gameState/global-state";
 import type TeamManager from "../gameState/team";
 import { ParticleEmitter } from "../particles/particle-emmitter";
 import { ParticleFX } from "../particles/particles-fx";
-import NPCEntity from "./NPCEntity";
 import { getDirectionFromRotation } from "../utilities/math";
 class CustomPlayerEntity extends PlayerEntity {
   private playerClass: PlayerClass = PlayerClass.SLINGSHOT;
@@ -65,9 +64,10 @@ class CustomPlayerEntity extends PlayerEntity {
 
     this.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
       if (
-        (otherEntity instanceof CustomPlayerEntity || otherEntity instanceof NPCEntity) &&
+        (otherEntity instanceof CustomPlayerEntity) &&
         entity instanceof CustomPlayerEntity && 
         this.isPlayerTackling() &&
+        !otherEntity.isInvincible() &&
         started
       ) {
         const direction = getDirectionFromRotation(entity.rotation)
@@ -75,14 +75,11 @@ class CustomPlayerEntity extends PlayerEntity {
         let multiplier = 1;
         if (entity.isStrengthBoostActive()) {
           multiplier = STRENGTH_BOOST_MULTIPLIER;
-          if(otherEntity instanceof NPCEntity) {
-            multiplier = 5;
-          }
         }
         otherEntity.applyImpulse({
-          x: direction.x * PUNCH_FORCE * multiplier,
+          x: direction.x * PUNCH_KNOCKBACK * multiplier,
           y: verticalForce * multiplier,
-          z: direction.z * PUNCH_FORCE * multiplier,
+          z: direction.z * PUNCH_KNOCKBACK * multiplier,
         });
         otherEntity.setLastHitBy(entity.player.username);
       }

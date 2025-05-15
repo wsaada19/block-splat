@@ -17,7 +17,6 @@ import { ParticleEmitter } from "../particles/particle-emmitter";
 import { ParticleFX } from "../particles/particles-fx";
 import { globalState } from "../gameState/global-state";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
-import NPCEntity from "../entities/NPCEntity";
 const BLOB_CHECK_PATTERN = [
   [0, 0, 0], // Center block
   [0, 1, 0], // Above
@@ -77,7 +76,7 @@ export function onBlockHit(
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
   // Early exit conditions
-  if (!started || !blockIds.includes(type.id) || !game.isGameRunning || entity instanceof NPCEntity) return;
+  if (!started || !blockIds.includes(type.id) || !game.isGameRunning) return;
 
   if (!(entity instanceof PlayerEntity)) {
     handleProjectileHit(entity, colliderHandleA, colliderHandleB, world, game, blockStateMap);
