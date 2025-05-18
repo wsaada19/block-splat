@@ -114,4 +114,3 @@ Models and music from the following sources, all other assets are mine or came f
 - [Energy Drink Model](https://sketchfab.com/3d-models/cold-energy-drink-a7c77ba7ff844fd78d3a429865181b9e)
 - [Invincibility Boost Model](https://sketchfab.com/3d-models/potion-bottle-heart-64d3d02fa816415987d4585919dae0c6)
 - [To The Death Battle Music](https://pixabay.com/music/video-games-to-the-death-159171/)
-- [Class Icons](https://captaincatsparrow.itch.io/25-free-hunter-skill-icons)

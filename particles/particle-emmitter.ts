@@ -131,7 +131,7 @@ export class ParticleEmitter extends Entity {
         this.update(tickDeltaMs / 1000);
     }
 
-    public update = (deltaTime: number) => {  // Changed to arrow function to preserve 'this' context
+    public update = (deltaTime: number) => {
         this.emitterLifetime += deltaTime;
 
         // Update and remove dead particles

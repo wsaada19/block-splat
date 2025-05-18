@@ -9,22 +9,28 @@
   rel="stylesheet"
 />
 <style>
+  /* Common styles */
+  .gradient-bg {
+    background: linear-gradient(to bottom, rgba(40, 40, 40, 0.92), rgba(25, 25, 25, 0.92));
+    border: 3px solid rgba(180, 180, 180, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+  }
+
+  .panel-bg {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+  }
+
   .hud-panel {
     position: fixed;
     right: 20px;
     bottom: 20px;
-    background: linear-gradient(
-      to bottom,
-      rgba(40, 40, 40, 0.92),
-      rgba(25, 25, 25, 0.92)
-    );
-    border: 3px solid rgba(180, 180, 180, 0.4);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5),
-      inset 0 0 20px rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
     padding: 12px;
     width: 160px;
-    backdrop-filter: blur(4px);
   }
 
   .panel-row {
@@ -49,16 +55,6 @@
     box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
   }
 
-  .panel-name.red-team {
-    color: #ff4444;
-    font-weight: bold;
-  }
-
-  .panel-name.blue-team {
-    color: #4444ff;
-    font-weight: bold;
-  }
-
   .panel-name {
     flex: 1;
     color: #ffffff;
@@ -67,6 +63,9 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     letter-spacing: 0.5px;
   }
+
+  .panel-name.red-team { color: #ff4444; font-weight: bold; }
+  .panel-name.blue-team { color: #4444ff; font-weight: bold; }
 
   .panel-value {
     font-weight: bold;
@@ -79,20 +78,24 @@
 
   .time-value {
     color: #ffffff;
-    font-size: 22px;
     font-weight: bold;
     font-family: "Trebuchet MS", "Arial", sans-serif;
   }
 
-  .red-score {
-    color: #ff4444;
-    text-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+  .red-background {
+    background: rgba(255, 68, 68, 0.8);
+    border: 1px solid rgba(255, 68, 68, 0.8);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
   }
 
-  .blue-score {
-    color: #4444ff;
-    text-shadow: 0 0 8px rgba(68, 68, 255, 0.4);
+  .blue-background {
+    background: rgba(68, 68, 255, 0.8);
+    border: 1px solid rgba(68, 68, 255, 0.8);
+    box-shadow: 0 0 10px rgba(68, 68, 255, 0.2);
   }
+
+  .red-score { color: #ff4444; text-shadow: 0 0 8px rgba(255, 68, 68, 0.4); }
+  .blue-score { color: #4444ff; text-shadow: 0 0 8px rgba(68, 68, 255, 0.4); }
 
   .team-indicator {
     font-size: 12px;
@@ -103,139 +106,9 @@
     color: #ffffff;
   }
 
-  .your-team .team-indicator {
-    display: inline-block;
-  }
+  .your-team .team-indicator { display: inline-block; }
 
-  .team-button {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    background: linear-gradient(to bottom, #14376c, #1c4d97);
-    border: 2px solid rgba(200, 200, 200, 0.2);
-    border-radius: 6px;
-    color: #ffffff;
-    font-family: "Trebuchet MS", "Arial", sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  }
-
-  .team-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .team-button:active {
-    transform: translateY(0);
-  }
-
-  .start-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .start-menu-content {
-    width: 80%;
-    max-width: 600px;
-    position: relative;
-  }
-
-  .start-menu-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-  }
-
-  .start-title {
-    color: white;
-    font-size: 48px;
-    text-align: center;
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-    font-weight: bold;
-    margin-bottom: 30px;
-  }
-
-  .start-selection {
-    color: white;
-    font-size: 24px;
-    text-align: center;
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-    font-weight: bold;
-  }
-
-  .team-selection {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-  }
-
-  .team-select-button {
-    width: 200px;
-    padding: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  }
-
-  .team-select-button.red {
-    background: linear-gradient(to bottom, #ff4444, #cc0000);
-    color: white;
-    border: 3px solid #ff7777;
-  }
-
-  .team-select-button.blue {
-    background: linear-gradient(to bottom, #4444ff, #0000cc);
-    color: white;
-    border: 3px solid #7777ff;
-  }
-
-  .team-select-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-  }
-
-  .class-button {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    background: linear-gradient(to bottom, #146c14, #1c971c);
-    border: 2px solid rgba(200, 200, 200, 0.2);
-    border-radius: 6px;
-    color: #ffffff;
-    font-family: "Trebuchet MS", "Arial", sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  }
-
-  .class-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .class-button:active {
-    transform: translateY(0);
-  }
-
+  /* Game Over Screen */
   .game-over {
     display: none;
     position: fixed;
@@ -261,65 +134,22 @@
     font-family: "Trebuchet MS", "Arial", sans-serif;
     font-size: 48px;
     color: #00ffaa;
-    text-shadow: 0 0 20px rgba(0, 255, 170, 0.6),
-      0 0 40px rgba(0, 255, 170, 0.4);
+    text-shadow: 0 0 20px rgba(0, 255, 170, 0.6), 0 0 40px rgba(0, 255, 170, 0.4);
     margin-bottom: 20px;
     animation: pulse 2s infinite;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      transform: translate(-50%, -50%) scale(0);
-    }
-
-    to {
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-
-    50% {
-      transform: scale(1.1);
-    }
-
-    100% {
-      transform: scale(1);
-    }
-  }
-
+  /* Class Selection */
   .class-select {
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(
-      to bottom,
-      rgba(40, 40, 40, 0.95),
-      rgba(25, 25, 25, 0.95)
-    );
-    border: 3px solid rgba(180, 180, 180, 0.4);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-    border-radius: 12px;
     padding: 28px;
     width: 700px;
     display: none;
     justify-content: space-around;
     gap: 20px;
-    backdrop-filter: blur(8px);
   }
 
   .close-button {
@@ -345,6 +175,7 @@
     transform: scale(1.1);
   }
 
+  /* Leaderboard */
   #player-leaderboard {
     display: none;
     padding: 24px;
@@ -362,14 +193,6 @@
   .leaderboard {
     padding: 8px;
     width: 100%;
-  }
-
-  .leaderboard#red-leaderboard {
-    background: rgba(200, 30, 30);
-  }
-
-  .leaderboard#blue-leaderboard {
-    background: rgba(30, 30, 200);
   }
 
   .leaderboard-title {
@@ -403,14 +226,10 @@
     transition: all 0.2s ease;
   }
 
-  #red-leaderboard .leaderboard-title {
-    color: #ff4444;
-  }
+  #red-leaderboard .leaderboard-title { color: #ff4444; }
+  #blue-leaderboard .leaderboard-title { color: #4444ff; }
 
-  #blue-leaderboard .leaderboard-title {
-    color: #4444ff;
-  }
-
+  /* Class Cards */
   .class-card {
     width: 160px;
     background: rgba(60, 60, 60, 0.4);
@@ -466,20 +285,22 @@
     margin: 4px 0;
   }
 
-  .stat.pro {
-    color: #00ff00;
-  }
+  .stat.pro { color: #00ff00; }
+  .stat.con { color: #ff4444; }
 
-  .stat.con {
-    color: #ff4444;
-  }
-
+  /* Stamina */
   .stamina-container {
     position: fixed;
     bottom: 18px;
     right: 4px;
     width: 224px;
     height: 200px;
+    @media (max-width: 760px) {
+      width: 120px;
+      height: 100px;
+      top: 40%;
+      bottom: 0;
+    }
     z-index: 1000;
     display: flex;
     justify-content: center;
@@ -495,11 +316,13 @@
     background-position: center;
     z-index: 1;
     transition: filter 0.3s ease;
-    img {
-      object-fit: cover;
-      width: 100%;
-      transition: opacity 0.3s ease, filter 0.3s ease;
-    }
+
+  }
+
+  .paint-splat-bg img {
+    object-fit: cover;
+    width: 100%;
+    transition: opacity 0.3s ease, filter 0.3s ease;
   }
 
   .stamina-text {
@@ -507,6 +330,9 @@
     color: white;
     font-family: Arial, sans-serif;
     font-size: 22px;
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
     padding-right: 6px;
     padding-bottom: 8px;
     font-weight: bold;
@@ -514,10 +340,7 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  /* div[style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"] {
-    display: none !important;
-  } */
-
+  /* Crosshair */
   .crosshair {
     position: fixed;
     left: 50%;
@@ -552,6 +375,7 @@
     transform: translateY(-50%);
   }
 
+  /* Respawn Screen */
   .respawn-screen {
     display: none;
     position: fixed;
@@ -589,9 +413,13 @@
     animation: pulse 1s infinite;
   }
 
+  /* Team Banner */
   .team-banner {
     position: static;
     min-width: 80px;
+    @media (max-width: 768px) {
+      min-width: 40px;
+    }
     display: flex;
     align-items: center;
     justify-content: center;
@@ -601,17 +429,10 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
 
-  .team-banner.red {
-    background: rgba(200, 30, 30, 0.95);
-  }
+  .team-banner.red { background: rgba(200, 30, 30, 0.95); }
+  .team-banner.blue { background: rgba(30, 30, 200, 0.95); }
 
-  .team-banner.blue {
-    background: rgba(30, 30, 200, 0.95);
-  }
-
-  .team-name {
-    display: none;
-  }
+  .team-name { display: none; }
 
   .team-score {
     font-size: 28px;
@@ -619,92 +440,115 @@
     font-weight: bold;
   }
 
+  /* Controls Panel */
   .controls-panel {
     position: fixed;
     right: 20px;
     top: 80px;
-    background: linear-gradient(
-      to bottom,
-      rgba(40, 40, 40, 0.92),
-      rgba(25, 25, 25, 0.92)
-    );
-    border: 3px solid rgba(180, 180, 180, 0.4);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    border-radius: 12px;
     padding: 12px;
     width: 200px;
-    backdrop-filter: blur(4px);
   }
 
+  /* Player Stats */
   .player-stats {
     position: fixed;
     right: 20px;
     top: 200px;
-    background: linear-gradient(
-      to bottom,
-      rgba(40, 40, 40, 0.92),
-      rgba(25, 25, 25, 0.92)
-    );
-    border: 3px solid rgba(180, 180, 180, 0.4);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    border-radius: 12px;
-    padding: 12px;
-    width: 140px;
+    height: 100px;
+    width: 100px;
+
+    @media (max-width: 768px) {
+      top: 10px;
+      bottom: 0;
+      height: 90px;
+      width: 80px;
+
+      .player-name {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .stat-counter {
+        font-size: 11px;
+      }
+
+      .stat-label {
+        font-size: 10px;
+      }
+
+      .stat-value {
+        font-size: 11px;
+      }
+    }
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
     backdrop-filter: blur(4px);
+  }
+
+  .player-name {
+    color: #ffffff;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 6px;
+    opacity: 0.9;
+    text-transform: uppercase;
   }
 
   .stats-row {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
   }
 
   .stat-counter {
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .death-count {
-    color: #ff4444;
-    font-size: 16px;
-  }
-
-  .points-count {
-    color: #44ff44;
-    font-size: 16px;
-  }
-
-  .kills-count {
-    color: #44ff44;
-    font-size: 16px;
-  }
-
-  .current-class {
-    color: #ffffff;
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .stat-label {
-    font-weight: bold;
-    font-family: "Roboto", serif;
+    color: rgb(255, 255, 255);
+    font-family: "Roboto", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
   }
 
   .stat-value {
-    font-size: 22px;
+    font-size: 13px;
     color: #ffffff;
-    font-family: "Roboto", serif;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
   }
 
-  .player-name {
-    color: #ffffff;
-    font-family: "Roboto", serif;
-    font-size: 16px;
+  .points-count .stat-value { color: #44ff44; }
+  .kills-count .stat-value { color: #44ff44; }
+  .death-count .stat-value { color: #ff4444; }
+
+  .current-class {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
-    font-weight: bold;
-    padding-bottom: 6px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
   }
 
+  .red-background {
+    border-color: rgba(255, 68, 68, 0.3);
+  }
+
+  .blue-background {
+    border-color: rgba(68, 68, 255, 0.3);
+  }
+
+  /* Score Time Container */
   .score-time-container {
     position: fixed;
     top: 0px;
@@ -719,6 +563,9 @@
   .time-display {
     position: static;
     padding: 0 20px;
+    @media (max-width: 768px) {
+      padding: 0 8px;
+    }
     display: flex;
     align-items: center;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
@@ -728,11 +575,15 @@
   .time-label {
     color: #ffffff;
     font-family: "Trebuchet MS", "Arial", sans-serif;
-    font-size: 22px;
+    font-size: 18px;
+    @media (max-width: 768px) {
+      font-size: 10px;
+    }
     font-weight: bold;
-    text-align: center;
+    text-align: center; 
   }
 
+  /* Game Message */
   .my-game-message {
     background: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
@@ -751,6 +602,7 @@
     margin: 0;
   }
 
+  /* Instructions */
   .instructions {
     display: none;
     position: fixed;
@@ -773,7 +625,6 @@
   }
 
   .instructions-panel {
-    background: rgba(0, 0, 0, 0.85);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     padding: 20px;
@@ -826,17 +677,19 @@
     color: #cccccc;
   }
 
-  .victory-screen {
+  /* Victory/Defeat Screens */
+  .victory-screen,
+  .defeat-screen {
     display: none;
     position: fixed;
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
-    color: green;
   }
 
-  .victory-content {
+  .victory-content,
+  .defeat-content {
     text-align: center;
     animation: fadeIn 0.3s ease-in;
   }
@@ -858,21 +711,6 @@
     text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
   }
 
-  .defeat-screen {
-    display: none;
-    position: fixed;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    color: red;
-  }
-
-  .defeat-content {
-    text-align: center;
-    animation: fadeIn 0.3s ease-in;
-  }
-
   .defeat-message {
     font-size: 62px;
     font-family: "Roboto", serif;
@@ -890,59 +728,11 @@
     text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
   }
 
-  .waiting-text {
-    color: #ffaa00;
-    animation: pulse 2s infinite;
-  }
-
-  .countdown-text {
-    color: #00ff00;
-    animation: pulse 1s infinite;
-  }
-
-  @keyframes pulse {
-    0% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.7;
-    }
-  }
-
-  @font-face {
-    font-family: "JollyLodger"; /* Give your font a name */
-
-    src: url("{{CDN_ASSETS_URL}}/ui/fonts/JollyLodger-Regular.ttf")
-      format("ttf"); /* Specify the font file path and format */
-  }
-
-  .help-button {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: linear-gradient(to bottom, #14376c, #1c4d97);
-    border: 2px solid rgba(200, 200, 200, 0.2);
-    border-radius: 6px;
-    padding: 8px 16px;
-    color: #ffffff;
-    font-family: "Trebuchet MS", "Arial", sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-  }
-
+  /* Buttons */
+  .help-button,
   .select-class-button {
     position: fixed;
     bottom: 20px;
-    left: 100px;
-    background: linear-gradient(to bottom, #14376c, #1c4d97);
-    border: 2px solid rgba(200, 200, 200, 0.2);
-    border-radius: 6px;
     padding: 8px 16px;
     color: #ffffff;
     font-family: "Trebuchet MS", "Arial", sans-serif;
@@ -952,6 +742,9 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     z-index: 1000;
   }
+
+  .help-button { left: 20px; }
+  .select-class-button { left: 100px; }
 
   .help-button:hover,
   .select-class-button:hover {
@@ -962,6 +755,65 @@
   .help-button:active,
   .select-class-button:active {
     transform: translateY(0);
+  }
+
+  /* Mobile Controls */
+  .mobile-controls {
+    display: none;
+  }
+
+  body.mobile .mobile-controls {
+    display: flex;
+    gap: 14px;
+    position: fixed;
+    bottom: 16px;
+    right: 30px;
+  }
+
+  .mobile-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 50px;
+    height: 50px;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, background-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .mobile-button img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobile-button.active {
+    transform: scale(0.92);
+    background-color: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from { transform: translate(-50%, -50%) scale(0); }
+    to { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
   }
 </style>
 <div class="crosshair" id="crosshair"></div>
@@ -998,7 +850,7 @@
   </div>
 </div>
 
-<div class="class-select" id="class-select">
+<div class="class-select panel-bg" id="class-select">
   <div class="close-button" id="close-class-select">×</div>
   <div class="class-card" id="runner-class">
     <div class="class-name">Runner</div>
@@ -1107,18 +959,15 @@
       <span class="stat-label">Deaths</span>
       <span class="stat-value" id="death-count">0</span>
     </div>
-    <div class="stat-counter current-class">
-      <span class="stat-label">Class </span>
-      <span class="current-class" id="current-class">Runner</span>
-    </div>
   </div>
+  <div class="current-class" id="current-class">Runner</div>
 </div>
 
-<div class="help-button" id="help-button">Help</div>
-<div class="select-class-button" id="select-class-button">Class</div>
+<div class="help-button panel-bg" id="help-button">Help</div>
+<div class="select-class-button panel-bg" id="select-class-button">Class</div>
 
 <div class="instructions" id="instructions">
-  <div class="instructions-panel">
+  <div class="instructions-panel panel-bg">
     <div class="close-button" id="close-instructions">×</div>
     <h2 class="instructions-title">Block Splat</h2>
     <div class="instruction-section">
@@ -1160,6 +1009,18 @@
       </p>
     </div>
   </div>
+</div>
+<div class="mobile-controls">
+  <a id="mobile-interact-button" class="mobile-button">
+    <img src="{{CDN_ASSETS_URL}}/icons/target.png" />
+  </a>
+
+  <a id="mobile-jump-button" class="mobile-button">
+    <img src="{{CDN_ASSETS_URL}}/icons/jump.png" />
+  </a>
+  <a id="mobile-sprint-button" class="mobile-button">
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/sprint.png" />
+  </a>
 </div>
 
 <script>
@@ -1400,7 +1261,9 @@
   helpButton.addEventListener("click", toggleInstructions);
 
   // Add close button functionality
-  document.getElementById("close-instructions").addEventListener("click", toggleInstructions);
+  document
+    .getElementById("close-instructions")
+    .addEventListener("click", toggleInstructions);
 
   // Add keyboard shortcut
   document.addEventListener("keydown", (event) => {
@@ -1418,5 +1281,48 @@
     } else {
       classSelect.style.display = "none";
     }
+  });
+</script>
+<script>
+  // Handle interact button touch / untouch
+  const mobileInteractButton = document.getElementById(
+    "mobile-interact-button"
+  );
+  mobileInteractButton.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // Prevents mobile highlight/select/copy popup behaviors
+    mobileInteractButton.classList.add("active"); // more immediate feedback to add/remove active class
+    hytopia.pressInput("ml", true);
+  });
+
+  mobileInteractButton.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    mobileInteractButton.classList.remove("active");
+    hytopia.pressInput("ml", false);
+  });
+
+    // Handle jump button touch / untouch
+    const mobileJumpButton = document.getElementById('mobile-jump-button');
+  mobileJumpButton.addEventListener('touchstart', e => {
+    e.preventDefault();
+    mobileJumpButton.classList.add('active');
+    hytopia.pressInput(' ', true);
+  });
+
+  mobileJumpButton.addEventListener('touchend', e => {
+    e.preventDefault();
+    mobileJumpButton.classList.remove('active');
+    hytopia.pressInput(' ', false);
+  });
+
+  const mobileSprintButton = document.getElementById('mobile-sprint-button');
+  mobileSprintButton.addEventListener('touchstart', e => {
+    e.preventDefault();
+    mobileSprintButton.classList.add('active');
+    hytopia.pressInput('sh', true);
+  });
+  mobileSprintButton.addEventListener('touchend', e => {
+    e.preventDefault();
+    mobileSprintButton.classList.remove('active');
+    hytopia.pressInput('sh', false);
   });
 </script>
