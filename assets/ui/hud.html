@@ -245,11 +245,11 @@
     transition: all 0.2s ease;
   }
 
-  #red-leaderboard .leaderboard-title {
-    color: #ff4444;
+  #red-leaderboard {
+    background: rgba(200, 30, 30, 0.95);
   }
-  #blue-leaderboard .leaderboard-title {
-    color: #4444ff;
+  #blue-leaderboard {
+    background: rgba(30, 30, 200, 0.95);
   }
 
   /* Class Cards */
@@ -668,6 +668,8 @@
     font-family: "Jolly Lodger", serif;
     font-size: 64px;
     color: #4488ff;
+    text-align: center;
+    margin: 0 0 12px 0;
   }
 
   .instructions-panel {
@@ -680,11 +682,6 @@
     font-size: 18px;
   }
 
-  .instructions h2 {
-    text-align: center;
-    color: #ffffff;
-    margin: 0 0 12px 0;
-  }
 
   .instruction-section {
     margin: 12px 0;
@@ -1254,7 +1251,7 @@
         document.getElementById("player-leaderboard").style.display = "flex";
         const redLeaderboard = data.redLeaderboard;
         document.getElementById("red-leaderboard").innerHTML =
-          '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Knockouts</span></div>';
+          '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Blocks Colored</span><span class="leaderboard-kills">Knockouts</span></div>';
         redLeaderboard.forEach((player) => {
           document.getElementById(
             "red-leaderboard"

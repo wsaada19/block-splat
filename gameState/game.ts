@@ -64,7 +64,7 @@ export default class Game {
 
   checkPlayerCount() {
     const players = PlayerManager.instance.getConnectedPlayers();
-    if (players.length >= 1 && !this.isGameRunning && !this.gameCountdownTimerInterval) {
+    if (players.length >= 2 && !this.isGameRunning && !this.gameCountdownTimerInterval) {
       // start game in 30 seconds
       this.world.chatManager.sendBroadcastMessage(
         "Game starting in " + this.gameCountdownTimer + " seconds!",
