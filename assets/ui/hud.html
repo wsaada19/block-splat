@@ -171,6 +171,14 @@
     gap: 20px;
   }
 
+  body.mobile .class-select {
+    width: 90%;
+    max-width: 400px;
+    padding: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
   .close-button {
     position: absolute;
     top: 10px;
@@ -187,6 +195,14 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+  }
+
+  body.mobile .close-button {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    top: 8px;
+    right: 8px;
   }
 
   .close-button:hover {
@@ -209,9 +225,19 @@
     z-index: 1000;
   }
 
+  body.mobile #player-leaderboard {
+    width: 90%;
+    padding: 16px;
+    gap: 12px;
+  }
+
   .leaderboard {
     padding: 8px;
     width: 100%;
+  }
+
+  body.mobile .leaderboard {
+    padding: 4px;
   }
 
   .leaderboard-title {
@@ -221,6 +247,11 @@
     text-align: center;
     margin-bottom: 16px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  body.mobile .leaderboard-title {
+    font-size: 18px;
+    margin-bottom: 12px;
   }
 
   .leaderboard-header {
@@ -234,6 +265,11 @@
     margin-bottom: 8px;
   }
 
+  body.mobile .leaderboard-header {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
   .leaderboard-entry {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -243,6 +279,11 @@
     font-weight: bold;
     border-radius: 6px;
     transition: all 0.2s ease;
+  }
+
+  body.mobile .leaderboard-entry {
+    padding: 4px 6px;
+    font-size: 12px;
   }
 
   #red-leaderboard {
@@ -264,10 +305,19 @@
     transition: all 0.2s ease;
   }
 
+  body.mobile .class-card {
+    min-width: 140px;
+    padding: 6px;
+  }
+
   .class-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-color: rgba(200, 200, 200, 0.4);
+  }
+
+  body.mobile .class-card:hover {
+    transform: translateY(-2px);
   }
 
   .class-card.selected {
@@ -281,12 +331,23 @@
     margin: 0 auto 10px;
   }
 
+  body.mobile .class-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 6px;
+  }
+
   .class-name {
     color: #ffffff;
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 10px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  body.mobile .class-name {
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 
   .class-desc {
@@ -296,16 +357,32 @@
     line-height: 1.4;
   }
 
+  body.mobile .class-desc {
+    font-size: 11px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
   .class-stats {
     text-align: left;
     margin-top: 10px;
     padding: 0 10px;
   }
 
+  body.mobile .class-stats {
+    margin-top: 6px;
+    padding: 0 6px;
+  }
+
   .stat {
     color: #aaaaaa;
     font-size: 13px;
     margin: 4px 0;
+  }
+
+  body.mobile .stat {
+    font-size: 10px;
+    margin: 2px 0;
   }
 
   .stat.pro {
@@ -672,6 +749,11 @@
     margin: 0 0 12px 0;
   }
 
+  body.mobile .instructions-title {
+    font-size: 36px;
+    margin: 0 0 8px 0;
+  }
+
   .instructions-panel {
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
@@ -682,9 +764,19 @@
     font-size: 18px;
   }
 
+  body.mobile .instructions-panel {
+    width: 95%;
+    max-width: 450px;
+    padding: 10px;
+    font-size: 12px;
+  }
 
   .instruction-section {
     margin: 12px 0;
+  }
+
+  body.mobile .instruction-section {
+    margin: 8px 0;
   }
 
   .instruction-section h3 {
@@ -692,6 +784,11 @@
     margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: bold;
+  }
+
+  body.mobile .instruction-section h3 {
+    font-size: 18px;
+    margin: 0 0 6px 0;
   }
 
   .instruction-section ul {
@@ -703,6 +800,11 @@
     gap: 4px;
   }
 
+  body.mobile .instruction-section ul {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
   .instruction-section li {
     margin: 5px 0;
     font-size: 16px;
@@ -710,8 +812,18 @@
     padding-right: 10px;
   }
 
+  body.mobile .instruction-section li {
+    margin: 3px 0;
+    font-size: 12px;
+    padding-right: 0;
+  }
+
   .instruction-section strong {
     font-size: 18px;
+  }
+
+  body.mobile .instruction-section strong {
+    font-size: 14px;
   }
 
   .instruction-section p {
@@ -720,55 +832,120 @@
     color: #cccccc;
   }
 
+  body.mobile .instruction-section p {
+    margin: 3px 0;
+    font-size: 12px;
+  }
+
   /* Victory/Defeat Screens */
   .victory-screen,
   .defeat-screen {
     display: none;
     position: fixed;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    animation: fadeIn 0.4s ease-in;
   }
 
   .victory-content,
   .defeat-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
-    animation: fadeIn 0.3s ease-in;
+    animation: scaleIn 0.5s ease-out;
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+  }
+
+  .victory-content {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.15));
+    border: 3px solid rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.3), inset 0 0 20px rgba(34, 197, 94, 0.1);
+  }
+
+  .defeat-content {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+    border: 3px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(239, 68, 68, 0.1);
   }
 
   .victory-message {
-    font-size: 58px;
-    font-family: "Roboto", serif;
-    font-weight: bold;
-    color: #1c971c;
-    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+    font-size: 72px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    background: linear-gradient(45deg, #22c55e, #10b981, #059669);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+    margin-bottom: 20px;
+    animation: gradientShift 3s ease-in-out infinite, victoryGlow 2s ease-in-out infinite alternate;
+    letter-spacing: 2px;
   }
 
   .victory-team {
-    font-size: 40px;
-    font-family: "Roboto", serif;
-    font-weight: bold;
-    color: #1c971c;
+    font-size: 48px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 20px;
-    text-shadow: 0 0 10px rgba(0, 255, 170, 0.4);
+    animation: teamGlow 2s ease-in-out infinite alternate;
   }
 
   .defeat-message {
-    font-size: 62px;
-    font-family: "Roboto", serif;
-    font-weight: bold;
-    color: #ff4444;
-    text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+    font-size: 72px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+    margin-bottom: 20px;
+    animation: gradientShift 3s ease-in-out infinite, defeatGlow 2s ease-in-out infinite alternate;
+    letter-spacing: 2px;
   }
 
   .defeat-team {
-    font-size: 42px;
-    font-family: "Roboto", serif;
-    font-weight: bold;
-    color: #ff4444;
+    font-size: 48px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 20px;
-    text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+    animation: teamGlow 2s ease-in-out infinite alternate;
+  }
+
+  /* Victory/Defeat Animations */
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes victoryGlow {
+    0% { text-shadow: 0 0 30px rgba(34, 197, 94, 0.6); }
+    100% { text-shadow: 0 0 50px rgba(34, 197, 94, 0.9), 0 0 70px rgba(34, 197, 94, 0.4); }
+  }
+
+  @keyframes defeatGlow {
+    0% { text-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
+    100% { text-shadow: 0 0 50px rgba(239, 68, 68, 0.9), 0 0 70px rgba(239, 68, 68, 0.4); }
+  }
+
+  @keyframes teamGlow {
+    0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.5); }
+    100% { text-shadow: 0 0 30px rgba(255, 255, 255, 1), 2px 2px 4px rgba(0, 0, 0, 0.5); }
   }
 
   /* Buttons */
@@ -1171,12 +1348,28 @@
       }
 
       // Set team color for nametags
-      if (data.playerTeam !== undefined) {
-        const nametags = document.getElementsByClassName(
-          "hytopia-nametag-username"
-        );
-        Array.from(nametags).forEach((nametag) => {
-          nametag.setAttribute("data-team", data.playerTeam);
+      if (data.playerTeams !== undefined) {
+        const nameTagContainers = document.getElementsByClassName("hytopia-nametag");
+        Array.from(nameTagContainers).forEach((container) => {
+          const playerNameElement = container.getElementsByClassName("hytopia-nametag-username")[0];
+          if (playerNameElement) {
+            const playerName = playerNameElement.textContent.trim();
+            playerNameElement.style.color = "#ffffff";
+            const playerTeamData = data.playerTeams.find(p => p.name === playerName);
+            
+            if (playerTeamData) {
+              container.style.padding = "10px 16px";
+              if (playerTeamData.team === "Red Raiders") {
+                container.style.backgroundColor = "rgba(200, 30, 30, 0.75)";
+              } else if (playerTeamData.team === "Blue Bandits") {
+                container.style.backgroundColor = "rgba(30, 30, 200, 0.75)";
+              }
+            }
+            
+            if(playerName === data.playerName) {
+              container.style.display = "none";
+            }
+          }
         });
       }
     }
@@ -1313,13 +1506,50 @@
     .getElementById("slingshot-class")
     .addEventListener("click", () => selectClass("slingshot"));
   document
+    .getElementById("sniper-class")
+    .addEventListener("click", () => selectClass("sniper"));
+  document
     .getElementById("grenader-class")
     .addEventListener("click", () => selectClass("grenader"));
+
+  // Add touch handlers for class selection on mobile
+  document
+    .getElementById("runner-class")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      selectClass("runner");
+    });
+  document
+    .getElementById("slingshot-class")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      selectClass("slingshot");
+    });
+  document
+    .getElementById("sniper-class")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      selectClass("sniper");
+    });
+  document
+    .getElementById("grenader-class")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      selectClass("grenader");
+    });
 
   // Add click handler for close button
   document
     .getElementById("close-class-select")
     .addEventListener("click", () => {
+      document.getElementById("class-select").style.display = "none";
+    });
+
+  // Add touch handler for close button on mobile
+  document
+    .getElementById("close-class-select")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
       document.getElementById("class-select").style.display = "none";
     });
 
@@ -1338,6 +1568,14 @@
     .getElementById("close-instructions")
     .addEventListener("click", toggleInstructions);
 
+  // Add touch handler for instructions close button on mobile
+  document
+    .getElementById("close-instructions")
+    .addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      toggleInstructions();
+    });
+
   // Add keyboard shortcut
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() === "v") {
@@ -1354,6 +1592,34 @@
     } else {
       classSelect.style.display = "none";
     }
+  });
+
+  // Mobile touch handlers for help and class buttons
+  helpButton.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    helpButton.classList.add("active");
+    toggleInstructions();
+  });
+
+  helpButton.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    helpButton.classList.remove("active");
+  });
+
+  selectClassButton.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    selectClassButton.classList.add("active");
+    const classSelect = document.getElementById("class-select");
+    if (classSelect.style.display === "none" || !classSelect.style.display) {
+      classSelect.style.display = "flex";
+    } else {
+      classSelect.style.display = "none";
+    }
+  });
+
+  selectClassButton.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    selectClassButton.classList.remove("active");
   });
 </script>
 <script>

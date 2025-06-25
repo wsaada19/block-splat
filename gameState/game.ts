@@ -194,6 +194,14 @@ export default class Game {
     const playerTeam = this.teamManager.getTeamName(
       this.teamManager.getPlayerTeam(player.username) ?? 1
     );
+
+    // Get all players and their team information for nametag coloring
+    const allPlayers = PlayerManager.instance.getConnectedPlayers();
+    const playerTeams = allPlayers.map(p => ({
+      name: p.username,
+      team: this.teamManager.getTeamName(this.teamManager.getPlayerTeam(p.username) ?? 1)
+    }));
+
     player.ui.sendData({
       type: UI_EVENT_TYPES.GAME_UI,
       time: timeStr,
@@ -206,6 +214,7 @@ export default class Game {
       playerName: playerStats.getDisplayName(),
       playerDeaths: playerStats.getPlayerDeaths(),
       playerClass: playerStats.getPlayerClass(),
+      playerTeams: playerTeams,
     });
   }
 
