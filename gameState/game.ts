@@ -85,6 +85,11 @@ export default class Game {
   }
   
   clearMapThenStartGame() {
+    if (this.gameCountdownTimerInterval) {
+      clearInterval(this.gameCountdownTimerInterval);
+      this.gameCountdownTimerInterval = null;
+    }
+
     if (this.blockStateMap.size > 0) {
       this.world.chatManager.sendBroadcastMessage('Game will begin once the map is reset!')
       clearBlockStates(this.blockStateMap, this.world).then(() => {
@@ -167,7 +172,7 @@ export default class Game {
       const seconds = this.timeRemaining % 60;
       timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
     } else if (this.gameCountdownTimerInterval) {
-      timeStr = `Starting in ${this.gameCountdownTimer}`;
+      timeStr = `${this.gameCountdownTimer}`;
     } else {
       const players = PlayerManager.instance.getConnectedPlayers();
       timeStr = `Waiting... (${players.length}/2)`;

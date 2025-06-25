@@ -11,7 +11,11 @@
 <style>
   /* Common styles */
   .gradient-bg {
-    background: linear-gradient(to bottom, rgba(40, 40, 40, 0.92), rgba(25, 25, 25, 0.92));
+    background: linear-gradient(
+      to bottom,
+      rgba(40, 40, 40, 0.92),
+      rgba(25, 25, 25, 0.92)
+    );
     border: 3px solid rgba(180, 180, 180, 0.4);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     border-radius: 12px;
@@ -64,12 +68,18 @@
     letter-spacing: 0.5px;
   }
 
-  .panel-name.red-team { color: #ff4444; font-weight: bold; }
-  .panel-name.blue-team { color: #4444ff; font-weight: bold; }
+  .panel-name.red-team {
+    color: #ff4444;
+    font-weight: bold;
+  }
+  .panel-name.blue-team {
+    color: #4444ff;
+    font-weight: bold;
+  }
 
   .panel-value {
     font-weight: bold;
-    font-size: 18px;
+    font-size: 20px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     font-family: "Georgia", serif;
     padding: 0 4px;
@@ -94,8 +104,14 @@
     box-shadow: 0 0 10px rgba(68, 68, 255, 0.2);
   }
 
-  .red-score { color: #ff4444; text-shadow: 0 0 8px rgba(255, 68, 68, 0.4); }
-  .blue-score { color: #4444ff; text-shadow: 0 0 8px rgba(68, 68, 255, 0.4); }
+  .red-score {
+    color: #ff4444;
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+  }
+  .blue-score {
+    color: #4444ff;
+    text-shadow: 0 0 8px rgba(68, 68, 255, 0.4);
+  }
 
   .team-indicator {
     font-size: 12px;
@@ -106,7 +122,9 @@
     color: #ffffff;
   }
 
-  .your-team .team-indicator { display: inline-block; }
+  .your-team .team-indicator {
+    display: inline-block;
+  }
 
   /* Game Over Screen */
   .game-over {
@@ -134,7 +152,8 @@
     font-family: "Trebuchet MS", "Arial", sans-serif;
     font-size: 48px;
     color: #00ffaa;
-    text-shadow: 0 0 20px rgba(0, 255, 170, 0.6), 0 0 40px rgba(0, 255, 170, 0.4);
+    text-shadow: 0 0 20px rgba(0, 255, 170, 0.6),
+      0 0 40px rgba(0, 255, 170, 0.4);
     margin-bottom: 20px;
     animation: pulse 2s infinite;
   }
@@ -226,8 +245,12 @@
     transition: all 0.2s ease;
   }
 
-  #red-leaderboard .leaderboard-title { color: #ff4444; }
-  #blue-leaderboard .leaderboard-title { color: #4444ff; }
+  #red-leaderboard .leaderboard-title {
+    color: #ff4444;
+  }
+  #blue-leaderboard .leaderboard-title {
+    color: #4444ff;
+  }
 
   /* Class Cards */
   .class-card {
@@ -285,8 +308,12 @@
     margin: 4px 0;
   }
 
-  .stat.pro { color: #00ff00; }
-  .stat.con { color: #ff4444; }
+  .stat.pro {
+    color: #00ff00;
+  }
+  .stat.con {
+    color: #ff4444;
+  }
 
   /* Stamina */
   .stamina-container {
@@ -295,16 +322,17 @@
     right: 4px;
     width: 224px;
     height: 200px;
-    @media (max-width: 760px) {
-      width: 120px;
-      height: 100px;
-      top: 40%;
-      bottom: 0;
-    }
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  body.mobile .stamina-container {
+    width: 120px;
+    height: 100px;
+    top: 40%;
+    bottom: 0;
   }
 
   .paint-splat-bg {
@@ -316,7 +344,6 @@
     background-position: center;
     z-index: 1;
     transition: filter 0.3s ease;
-
   }
 
   .paint-splat-bg img {
@@ -330,14 +357,17 @@
     color: white;
     font-family: Arial, sans-serif;
     font-size: 22px;
-    @media (max-width: 768px) {
-      font-size: 18px;
-    }
     padding-right: 6px;
     padding-bottom: 8px;
     font-weight: bold;
     z-index: 3;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  body.mobile .stamina-text {
+    font-size: 14px;
+    padding-top: 2px;
+    padding-bottom: 0;
   }
 
   /* Crosshair */
@@ -417,9 +447,7 @@
   .team-banner {
     position: static;
     min-width: 80px;
-    @media (max-width: 768px) {
-      min-width: 40px;
-    }
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -429,10 +457,20 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
 
-  .team-banner.red { background: rgba(200, 30, 30, 0.95); }
-  .team-banner.blue { background: rgba(30, 30, 200, 0.95); }
+  body.mobile .team-banner {
+    min-width: 40px;
+  }
 
-  .team-name { display: none; }
+  .team-banner.red {
+    background: rgba(200, 30, 30, 0.95);
+  }
+  .team-banner.blue {
+    background: rgba(30, 30, 200, 0.95);
+  }
+
+  .team-name {
+    display: none;
+  }
 
   .team-score {
     font-size: 28px;
@@ -456,8 +494,14 @@
     top: 200px;
     height: 100px;
     width: 100px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 12px;
+    backdrop-filter: blur(4px);
+  }
 
-    @media (max-width: 768px) {
+  body.mobile .player-stats {
       top: 10px;
       bottom: 0;
       height: 90px;
@@ -477,15 +521,9 @@
       }
 
       .stat-value {
-        font-size: 11px;
+        font-size: 12px;
       }
     }
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 8px 12px;
-    backdrop-filter: blur(4px);
-  }
 
   .player-name {
     color: #ffffff;
@@ -525,9 +563,15 @@
     font-weight: 500;
   }
 
-  .points-count .stat-value { color: #44ff44; }
-  .kills-count .stat-value { color: #44ff44; }
-  .death-count .stat-value { color: #ff4444; }
+  .points-count .stat-value {
+    color: #44ff44;
+  }
+  .kills-count .stat-value {
+    color: #44ff44;
+  }
+  .death-count .stat-value {
+    color: #ff4444;
+  }
 
   .current-class {
     margin-top: 4px;
@@ -563,24 +607,26 @@
   .time-display {
     position: static;
     padding: 0 20px;
-    @media (max-width: 768px) {
-      padding: 0 8px;
-    }
+
     display: flex;
     align-items: center;
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  body.mobile .time-display {
+    padding: 0 8px;
   }
 
   .time-label {
     color: #ffffff;
     font-family: "Trebuchet MS", "Arial", sans-serif;
-    font-size: 18px;
-    @media (max-width: 768px) {
-      font-size: 10px;
-    }
+    font-size: 20px;
+
     font-weight: bold;
-    text-align: center; 
+    text-align: center;
+  }
+
+  body.mobile .time-label {
+    font-size: 10px;
   }
 
   /* Game Message */
@@ -743,8 +789,12 @@
     z-index: 1000;
   }
 
-  .help-button { left: 20px; }
-  .select-class-button { left: 100px; }
+  .help-button {
+    left: 20px;
+  }
+  .select-class-button {
+    left: 100px;
+  }
 
   .help-button:hover,
   .select-class-button:hover {
@@ -781,16 +831,26 @@
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, background-color;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: bold;
     color: rgba(255, 255, 255, 0.8);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
-  
+
   .mobile-button img {
     width: 22px;
     height: 22px;
+  }
+
+  #mobile-tackle-button img {
+    width: 26px;
+    height: 26px;
+  }
+
+  #mobile-sprint-button img {
+    width: 26px;
+    height: 26px;
   }
 
   .mobile-button.active {
@@ -801,19 +861,33 @@
 
   /* Animations */
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes scaleIn {
-    from { transform: translate(-50%, -50%) scale(0); }
-    to { transform: translate(-50%, -50%) scale(1); }
+    from {
+      transform: translate(-50%, -50%) scale(0);
+    }
+    to {
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 
   @keyframes pulse {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+    0% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.7;
+    }
   }
 </style>
 <div class="crosshair" id="crosshair"></div>
@@ -1014,7 +1088,9 @@
   <a id="mobile-interact-button" class="mobile-button">
     <img src="{{CDN_ASSETS_URL}}/icons/target.png" />
   </a>
-
+  <a id="mobile-tackle-button" class="mobile-button">
+    <img src="{{CDN_ASSETS_URL}}/ui/icons/punch.svg" />
+  </a>
   <a id="mobile-jump-button" class="mobile-button">
     <img src="{{CDN_ASSETS_URL}}/icons/jump.png" />
   </a>
@@ -1300,29 +1376,42 @@
     hytopia.pressInput("ml", false);
   });
 
-    // Handle jump button touch / untouch
-    const mobileJumpButton = document.getElementById('mobile-jump-button');
-  mobileJumpButton.addEventListener('touchstart', e => {
+  // Handle jump button touch / untouch
+  const mobileJumpButton = document.getElementById("mobile-jump-button");
+  mobileJumpButton.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    mobileJumpButton.classList.add('active');
-    hytopia.pressInput(' ', true);
+    mobileJumpButton.classList.add("active");
+    hytopia.pressInput(" ", true);
   });
 
-  mobileJumpButton.addEventListener('touchend', e => {
+  mobileJumpButton.addEventListener("touchend", (e) => {
     e.preventDefault();
-    mobileJumpButton.classList.remove('active');
-    hytopia.pressInput(' ', false);
+    mobileJumpButton.classList.remove("active");
+    hytopia.pressInput(" ", false);
   });
 
-  const mobileSprintButton = document.getElementById('mobile-sprint-button');
-  mobileSprintButton.addEventListener('touchstart', e => {
+  const mobileSprintButton = document.getElementById("mobile-sprint-button");
+  mobileSprintButton.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    mobileSprintButton.classList.add('active');
-    hytopia.pressInput('sh', true);
+    mobileSprintButton.classList.add("active");
+    hytopia.pressInput("sh", true);
   });
-  mobileSprintButton.addEventListener('touchend', e => {
+  mobileSprintButton.addEventListener("touchend", (e) => {
     e.preventDefault();
-    mobileSprintButton.classList.remove('active');
-    hytopia.pressInput('sh', false);
+    mobileSprintButton.classList.remove("active");
+    hytopia.pressInput("sh", false);
+  });
+
+  const mobileTackleButton = document.getElementById("mobile-tackle-button");
+  mobileTackleButton.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    mobileTackleButton.classList.add("active");
+    hytopia.pressInput("mr", true);
+  });
+
+  mobileTackleButton.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    mobileTackleButton.classList.remove("active");
+    hytopia.pressInput("mr", false);
   });
 </script>

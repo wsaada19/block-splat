@@ -1,4 +1,4 @@
-import { startServer, Audio, Entity, BlockType, SceneUI, World, PlayerEvent, EntityEvent, BlockTypeEvent } from "hytopia";
+import { startServer, Audio, World, PlayerEvent, BlockTypeEvent } from "hytopia";
 import { BLOCK_STATE, coloredBlockData } from "./utilities/block-utils";
 
 import Game from "./gameState/game";
@@ -122,27 +122,3 @@ const loadGameLobby = (world: World) => {
     }
   }
 }
-
-// unused method for adding colored walls around the arena
-const loadWalls = (world: World) => {
-  const boundaries = [50, -50]
-  boundaries.forEach((x) => {
-    for(let y = -10; y < 50; y++) {
-      for(let z = -50; z < 50; z++) {
-        world.chunkLattice.setBlock({x, y, z}, 22);
-      }
-    }
-  })
-  boundaries.forEach((z) => {
-    for(let y = -10; y < 50; y++) {
-      for(let x = -50; x < 50; x++) {
-        world.chunkLattice.setBlock({x, y, z}, 23);
-      }
-    }
-  })
-  for(let x = -50; x < 50; x++) {
-    for(let z = -50; z < 50; z++) {
-      world.chunkLattice.setBlock({x, y: 50, z}, 24);
-    }
-  }
-};
