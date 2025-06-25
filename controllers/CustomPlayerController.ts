@@ -279,8 +279,8 @@ export default class CustomPlayerController extends BaseEntityController {
     direction.y = Math.sin(cameraOrientation.pitch);
 
     const cosP = Math.cos(cameraOrientation.pitch);
-    direction.x = -direction.x * cosP;
-    direction.z = -direction.z * cosP;
+    direction.x = direction.x * cosP;
+    direction.z = direction.z * cosP;
 
     return direction.normalize();
   }
