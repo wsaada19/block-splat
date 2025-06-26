@@ -3,10 +3,10 @@ import { PlayerClass } from "../entities/player-types";
 export const USE_PARTICLES = true;
 
 // game time in seconds
-export const GAME_TIME = 4 * 60;
+export const GAME_TIME = 4.5 * 60;
 
 // cooldowns
-export const SHOOTING_COOLDOWN = 400;
+export const SHOOTING_COOLDOWN = 500;
 export const PUNCH_COOLDOWN = 500;
 
 export const SEARCH_POINTS = {
@@ -82,30 +82,39 @@ export const PROJECTILES = {
     SPEED: 30,
     KNOCKBACK: 12,
     ENERGY: -28,
-    CCD_ENABLED: false
+    CCD_ENABLED: false,
+    COOLDOWN: 500,
   },
   SLINGSHOT: {
     NAME: 'SLINGSHOT',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
-    SPEED: 40,
-    KNOCKBACK: 10,
+    SPEED: 38,
+    KNOCKBACK: 9,
     ENERGY: -30,
-    CCD_ENABLED: false
+    CCD_ENABLED: false,
+    COOLDOWN: 500,
   },
   SNIPER: {
     NAME: 'SNIPER',
     MODEL_URI: 'models/projectiles/energy-orb-projectile.gltf',
     MODEL_SCALE: 0.8,
     SPEED: 60,
-    KNOCKBACK: 10,
-    ENERGY: -22,
-    CCD_ENABLED: true
+    KNOCKBACK: 9,
+    ENERGY: -20,
+    CCD_ENABLED: true,
+    COOLDOWN: 300,
   }
 }
 
-export const SLINGSHOT_OFFSET = 19;
-export const SLINGSHOT_SPEED_OFFSET = 0;
+export const PROJECTILE_MAP: { [key: string]: { type: string; energy: number; cooldown: number } } = {
+  [PlayerClass.GRENADER]: { type: "BLOB", energy: PROJECTILES.BLOB.ENERGY, cooldown: PROJECTILES.BLOB.COOLDOWN },
+  [PlayerClass.SLINGSHOT]: { type: "SLINGSHOT", energy: PROJECTILES.SLINGSHOT.ENERGY, cooldown: PROJECTILES.SLINGSHOT.COOLDOWN },
+  [PlayerClass.SNIPER]: { type: "SNIPER", energy: PROJECTILES.SNIPER.ENERGY, cooldown: PROJECTILES.SNIPER.COOLDOWN },
+};
+
+export const SLINGSHOT_OFFSET = 15;
+export const SLINGSHOT_SPEED_OFFSET = -2;
 
 // UI Events
 export const UI_EVENT_TYPES = {
@@ -115,7 +124,8 @@ export const UI_EVENT_TYPES = {
     VICTORY: "victory",
     DEFEAT: "defeat",
     PLAYER_DEATH: "player-death",
-    PLAYER_ID: "player-id"
+    PLAYER_ID: "player-id",
+    PLAYER_TEAMS: "player-teams"
   };
 
   export const UI_BUTTONS = {

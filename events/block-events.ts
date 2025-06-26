@@ -11,7 +11,7 @@ import {
   RED_BLOCK_ID,
   setBlockState,
 } from "../utilities/block-utils";
-import { PROJECTILES, USE_PARTICLES } from "../utilities/gameConfig";
+import { PROJECTILES, USE_PARTICLES } from "../utilities/game-config";
 import { TEAM_COLORS } from "../gameState/team";
 import { ParticleEmitter } from "../particles/particle-emmitter";
 import { ParticleFX } from "../particles/particles-fx";
@@ -78,7 +78,7 @@ export function onBlockHit(
   // Early exit conditions
   if (!started || !blockIds.includes(type.id) || !game.isGameRunning) return;
 
-  if (!(entity instanceof PlayerEntity)) {
+  if (!(entity instanceof CustomPlayerEntity)) {
     handleProjectileHit(entity, colliderHandleA, colliderHandleB, world, game, blockStateMap);
   } else {
     handlePlayerHit(entity, world, game, blockStateMap);
@@ -142,15 +142,14 @@ function handleProjectileHit(
 }
 
 function handlePlayerHit(
-  entity: PlayerEntity,
+  entity: CustomPlayerEntity,
   world: World,
   game: Game,
   blockStateMap: Map<string, BLOCK_STATE>
 ) {
-  const playerEntity = globalState.getPlayerEntity(entity.player.username);
-  if (playerEntity?.getPlayerClass() !== PlayerClass.RUNNER) return;
+  if (entity.getPlayerClass() !== PlayerClass.RUNNER && !entity.isStrengthBoostActive()) return;
 
-  const teamColor = playerEntity?.getTeam() === TEAM_COLORS.BLUE ? "BLUE" : "RED";
+  const teamColor = entity.getTeam() === TEAM_COLORS.BLUE ? "BLUE" : "RED";
   const colorData = BLOCK_COLORS[teamColor as keyof typeof BLOCK_COLORS];
   const position = entity.position;
 
@@ -161,7 +160,7 @@ function handlePlayerHit(
   };
 
   const nearbyBlocks = getNearbyBlocks(blockPos);
-  colorRunnerBlocks(nearbyBlocks, colorData, world, game, blockStateMap, playerEntity);
+  colorRunnerBlocks(nearbyBlocks, colorData, world, game, blockStateMap, entity);
 }
 
 // Helper functions

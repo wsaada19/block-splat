@@ -220,6 +220,7 @@
     justify-content: space-around;
     left: 50%;
     top: 30%;
+    gap: 16px;
     opacity: 1;
     transform: translate(-50%, -50%);
     z-index: 1000;
@@ -234,6 +235,7 @@
   .leaderboard {
     padding: 8px;
     width: 100%;
+    border-radius: 12px;
   }
 
   body.mobile .leaderboard {
@@ -320,11 +322,6 @@
     transform: translateY(-2px);
   }
 
-  .class-card.selected {
-    border-color: #00ffaa;
-    box-shadow: 0 0 15px rgba(0, 255, 170, 0.3);
-  }
-
   .class-icon {
     width: 64px;
     height: 64px;
@@ -396,7 +393,7 @@
   .stamina-container {
     position: fixed;
     bottom: 18px;
-    right: 4px;
+    right: 12px;
     width: 224px;
     height: 200px;
     z-index: 1000;
@@ -409,6 +406,7 @@
     width: 120px;
     height: 100px;
     top: 40%;
+    right: 4px;
     bottom: 0;
   }
 
@@ -568,9 +566,10 @@
   .player-stats {
     position: fixed;
     right: 20px;
-    top: 200px;
+    top: 10px;
     height: 100px;
-    width: 100px;
+    width: auto;
+    min-width: 100px;
     background: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
@@ -609,8 +608,6 @@
     text-align: center;
     font-weight: 500;
     margin-bottom: 6px;
-    opacity: 0.9;
-    text-transform: uppercase;
   }
 
   .stats-row {
@@ -651,14 +648,13 @@
   }
 
   .current-class {
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1.2px solid rgba(255, 255, 255, 0.5);
     text-align: center;
     color: #ffffff;
     font-size: 14px;
     font-weight: 500;
-    opacity: 0.9;
   }
 
   .red-background {
@@ -684,13 +680,14 @@
   .time-display {
     position: static;
     padding: 0 20px;
-
+    min-width: 30px;
     display: flex;
     align-items: center;
   }
 
   body.mobile .time-display {
     padding: 0 8px;
+    min-width: 20px;
   }
 
   .time-label {
@@ -1127,7 +1124,9 @@
     <div class="class-desc">Spray damage, shoot 3 paint balls at once</div>
     <div class="class-stats">
       <div class="stat pro">+ Shoot 3 paint balls at once</div>
+      <div class="stat pro">+ Good knockback</div>
       <div class="stat con">- Small splash radius</div>
+      <div class="stat con">- Hard to aim</div>
     </div>
   </div>
 
@@ -1142,8 +1141,8 @@
       Long range fast bullets with knockback, shoot 1 paint ball at a time
     </div>
     <div class="class-stats">
-      <div class="stat pro">+ Long range</div>
-      <div class="stat pro">+ Fast bullets</div>
+      <div class="stat pro">+ Long range fast bullets</div>
+      <div class="stat pro">+ Bounces off players</div>
       <div class="stat con">- Small splash radius</div>
       <div class="stat con">- 1 bullet</div>
     </div>
@@ -1346,9 +1345,11 @@
       } else if (data.playerTeam === "Blue Bandits") {
         document.getElementById("blue-banner").classList.add("your-team");
       }
+    }
 
-      // Set team color for nametags
-      if (data.playerTeams !== undefined) {
+    if (data.type === "player-teams") {
+       // Set team color for nametags
+       if (data.playerTeams !== undefined) {
         const nameTagContainers = document.getElementsByClassName("hytopia-nametag");
         Array.from(nameTagContainers).forEach((container) => {
           const playerNameElement = container.getElementsByClassName("hytopia-nametag-username")[0];
@@ -1373,7 +1374,6 @@
         });
       }
     }
-
     if (data.type === "game-over") {
       document.querySelector(".game-over").style.display = "block";
       document.getElementById(
@@ -1444,7 +1444,7 @@
         document.getElementById("player-leaderboard").style.display = "flex";
         const redLeaderboard = data.redLeaderboard;
         document.getElementById("red-leaderboard").innerHTML =
-          '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Blocks Colored</span><span class="leaderboard-kills">Knockouts</span></div>';
+          '<div class="leaderboard-entry"><span class="leaderboard-name">Name</span><span class="leaderboard-points">Points</span><span class="leaderboard-kills">Knockouts</span></div>';
         redLeaderboard.forEach((player) => {
           document.getElementById(
             "red-leaderboard"
@@ -1487,9 +1487,6 @@
       card.classList.remove("selected");
     });
 
-    // Add selected class to clicked card
-    document.getElementById(`${className}-class`).classList.add("selected");
-
     // Send selection to game
     hytopia.sendData({ button: "select-class", class: className });
     document.getElementById("current-class").textContent = className;
@@ -1501,41 +1498,41 @@
   // Add click handlers for class selection
   document
     .getElementById("runner-class")
-    .addEventListener("click", () => selectClass("runner"));
+    .addEventListener("click", () => selectClass("Runner"));
   document
     .getElementById("slingshot-class")
-    .addEventListener("click", () => selectClass("slingshot"));
+    .addEventListener("click", () => selectClass("Slingshot"));
   document
     .getElementById("sniper-class")
-    .addEventListener("click", () => selectClass("sniper"));
+    .addEventListener("click", () => selectClass("Sniper"));
   document
     .getElementById("grenader-class")
-    .addEventListener("click", () => selectClass("grenader"));
+    .addEventListener("click", () => selectClass("Grenader"));
 
   // Add touch handlers for class selection on mobile
   document
     .getElementById("runner-class")
     .addEventListener("touchstart", (e) => {
       e.preventDefault();
-      selectClass("runner");
+      selectClass("Runner");
     });
   document
     .getElementById("slingshot-class")
     .addEventListener("touchstart", (e) => {
       e.preventDefault();
-      selectClass("slingshot");
+      selectClass("Slingshot");
     });
   document
     .getElementById("sniper-class")
     .addEventListener("touchstart", (e) => {
       e.preventDefault();
-      selectClass("sniper");
+      selectClass("Sniper");
     });
   document
     .getElementById("grenader-class")
     .addEventListener("touchstart", (e) => {
       e.preventDefault();
-      selectClass("grenader");
+      selectClass("Grenader");
     });
 
   // Add click handler for close button

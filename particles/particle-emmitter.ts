@@ -90,7 +90,6 @@ class Particle extends Entity {
 }
 
 export class ParticleEmitter extends Entity {
-    private readonly particleTextureUri: string = 'blocks/sand.png';
     private particles: Particle[] = [];
     private emitterLifetime: number = 0;
     private maxLifetime: number;
@@ -101,8 +100,8 @@ export class ParticleEmitter extends Entity {
             //blockHalfExtents: { x: 0.01, y: 0.01, z: 0.01 },
             modelScale: 0.1,
             opacity: 0.0,
-            rigidBodyOptions: { //
-                
+            rigidBodyOptions: {
+                type: RigidBodyType.DYNAMIC,
                 colliders: [ // Array of collider options, results in a created collider when spawned
                     {
                         shape: ColliderShape.BALL,

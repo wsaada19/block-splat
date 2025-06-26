@@ -7,7 +7,7 @@ import {
   RESPAWN_INVINCIBILITY_TIME,
   STRENGTH_BOOST_MULTIPLIER,
   STRENGTH_BOOST_DURATION,
-} from "../utilities/gameConfig";
+} from "../utilities/game-config";
 import { PlayerClass } from "./player-types";
 import CustomPlayerController from "../controllers/CustomPlayerController";
 import { globalState } from "../gameState/global-state";
@@ -31,8 +31,8 @@ class CustomPlayerEntity extends PlayerEntity {
   private strengthBoostInterval: number | null = null;
   private isRespawning: boolean = false;
   private activeBoosts: {
-    strength: { count: number; timeouts: number[]; remainingTime: number };
-    invincibility: { count: number; timeouts: number[]; remainingTime: number };
+    strength: { count: number; timeouts: NodeJS.Timeout[]; remainingTime: number };
+    invincibility: { count: number; timeouts: NodeJS.Timeout[]; remainingTime: number };
   } = {
     strength: { count: 0, timeouts: [], remainingTime: 0 },
     invincibility: { count: 0, timeouts: [], remainingTime: 0 }
@@ -57,7 +57,6 @@ class CustomPlayerEntity extends PlayerEntity {
     // Set the custom controller
     const world = globalState.world;
     this.setController(new CustomPlayerController({
-      teamManager: teamManager,
       world: world,
     }));
     this.player.camera.setOffset({x: 0, y: 0.8, z: 0});
@@ -203,7 +202,7 @@ class CustomPlayerEntity extends PlayerEntity {
       this.setOpacity(1);
       this.activeBoosts.invincibility.remainingTime = 0;
       this._lastInvincibilityUpdate = null;
-    }, this.activeBoosts.invincibility.remainingTime) as unknown as number;
+    }, this.activeBoosts.invincibility.remainingTime);
 
     // Store the timeout
     this.activeBoosts.invincibility.timeouts = [timeout];
@@ -263,7 +262,7 @@ class CustomPlayerEntity extends PlayerEntity {
           this.strengthBoostEmitter.destroy();
           this.strengthBoostEmitter = null;
         }
-      }, this.activeBoosts.strength.remainingTime) as unknown as number;
+      }, this.activeBoosts.strength.remainingTime);
 
       // Store the timeout
       this.activeBoosts.strength.timeouts = [timeout];

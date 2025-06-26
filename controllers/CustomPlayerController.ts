@@ -15,17 +15,16 @@ import {
 } from 'hytopia';
 import { spawnProjectile } from "../utilities/projectiles";
 import { PlayerClass } from "../entities/player-types";
-import TeamManager, { TEAM_COLORS, TEAM_COLOR_STRINGS } from "../gameState/team";
+import { TEAM_COLORS, TEAM_COLOR_STRINGS } from "../gameState/team";
 import {
   TACKLE_ENERGY_COST,
   SPRINT_ENERGY_COST,
-  PROJECTILES,
   type ProjectileType,
   PUNCH_PLAYER_FORCE,
   PUNCH_VERTICAL_FORCE,
   UI_EVENT_TYPES,
-  SHOOTING_COOLDOWN,
-} from "../utilities/gameConfig";
+  PROJECTILE_MAP,
+} from "../utilities/game-config";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
 import { getDirectionFromRotation } from '../utilities/math';
@@ -53,9 +52,6 @@ export interface PlayerEntityControllerOptions {
   /** The normalized horizontal velocity applied to the entity when it walks. */
   walkVelocity?: number;
 
-  /** The team manager instance */
-  teamManager?: TeamManager;
-
   /** The game world instance */
   world?: World;
 }
@@ -65,16 +61,15 @@ export default class CustomPlayerController extends BaseEntityController {
   public canRun: (playerEntityController: CustomPlayerController) => boolean = () => true;
   public canJump: (playerEntityController: CustomPlayerController) => boolean = () => true;
   public jumpVelocity: number = 10;
-  public runVelocity: number = 8;
+  public runVelocity: number = 9;
   public sticksToPlatforms: boolean = true;
-  public walkVelocity: number = 4;
+  public walkVelocity: number = 5;
 
   private _stepAudio: Audio | undefined;
   private _groundContactCount: number = 0;
   private _platform: Entity | undefined;
-  private _lastShootTime: Map<string, number> = new Map();
+  private _lastShotTime: Map<string, number> = new Map();
   private _lastClassSelectTime: Map<string, number> = new Map();
-  private _teamManager: TeamManager;
   private _world: World;
   private readonly CLASS_SELECT_COOLDOWN = 500; // 500ms cooldown between class select UI toggles
 
@@ -89,11 +84,10 @@ export default class CustomPlayerController extends BaseEntityController {
     this.canJump = options.canJump ?? this.canJump;
     this.sticksToPlatforms = options.sticksToPlatforms ?? this.sticksToPlatforms;
     
-    if (!options.teamManager || !options.world) {
-      throw new Error('TeamManager and World are required for CustomPlayerController');
+    if (!options.world) {
+      throw new Error('World is required for CustomPlayerController');
     }
     
-    this._teamManager = options.teamManager;
     this._world = options.world;
   }
 
@@ -167,23 +161,18 @@ export default class CustomPlayerController extends BaseEntityController {
     if (entity.getPlayerClass() === PlayerClass.RUNNER || entity.getIsRespawning()) {
       return;
     }
-
-    const lastShoot = this._lastShootTime.get(entity.player.username);
-    if (lastShoot && Date.now() - lastShoot < SHOOTING_COOLDOWN) {
+    
+    const projectileConfig = PROJECTILE_MAP[entity.getPlayerClass()];
+    const lastShot = this._lastShotTime.get(entity.player.username);
+    if (lastShot && Date.now() - lastShot < projectileConfig.cooldown) {
       return;
     }
-    this._lastShootTime.set(entity.player.username, Date.now());
+    this._lastShotTime.set(entity.player.username, Date.now());
 
     const direction = this.calculateShootingDirection(entity, cameraOrientation);
     const bulletOrigin = this.calculateBulletOrigin(entity, direction);
 
-    const projectileMap: { [key: string]: { type: string; energy: number } } = {
-      [PlayerClass.GRENADER]: { type: "BLOB", energy: PROJECTILES.BLOB.ENERGY },
-      [PlayerClass.SLINGSHOT]: { type: "SLINGSHOT", energy: PROJECTILES.SLINGSHOT.ENERGY },
-      [PlayerClass.SNIPER]: { type: "SNIPER", energy: PROJECTILES.SNIPER.ENERGY },
-    };
 
-    const projectileConfig = projectileMap[entity.getPlayerClass()];
     if (!projectileConfig) return;
     const { type, energy } = projectileConfig;
     if (entity.getStamina() >= Math.abs(energy)) {
@@ -256,22 +245,14 @@ export default class CustomPlayerController extends BaseEntityController {
     });
   }
 
-  private handleClassSelection(entity: CustomPlayerEntity, key: "1" | "2" | "3" | "4", input: PlayerInput) {
+  private handleClassSelection(entity: CustomPlayerEntity, key: "1" | "2" | "3" | "4") {
     const classMap = {
       "1": PlayerClass.RUNNER,
       "2": PlayerClass.GRENADER,
       "3": PlayerClass.SNIPER,
       "4": PlayerClass.SLINGSHOT,
     };
-
-    const selectedClass = classMap[key];
-    if (selectedClass) {
-      entity.setPlayerClass(selectedClass);
-      entity.player.ui.sendData({
-        type: UI_EVENT_TYPES.GAME_UI,
-        playerClass: selectedClass,
-      });
-    }
+    entity.setPlayerClass(classMap[key]);
   }
 
   private calculateShootingDirection(entity: PlayerEntity, cameraOrientation: PlayerCameraOrientation): Vector3 {
@@ -311,7 +292,7 @@ export default class CustomPlayerController extends BaseEntityController {
         const walkAnimations = [ 'walk_upper', 'walk_lower' ];
         entity.stopModelAnimations(Array.from(entity.modelLoopedAnimations).filter(v => !walkAnimations.includes(v)));
         entity.startModelLoopedAnimations(walkAnimations);
-        this._stepAudio?.setPlaybackRate(0.55);
+        this._stepAudio?.setPlaybackRate(0.6);
       }
 
       this._stepAudio?.play(entity.world as World, !this._stepAudio?.isPlaying);
@@ -341,13 +322,13 @@ export default class CustomPlayerController extends BaseEntityController {
       this.showLeaderboard(customEntity);
       input.r = false;
     } else if (input["1"]) {
-      this.handleClassSelection(customEntity, "1", input);
+      this.handleClassSelection(customEntity, "1");
     } else if (input["2"]) {
-      this.handleClassSelection(customEntity, "2", input);
+      this.handleClassSelection(customEntity, "2");
     } else if (input["3"]) {
-      this.handleClassSelection(customEntity, "3", input);
+      this.handleClassSelection(customEntity, "3");
     } else if (input["4"]) {
-      this.handleClassSelection(customEntity, "4", input);
+      this.handleClassSelection(customEntity, "4");
     }
 
     // Calculate movement velocities

@@ -1,18 +1,25 @@
 // Spawns stamina and strength boosts randomly across the map at a defined interval
-import { Entity, RigidBodyType, World, Audio, type Vector3Like, EntityEvent } from "hytopia";
+import {
+  Entity,
+  RigidBodyType,
+  World,
+  Audio,
+  type Vector3Like,
+  EntityEvent,
+} from "hytopia";
 import {
   STRENGTH_BOOST_DURATION,
   ENERGY_BOOST_STAMINA_REGEN,
   INVINCIBILITY_BOOST_DURATION,
   BOOST_PROBABILITIES,
-} from "./gameConfig";
+} from "./game-config";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 
 const boostsSpawned = new Map<string, boolean>();
 
 const boostOptions = {
   PAINT_BOTTLE: {
-    spawnProbability: 0.5,
+    spawnProbability: 0.6,
     modelUri: "models/items/paint-bottle.gltf",
     modelScale: 0.7,
     animation: "",
@@ -23,13 +30,13 @@ const boostOptions = {
     },
   },
   STRENGTH_BOOST: {
-    spawnProbability: 0.3,
+    spawnProbability: 0.1,
     duration: 10000,
     modelUri: "strength_up/strength.gltf",
     modelScale: 0.25,
     animation: "Take 001",
     sfx: "audio/sfx/fire/fire-ignite-2.mp3",
-    chatMessage: `You're feeling stronger! Increased knockback on enemy hits for ${
+    chatMessage: `POWER BOOST! Increased knockback on enemy hits and paint blocks by running for ${
       STRENGTH_BOOST_DURATION / 1000
     } seconds!`,
     addBoost: (player: CustomPlayerEntity, world: World) => {
@@ -45,7 +52,7 @@ const boostOptions = {
     },
   },
   INVINCIBILITY_BOOST: {
-    spawnProbability: 0.2,
+    spawnProbability: 0.3,
     duration: 10000,
     modelUri: "invincibility/invincibility.gltf",
     modelScale: 0.15,
@@ -54,16 +61,25 @@ const boostOptions = {
     chatMessage: `You're invincible! You won't be impacted by knockback for ${
       INVINCIBILITY_BOOST_DURATION / 1000
     } seconds!`,
-    addBoost: (player: CustomPlayerEntity, world: World) => {
+    addBoost: (player: CustomPlayerEntity, _: World) => {
       player.setInvincible();
     },
   },
 };
 
-export function spawnRandomBoost(
-  world: World,
-  energySpawnLocations: Vector3Like[]
-) {
+const energySpawnLocations: Vector3Like[] = [
+  { x: 3.5, y: 5.5, z: 0.5 },
+  { x: -4.5, y: 5.5, z: 1.5 },
+  { x: 10, y: 5.5, z: -10 },
+  { x: -10, y: 5.5, z: 10 },
+  { x: 0, y: 5.5, z: 10 },
+  { x: 0, y: 5.5, z: -10 },
+  { x: 34, y: 10, z: -3 },
+  { x: 6, y: 11, z: 35 },
+  { x: -16.5, y: 7, z: 18 },
+];
+
+export function spawnRandomBoost(world: World) {
   const randomLocation =
     energySpawnLocations[
       Math.floor(Math.random() * energySpawnLocations.length)
@@ -110,7 +126,7 @@ export function createBoost(
     },
   });
 
-  boost.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started, colliderHandleA, colliderHandleB }) => {
+  boost.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
     if (
       started &&
       otherEntity instanceof CustomPlayerEntity &&
@@ -131,8 +147,7 @@ export function createBoost(
       boostOptions[boostType].addBoost(otherEntity, world);
       boostsSpawned.delete(locationString(entity.position));
       entity.despawn();
-    } 
-    else if (!(otherEntity instanceof CustomPlayerEntity) && started) {
+    } else if (!(otherEntity instanceof CustomPlayerEntity) && started) {
       otherEntity.despawn();
     }
   });

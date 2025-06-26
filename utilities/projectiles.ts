@@ -5,7 +5,6 @@ import {
   World,
   Entity,
   RigidBodyType,
-  BlockType,
   Audio,
   EntityEvent,
 } from "hytopia";
@@ -17,7 +16,7 @@ import {
   SLINGSHOT_OFFSET,
   SLINGSHOT_SPEED_OFFSET,
   type ProjectileType,
-} from "./gameConfig";
+} from "./game-config";
 
 export function spawnProjectile(
   world: World,

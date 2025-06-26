@@ -15,7 +15,7 @@ export const ParticleFX = {
             size: 0.8,
             sizeRandomness: 1, // 30% size variation
             lifetime: 0.5,
-            modelUri: 'models/particles/blooddrop.gltf',
+            modelUri: 'models/particles/red-blob.gltf',
             gravityScale: 0.6
         }
     } satisfies EmitterOptions,
@@ -36,7 +36,7 @@ export const ParticleFX = {
             sizeRandomness: 0.2,
             lifetime: 0.8,
             lifetimeRandomness: 0.2,
-            modelUri: 'models/particles/blooddrop.gltf',
+            modelUri: 'models/particles/red-blob.gltf',
             gravityScale: 0.1
         }
     } satisfies EmitterOptions,

@@ -3,8 +3,8 @@ import { type Entity, Audio } from "hytopia";
 import {
   PROJECTILES,
   STRENGTH_BOOST_MULTIPLIER,
-} from "../utilities/gameConfig";
-import { FRIENDLY_FIRE_DISABLED } from "../utilities/gameConfig";
+} from "../utilities/game-config";
+import { FRIENDLY_FIRE_DISABLED } from "../utilities/game-config";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
 import { TEAM_COLOR_STRINGS } from "../gameState/team";

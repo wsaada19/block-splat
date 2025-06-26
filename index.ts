@@ -6,7 +6,7 @@ import worldMap from "./assets/maps/boilerplate.json";
 import Teams from "./gameState/team";
 import { onPlayerJoin, onPlayerLeave } from "./events/player-events";
 import { onBlockHit } from "./events/block-events";
-import { GAME_TIME } from "./utilities/gameConfig";
+import { GAME_TIME } from "./utilities/game-config";
 import { globalState } from "./gameState/global-state";
 
 export const TO_THE_DEATH_MUSIC = new Audio({
@@ -50,7 +50,7 @@ startServer((world) => {
   );
 
   world.on(PlayerEvent.LEFT_WORLD, ({ player }) =>
-    onPlayerLeave(player, world, teamManager)
+    onPlayerLeave(player, world, teamManager, game)
   );
 
   coloredBlockData.forEach((blockData) => {
@@ -90,6 +90,7 @@ startServer((world) => {
   world.chatManager.registerCommand("/change-team", (player, args) => {
     teamManager.switchTeam(player.username);
     world.chatManager.sendPlayerMessage(player, "Team changed!");
+    game.updatePlayerTeamsData();
   });
 
   world.chatManager.registerCommand("/stuck", (player) => {

@@ -18,7 +18,7 @@ import {
   RESPAWN_HEIGHT,
   UI_BUTTONS,
   UI_EVENT_TYPES,
-} from "../utilities/gameConfig";
+} from "../utilities/game-config";
 import CustomPlayerEntity from "../entities/CustomPlayerEntity";
 import { globalState } from "../gameState/global-state";
 
@@ -71,7 +71,7 @@ export function onPlayerJoin(
   player.camera.setOffset({ x: 0, y: 1, z: 0 });
 
   playerEntity.on(EntityEvent.TICK, ({ entity }) => {
-    if (entity instanceof PlayerEntity && entity.position.y < -8) {
+    if (entity.position.y < -8) {
       handlePlayerDeath(
         entity as CustomPlayerEntity,
         teamManager,
@@ -89,6 +89,7 @@ export function onPlayerJoin(
         playerUI.player.username,
         TEAM_COLORS[data.team as keyof typeof TEAM_COLORS]
       );
+      game.updatePlayerTeamsData();
     }
   });
 
@@ -102,9 +103,11 @@ export function onPlayerJoin(
         teamManager.addPlayerToTeam(playerUI.player.username, TEAM_COLORS.BLUE);
         playerUI.player.camera.setAttachedToEntity(playerEntity);
       }
+      game.updatePlayerTeamsData();
     }
 
     if (data.button && data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
+      console.log("selecting class", data.class);
       playerEntity.setPlayerClass(data.class as PlayerClass);
     }
   });
@@ -128,8 +131,10 @@ export function onPlayerJoin(
   ];
 
   messages.forEach((message) => {
-    world.chatManager.sendPlayerMessage(player, message);
+    world.chatManager.sendPlayerMessage(player, message, "ffff00");
   });
+
+  game.updatePlayerTeamsData();
 
   game.checkPlayerCount();
 }
@@ -137,12 +142,15 @@ export function onPlayerJoin(
 export function onPlayerLeave(
   player: Player,
   world: World,
-  teamManager: TeamManager
+  teamManager: TeamManager,
+  game: Game
 ) {
   teamManager.removePlayer(player.username);
   world.entityManager
     .getPlayerEntitiesByPlayer(player)
     .forEach((entity) => entity.despawn());
+
+  game.updatePlayerTeamsData();
 }
 
 export function handlePlayerDeath(
@@ -159,27 +167,18 @@ export function handlePlayerDeath(
   });
 
   entity.incrementPlayerDeaths();
+  let deathMessage = getFallingMessage(entity.getDisplayName());
   if (entity.getLastHitBy()) {
     const killer = globalState.getPlayerEntity(entity.getLastHitBy());
     if (killer) {
-      chatManager.sendBroadcastMessage(
-        getKillingMessage(killer.getDisplayName(), entity.getDisplayName()),
-        "FF0000"
-      );
+      deathMessage = getKillingMessage(killer.getDisplayName(), entity.getDisplayName());
       killer.incrementKills();
     } else {
-      chatManager.sendBroadcastMessage(
-        "You were killed by a bot lmfao",
-        "FF0000"
-      );
+      deathMessage = "You were killed by a bot lmfao";
     }
     entity.setLastHitBy("");
-  } else {
-    chatManager.sendBroadcastMessage(
-      getFallingMessage(entity.getDisplayName()),
-      "FF0000"
-    );
   }
+  chatManager.sendBroadcastMessage(deathMessage, "f87255");
 
   // Make player spectator during respawn
   entity.setPosition({ x: 0, y: RESPAWN_HEIGHT, z: 0 });
