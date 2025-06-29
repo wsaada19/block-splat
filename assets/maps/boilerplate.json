@@ -18,7 +18,7 @@
     {
       "id": 24,
       "name": "white",
-      "textureUri": "blocks/colors/base_paint.png"
+      "textureUri": "blocks/colors/white_concrete.png"
     }
   ],
   "blocks": {
