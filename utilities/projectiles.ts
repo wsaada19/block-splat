@@ -13,6 +13,7 @@ import { blockIds } from "./block-utils";
 import { TEAM_COLOR_STRINGS, TEAM_COLORS } from "../gameState/team";
 import {
   PROJECTILES,
+  RESPAWN_HEIGHT,
   SLINGSHOT_OFFSET,
   SLINGSHOT_SPEED_OFFSET,
   type ProjectileType,
@@ -28,7 +29,6 @@ export function spawnProjectile(
 ) {
   // Spawn a projectileEntity when the player shoots.
   const projectileEntity = createProjectileEntity(direction, tag, color, type);
-
   let projectiles = [projectileEntity];
   if (type === PROJECTILES.SLINGSHOT.NAME) {
     // create two additional orbs to the left and right of the original
@@ -52,26 +52,31 @@ export function spawnProjectile(
   }
 
   projectiles.forEach((projectile) => {
-    projectile.on(EntityEvent.ENTITY_COLLISION, ({ entity, otherEntity, started }) => {
-      knockBackCollisionHandler(
-        entity,
-        otherEntity,
-        started,
-        tag,
-        color
-      );
-    });
+    projectile.on(
+      EntityEvent.ENTITY_COLLISION,
+      ({ entity, otherEntity, started }) => {
+        knockBackCollisionHandler(entity, otherEntity, started, tag, color);
+      }
+    );
   });
 
   projectiles.forEach((projectile) => {
-    projectile.on(EntityEvent.BLOCK_COLLISION, ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
-      // If the projectileEntity hits a block, despawn it
-      if (started && !blockIds.includes(blockType.id)) {
-        entity.despawn();
+    projectile.on(
+      EntityEvent.BLOCK_COLLISION,
+      ({ blockType, entity, started, colliderHandleA, colliderHandleB }) => {
+        // If the projectileEntity hits a block, despawn it
+        if (started && !blockIds.includes(blockType.id)) {
+          entity.despawn();
+        }
+      }
+    );
+
+    projectile.on(EntityEvent.TICK, () => {
+      if (projectile.position.y <= -10 && projectile.isSpawned) {
+        projectile.despawn();
       }
     });
   });
-
   projectiles.forEach((projectile) => {
     projectile.spawn(world, coordinate);
   });

@@ -11,7 +11,7 @@ import {
   type PlayerCameraOrientation,
   Vector3,
   type Vector3Like,
-  World
+  World,
 } from 'hytopia';
 import { spawnProjectile } from "../utilities/projectiles";
 import { PlayerClass } from "../entities/player-types";
@@ -177,7 +177,7 @@ export default class CustomPlayerController extends BaseEntityController {
     const { type, energy } = projectileConfig;
     if (entity.getStamina() >= Math.abs(energy)) {
       entity.startModelOneshotAnimations(["chuck"]);
-      const projectile = spawnProjectile(
+      spawnProjectile(
         this._world,
         bulletOrigin,
         direction,
@@ -186,7 +186,6 @@ export default class CustomPlayerController extends BaseEntityController {
         type as ProjectileType
       );
       entity.setStamina(energy);
-      setTimeout(() => projectile.isSpawned && projectile.despawn(), 2000);
     }
   }
 

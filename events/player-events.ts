@@ -107,7 +107,6 @@ export function onPlayerJoin(
     }
 
     if (data.button && data.button === UI_BUTTONS.SELECT_CLASS && data.class) {
-      console.log("selecting class", data.class);
       playerEntity.setPlayerClass(data.class as PlayerClass);
     }
   });

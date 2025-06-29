@@ -1,12 +1,11 @@
-import {
-  World,
-  Player,
-  PlayerManager,
-  PlayerEntity,
-} from "hytopia";
+import { World, Player, PlayerManager, PlayerEntity } from "hytopia";
 import TeamManager from "./team";
 import { BLOCK_STATE, clearBlockStates } from "../utilities/block-utils";
-import { BOOST_SPAWN_INTERVAL, STAMINA_REGEN_RATE, UI_EVENT_TYPES } from "../utilities/game-config";
+import {
+  BOOST_SPAWN_INTERVAL,
+  STAMINA_REGEN_RATE,
+  UI_EVENT_TYPES,
+} from "../utilities/game-config";
 import { spawnRandomBoost } from "../utilities/boosts";
 import { BACKGROUND_MUSIC, TO_THE_DEATH_MUSIC } from "../index";
 import { globalState } from "./global-state";
@@ -35,33 +34,49 @@ export default class Game {
     this.teamManager = teamManager;
     this.blockStateMap = blockStateMap;
     this.gameTimer = new TimerController(timeLimit, () => this.endGame());
-    this.countdownTimer = new TimerController(35, () => this.clearMapThenStartGame(), () => this.world.chatManager.sendBroadcastMessage('Game starting in 35 seconds!', 'FFFF00'));
+    this.countdownTimer = new TimerController(
+      35,
+      () => this.clearMapThenStartGame(),
+      () =>
+        this.world.chatManager.sendBroadcastMessage(
+          "Game starting in 35 seconds!",
+          "FFFF00"
+        )
+    );
 
     // Initialize scores for each team
     for (let i = 1; i <= 2; i++) {
       this.scores.set(i, 0);
     }
     this.uiTimer = setInterval(() => {
-      globalState.getAllPlayers().forEach(player => player.setStamina(STAMINA_REGEN_RATE));
+      globalState
+        .getAllPlayers()
+        .forEach((player) => player.setStamina(STAMINA_REGEN_RATE));
       this.updateAllPlayersUI();
     }, 225);
   }
 
   checkPlayerCount() {
     const players = PlayerManager.instance.getConnectedPlayers();
-    if (players.length >= 2 && !this.isGameRunning && !this.countdownTimer.isRunning()) {
+    if (
+      players.length >= 2 &&
+      !this.isGameRunning &&
+      !this.countdownTimer.isRunning()
+    ) {
       this.countdownTimer.start();
     }
     this.updateAllPlayersUI();
   }
-  
+
   clearMapThenStartGame() {
     if (this.countdownTimer.isRunning()) {
       this.countdownTimer.stop();
     }
 
     if (this.blockStateMap.size > 0) {
-      this.world.chatManager.sendBroadcastMessage('Game will begin once the map is reset!')
+      this.world.chatManager.sendBroadcastMessage(
+        "Game will begin once the map is reset!"
+      );
       clearBlockStates(this.blockStateMap, this.world).then(() => {
         this.startGame();
       });
@@ -77,7 +92,7 @@ export default class Game {
     TO_THE_DEATH_MUSIC.play(this.world);
 
     // clear player data
-    globalState.getAllPlayers().forEach(player => {
+    globalState.getAllPlayers().forEach((player) => {
       player.resetData();
     });
 
@@ -102,6 +117,15 @@ export default class Game {
   }
 
   changeScore(teamId: number, score: number) {
+    // if (
+    //   (this.scores.get(teamId) || 0) > 50 &&
+    //   (this.scores.get(teamId) || 0) < 100
+    // ) {
+    //   this.world.chatManager.sendBroadcastMessage(
+    //     `There are ${this.world.entityManager.getAllEntities().length} entities in the game!`,
+    //     "FFFF00"
+    //   );
+    // }
     this.scores.set(teamId, (this.scores.get(teamId) ?? 0) + score);
   }
 
@@ -119,13 +143,15 @@ export default class Game {
   // New method to update player teams data when players join/leave
   public updatePlayerTeamsData() {
     const allPlayers = PlayerManager.instance.getConnectedPlayers();
-    const playerTeams = allPlayers.map(p => ({
+    const playerTeams = allPlayers.map((p) => ({
       name: p.username,
-      team: this.teamManager.getTeamName(this.teamManager.getPlayerTeam(p.username) ?? 1)
+      team: this.teamManager.getTeamName(
+        this.teamManager.getPlayerTeam(p.username) ?? 1
+      ),
     }));
 
     // Send player teams data to all players
-    allPlayers.forEach(player => {
+    allPlayers.forEach((player) => {
       player.ui.sendData({
         type: UI_EVENT_TYPES.PLAYER_TEAMS,
         playerTeams: playerTeams,
@@ -136,7 +162,7 @@ export default class Game {
 
   private updatePlayerUI(player: Player) {
     let timeStr: string;
-    
+
     if (this.isGameRunning) {
       const minutes = Math.floor(this.gameTimer.getTime() / 60);
       const seconds = this.gameTimer.getTime() % 60;
@@ -216,19 +242,22 @@ export default class Game {
       if (playerTeam === winningTeamName) {
         player.ui.sendData({
           type: UI_EVENT_TYPES.VICTORY,
-          winner: winningTeamName
+          winner: winningTeamName,
         });
       } else {
         player.ui.sendData({
           type: UI_EVENT_TYPES.DEFEAT,
-          winner: winningTeamName
+          winner: winningTeamName,
         });
       }
     }
 
     // clear all non-player entities
     this.world.entityManager.getAllEntities().forEach((entity) => {
-      if (!(entity instanceof PlayerEntity) && !entity.name.includes("Paint Brush")) {
+      if (
+        !(entity instanceof PlayerEntity) &&
+        !entity.name.includes("Paint Brush")
+      ) {
         entity.despawn();
       }
     });
