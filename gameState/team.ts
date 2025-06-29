@@ -51,6 +51,7 @@ export default class TeamManager {
     for(const player of players) {
       const team = this.getPlayerTeam(player.player.username);
       const spawn = team ? this.getTeamSpawn(team) : undefined;
+      player.setLinearVelocity({ x: 0, y: 0, z: 0 });
       if (spawn) {
         const randomPosition = {
           x: spawn.x + (Math.random() * 2 - 1),
