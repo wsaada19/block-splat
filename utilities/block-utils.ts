@@ -65,7 +65,7 @@ export const blockIds = [BLANK_BLOCK_ID, RED_BLOCK_ID, BLUE_BLOCK_ID];
 
 // Block data for registration
 export const coloredBlockData = [
-  { id: BLANK_BLOCK_ID, textureUri: 'blocks/colors/white_concrete.png', name: 'Blank Block' },
-  { id: RED_BLOCK_ID, textureUri: 'blocks/colors/red_wool.png', name: 'Red Block' },
-  { id: BLUE_BLOCK_ID, textureUri: 'blocks/colors/blue_wool.png', name: 'Blue Block' }
+  { id: BLANK_BLOCK_ID, textureUri: 'blocks/colors/base_paint.png', name: 'Blank Block' },
+  { id: RED_BLOCK_ID, textureUri: 'blocks/colors/red_paint.png', name: 'Red Block' },
+  { id: BLUE_BLOCK_ID, textureUri: 'blocks/colors/blue_paint.png', name: 'Blue Block' }
 ];

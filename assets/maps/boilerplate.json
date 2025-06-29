@@ -8,17 +8,17 @@
     {
       "id": 22,
       "name": "normal_red",
-      "textureUri": "blocks/colors/red_wool.png"
+      "textureUri": "blocks/colors/red_paint.png"
     },
     {
       "id": 23,
       "name": "normal_blue",
-      "textureUri": "blocks/colors/blue_wool.png"
+      "textureUri": "blocks/colors/blue_paint.png"
     },
     {
       "id": 24,
       "name": "white",
-      "textureUri": "blocks/colors/white_concrete.png"
+      "textureUri": "blocks/colors/base_paint.png"
     }
   ],
   "blocks": {
